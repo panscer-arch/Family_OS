@@ -1316,7 +1316,7 @@
               </div>
               <div style="display: flex; gap: 10px">
                 <button class="btn secondary" data-route-jump="week">План недели</button>
-                <button class="btn" data-route-jump="tasks">Новая задача</button>
+                <button class="btn" id="dashboardNewTask">Новая задача</button>
               </div>
             </div>
 
@@ -1411,7 +1411,7 @@
               <div><p class="eyebrow">Family</p><h1>Дети и родители</h1><p class="muted" style="margin-top: 8px">Профили детей, взрослых, настроение, уровень, баллы и прогресс.</p></div>
               <button class="btn" id="addChild">Добавить ребёнка</button>
             </div>
-            <div class="grid children-grid">
+            <div class="grid children-grid" id="childrenGrid">
               <article class="card">
                 <div class="child-top"><div class="child-meta"><span class="avatar">Я</span><div><h2>Яна</h2><p class="muted">8 лет · младшая сестра</p></div></div><span class="pill">настроение хорошее</span></div>
                 <div class="grid cols-3" style="margin-top: 18px"><div><p class="muted">Уровень</p><h2>3</h2></div><div><p class="muted">Streak</p><h2>9</h2></div><div><p class="muted">Баллы</p><h2>145</h2></div></div>
@@ -1517,6 +1517,7 @@
                 <div class="card-title"><h2 id="dayEditorTitle">Пн 18 · Яна</h2><span class="pill" id="dayEditorDate">18 мая</span></div>
                 <form class="grid" id="weekItemForm">
                   <input class="field" id="weekItemTime" type="time" value="18:00" />
+                  <select id="weekItemOwner"><option>Семья</option><option>Яна</option><option>Ева</option></select>
                   <input class="field" id="weekItemTitle" placeholder="Добавить пункт в выбранный день" />
                   <select id="weekItemTag"><option>режим</option><option>учёба</option><option>дом</option><option>кухня</option><option>комната</option><option>робот-пылесос</option><option>кошки</option><option>контент</option><option>еда</option><option>прогулка</option><option>спорт</option><option>сон</option><option>навык</option><option>библиотека</option></select>
                   <button class="btn">Добавить в день</button>
@@ -1584,8 +1585,8 @@
           </section>
 
           <section class="page" id="skills">
-            <div class="page-head"><div><p class="eyebrow">Skills</p><h1>Навыки</h1><p class="muted" style="margin-top: 8px">Детским языком: чему учимся и как понимаем, что навык освоен.</p></div><button class="btn">Добавить навык</button></div>
-            <div class="grid cols-4">
+            <div class="page-head"><div><p class="eyebrow">Skills</p><h1>Навыки</h1><p class="muted" style="margin-top: 8px">Детским языком: чему учимся и как понимаем, что навык освоен.</p></div><button class="btn" id="openSkillModal">Добавить навык</button></div>
+            <div class="grid cols-4" id="skillsGrid">
               <article class="reward-card"><div><span class="pill">жизнь</span><h2 style="margin-top: 18px">Умею заботиться о себе</h2><p class="muted" style="margin-top: 8px">завтрак, сон, одежда, прогулка</p></div><div class="progress"><span style="--value: 72%"></span></div></article>
               <article class="reward-card"><div><span class="pill blue">дом</span><h2 style="margin-top: 18px">Умею обращаться с техникой</h2><p class="muted" style="margin-top: 8px">стиралка, посудомойка, робот-пылесос</p></div><div class="progress"><span style="--value: 45%"></span></div></article>
               <article class="reward-card"><div><span class="pill peach">мышление</span><h2 style="margin-top: 18px">Думаю и выбираю</h2><p class="muted" style="margin-top: 8px">критическое мышление, безопасность, интуиция</p></div><div class="progress"><span style="--value: 38%"></span></div></article>
@@ -1637,7 +1638,7 @@
           <section class="page" id="settings">
             <div class="page-head"><div><p class="eyebrow">Settings</p><h1>Настройки</h1><p class="muted" style="margin-top: 8px">Роли, invite code и безопасность семейного пространства.</p></div><button class="btn" id="openAuth2">Регистрация</button></div>
             <div class="grid">
-              <article class="card"><div class="card-title"><h2>Семья</h2><span class="pill peach">Invite A7K42Q</span></div><div class="activity"><div class="settings-row"><div><h3>Дети и родители</h3><p class="muted">каждый подключается по invite code и получает свою роль</p></div><button class="btn secondary">Создать код</button></div><div class="settings-row"><div><h3>Детский вход</h3><p class="muted">отдельная роль и ограниченный доступ</p></div><button class="toggle on"><span></span></button></div></div></article>
+              <article class="card"><div class="card-title"><h2>Семья</h2><span class="pill peach" id="inviteCodeBadge">Invite A7K42Q</span></div><div class="activity"><div class="settings-row"><div><h3>Дети и родители</h3><p class="muted">каждый подключается по invite code и получает свою роль</p></div><button class="btn secondary" id="createInviteCode">Создать код</button></div><div class="settings-row"><div><h3>Детский вход</h3><p class="muted">отдельная роль и ограниченный доступ</p></div><button class="toggle on" type="button"><span></span></button></div></div></article>
             </div>
           </section>
         </div>
@@ -1686,6 +1687,42 @@
           </select>
           <textarea class="field" id="taskDescriptionInput" placeholder="Комментарий, ссылка или что нужно приложить"></textarea>
           <button class="btn">Добавить задачу</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal-backdrop" id="childModal">
+      <div class="modal">
+        <div class="card-title"><div><p class="eyebrow">Family</p><h2>Добавить ребёнка</h2></div><button class="btn secondary" id="closeChildModal" type="button">Закрыть</button></div>
+        <form class="grid" id="childForm">
+          <input class="field" id="childNameInput" placeholder="Имя ребёнка" />
+          <input class="field" id="childAgeInput" type="number" min="1" max="18" value="8" />
+          <select id="childMoodInput">
+            <option>настроение хорошее</option>
+            <option>в фокусе</option>
+            <option>отдыхает</option>
+            <option>нужна помощь</option>
+          </select>
+          <button class="btn">Добавить ребёнка</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="modal-backdrop" id="skillModal">
+      <div class="modal">
+        <div class="card-title"><div><p class="eyebrow">Skills</p><h2>Добавить навык</h2></div><button class="btn secondary" id="closeSkillModal" type="button">Закрыть</button></div>
+        <form class="grid" id="skillForm">
+          <input class="field" id="skillTitleInput" placeholder="Название навыка" />
+          <input class="field" id="skillDescriptionInput" placeholder="Простое объяснение для ребёнка" />
+          <select id="skillTypeInput">
+            <option>жизнь</option>
+            <option>дом</option>
+            <option>мышление</option>
+            <option>люди</option>
+            <option>безопасность</option>
+          </select>
+          <input class="field" id="skillProgressInput" type="number" min="0" max="100" value="10" />
+          <button class="btn">Добавить навык</button>
         </form>
       </div>
     </div>
@@ -1867,6 +1904,19 @@
 
       function escapeHtml(value) {
         return String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[char]));
+      }
+
+      function showNotice(message) {
+        const notice = document.createElement("div");
+        notice.className = "pill blue";
+        notice.style.position = "fixed";
+        notice.style.right = "24px";
+        notice.style.bottom = "24px";
+        notice.style.zIndex = "30";
+        notice.style.boxShadow = "var(--shadow)";
+        notice.textContent = message;
+        document.body.appendChild(notice);
+        setTimeout(() => notice.remove(), 2200);
       }
 
       function addTaskCard({ title, child, time, tag, description }) {
@@ -2136,12 +2186,13 @@
         const title = document.getElementById("weekItemTitle").value.trim();
         if (!title) return;
         const time = document.getElementById("weekItemTime").value;
+        const owner = document.getElementById("weekItemOwner").value;
         const tag = document.getElementById("weekItemTag").value;
         const plan = ensurePlan(selectedDate);
-        plan.items.push(`${time} ${title} #${tag}`);
+        plan.items.push(`${time} ${owner} · ${title} #${tag}`);
         const item = document.createElement("div");
         item.className = "week-item";
-        item.textContent = `${time} ${title} #${tag}`;
+        item.textContent = `${time} ${owner} · ${title} #${tag}`;
         activeWeekDay().querySelector(".week-items").appendChild(item);
         document.getElementById("weekItemTitle").value = "";
         renderMonthCalendar();
@@ -2266,6 +2317,14 @@
       });
       document.getElementById("authSubmit").addEventListener("click", () => modal.classList.remove("show"));
 
+      document.getElementById("openNotifications").addEventListener("click", () => {
+        showNotice("Пока новых уведомлений нет. Они появятся после задач, отчётов и сообщений.");
+      });
+
+      document.querySelectorAll(".toggle").forEach((button) => {
+        button.addEventListener("click", () => button.classList.toggle("on"));
+      });
+
       const rewardModal = document.getElementById("rewardModal");
       document.getElementById("openRewardModal").addEventListener("click", () => rewardModal.classList.add("show"));
       document.getElementById("closeRewardModal").addEventListener("click", () => rewardModal.classList.remove("show"));
@@ -2304,9 +2363,14 @@
       });
 
       const taskModal = document.getElementById("taskModal");
-      document.getElementById("openTaskModal").addEventListener("click", () => {
+      function openTaskDialog() {
         document.getElementById("taskChildInput").value = selectedChild;
         taskModal.classList.add("show");
+      }
+      document.getElementById("openTaskModal").addEventListener("click", openTaskDialog);
+      document.getElementById("dashboardNewTask").addEventListener("click", () => {
+        go("tasks");
+        openTaskDialog();
       });
       document.getElementById("closeTaskModal").addEventListener("click", () => taskModal.classList.remove("show"));
       document.getElementById("taskCreateForm").addEventListener("submit", (event) => {
@@ -2330,6 +2394,53 @@
         document.getElementById("taskCreateForm").reset();
         document.getElementById("taskTimeInput").value = "18:00";
         taskModal.classList.remove("show");
+        showNotice("Задача добавлена в kanban и чек-лист.");
+      });
+
+      const childModal = document.getElementById("childModal");
+      document.getElementById("addChild").addEventListener("click", () => childModal.classList.add("show"));
+      document.getElementById("closeChildModal").addEventListener("click", () => childModal.classList.remove("show"));
+      document.getElementById("childForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const name = document.getElementById("childNameInput").value.trim();
+        if (!name) return;
+        const age = document.getElementById("childAgeInput").value || "8";
+        const mood = document.getElementById("childMoodInput").value;
+        const initial = name.slice(0, 1).toUpperCase();
+        const card = document.createElement("article");
+        card.className = "card";
+        card.innerHTML = `<div class="child-top"><div class="child-meta"><span class="avatar mint">${escapeHtml(initial)}</span><div><h2>${escapeHtml(name)}</h2><p class="muted">${escapeHtml(age)} лет · ребёнок</p></div></div><span class="pill">${escapeHtml(mood)}</span></div><div class="grid cols-3" style="margin-top: 18px"><div><p class="muted">Уровень</p><h2>1</h2></div><div><p class="muted">Streak</p><h2>0</h2></div><div><p class="muted">Баллы</p><h2>0</h2></div></div><div class="progress"><span style="--value: 8%"></span></div>`;
+        document.getElementById("childrenGrid").appendChild(card);
+        document.getElementById("childForm").reset();
+        document.getElementById("childAgeInput").value = "8";
+        childModal.classList.remove("show");
+        showNotice(`${name} добавлен(а) в профили.`);
+      });
+
+      const skillModal = document.getElementById("skillModal");
+      document.getElementById("openSkillModal").addEventListener("click", () => skillModal.classList.add("show"));
+      document.getElementById("closeSkillModal").addEventListener("click", () => skillModal.classList.remove("show"));
+      document.getElementById("skillForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const title = document.getElementById("skillTitleInput").value.trim();
+        if (!title) return;
+        const description = document.getElementById("skillDescriptionInput").value.trim() || "новый навык для развития";
+        const type = document.getElementById("skillTypeInput").value;
+        const progress = Math.max(0, Math.min(100, Number(document.getElementById("skillProgressInput").value || 10)));
+        const card = document.createElement("article");
+        card.className = "reward-card";
+        card.innerHTML = `<div><span class="pill blue">${escapeHtml(type)}</span><h2 style="margin-top: 18px">${escapeHtml(title)}</h2><p class="muted" style="margin-top: 8px">${escapeHtml(description)}</p></div><div class="progress"><span style="--value: ${progress}%"></span></div>`;
+        document.getElementById("skillsGrid").prepend(card);
+        document.getElementById("skillForm").reset();
+        document.getElementById("skillProgressInput").value = "10";
+        skillModal.classList.remove("show");
+        showNotice("Навык добавлен.");
+      });
+
+      document.getElementById("createInviteCode").addEventListener("click", () => {
+        const code = Math.random().toString(36).slice(2, 8).toUpperCase();
+        document.getElementById("inviteCodeBadge").textContent = `Invite ${code}`;
+        showNotice(`Новый invite code: ${code}`);
       });
 
       document.getElementById("globalSearch").addEventListener("input", (event) => {
