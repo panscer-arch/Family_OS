@@ -1130,6 +1130,140 @@
         box-shadow: var(--shadow);
       }
 
+      .modal.auth-modal {
+        width: min(860px, calc(100vw - 48px));
+        padding: 0;
+        overflow: hidden;
+        background:
+          linear-gradient(135deg, rgba(142, 230, 200, 0.08), rgba(143, 199, 255, 0.04)),
+          #101621;
+      }
+
+      .auth-shell {
+        display: grid;
+        grid-template-columns: 0.9fr 1.1fr;
+        min-height: 560px;
+      }
+
+      .auth-aside {
+        border-right: 1px solid var(--line);
+        padding: 28px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background: rgba(255, 255, 255, 0.035);
+      }
+
+      .auth-aside h2 {
+        margin-top: 10px;
+        font-size: 32px;
+        line-height: 1.05;
+      }
+
+      .auth-benefits {
+        display: grid;
+        gap: 12px;
+        margin-top: 26px;
+      }
+
+      .auth-benefit {
+        display: grid;
+        grid-template-columns: 34px 1fr;
+        gap: 12px;
+        align-items: start;
+        color: var(--soft);
+      }
+
+      .auth-benefit .mini-icon {
+        width: 34px;
+        height: 34px;
+        border-radius: 12px;
+      }
+
+      .auth-main {
+        padding: 28px;
+      }
+
+      .auth-role-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin: 18px 0;
+      }
+
+      .role-card {
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.045);
+        color: var(--soft);
+        padding: 16px;
+        text-align: left;
+        transition: 180ms ease;
+      }
+
+      .role-card strong {
+        display: block;
+        color: white;
+        margin: 10px 0 5px;
+        font-size: 16px;
+      }
+
+      .role-card.active,
+      .role-card:hover {
+        border-color: rgba(142, 230, 200, 0.34);
+        background: rgba(142, 230, 200, 0.1);
+        transform: translateY(-1px);
+      }
+
+      .auth-panel {
+        display: none;
+        gap: 12px;
+      }
+
+      .auth-panel.active {
+        display: grid;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .form-label {
+        display: grid;
+        gap: 7px;
+        color: var(--soft);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .auth-result {
+        display: none;
+        border: 1px solid rgba(142, 230, 200, 0.18);
+        border-radius: 18px;
+        padding: 14px;
+        background: rgba(142, 230, 200, 0.08);
+        color: var(--soft);
+        line-height: 1.45;
+      }
+
+      .auth-result.show {
+        display: block;
+      }
+
+      @media (max-width: 820px) {
+        .auth-shell,
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+
+        .auth-aside {
+          border-right: 0;
+          border-bottom: 1px solid var(--line);
+        }
+      }
+
       .tabs {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
@@ -1302,7 +1436,7 @@
               <span class="dot"></span>
               <svg viewBox="0 0 24 24" width="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 7 3 9H3c0-2 3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
             </button>
-            <button class="profile-btn" id="openAuth"><span class="avatar blue">С</span><span>Дети и родители</span></button>
+            <button class="profile-btn" id="openAuth"><span class="avatar blue" id="profileInitial">С</span><span id="profileName">Дети и родители</span></button>
           </div>
         </header>
 
@@ -1650,14 +1784,49 @@
     </div>
 
     <div class="modal-backdrop" id="authModal">
-      <div class="modal">
-        <div class="card-title"><div><p class="eyebrow">Access</p><h2>Вход в Family OS</h2></div><button class="btn secondary" id="closeAuth">Закрыть</button></div>
-        <div class="tabs"><button class="tab active" data-role="parent">Родитель</button><button class="tab" data-role="child">Ребёнок</button></div>
-        <div class="grid">
-          <input class="field" placeholder="Имя" value="Мария" />
-          <input class="field" placeholder="Email или invite code" value="A7K42Q" />
-          <input class="field" type="password" placeholder="Пароль" value="familyos" />
-          <button class="btn" id="authSubmit">Продолжить</button>
+      <div class="modal auth-modal">
+        <div class="auth-shell">
+          <aside class="auth-aside">
+            <div>
+              <p class="eyebrow">Family OS Access</p>
+              <h2>Вход для всей семьи без путаницы</h2>
+              <p class="muted" style="margin-top: 12px">Взрослый создаёт семейное пространство. Ребёнок заходит по invite code и видит только свой план, задачи и награды.</p>
+              <div class="auth-benefits">
+                <div class="auth-benefit"><span class="mini-icon">1</span><div><strong>Мария или Павел</strong><p class="muted">создают семью, приглашают детей и управляют задачами.</p></div></div>
+                <div class="auth-benefit"><span class="mini-icon">2</span><div><strong>Яна или Ева</strong><p class="muted">заходят по коду, выбирают себя и работают с чек-листом.</p></div></div>
+                <div class="auth-benefit"><span class="mini-icon">3</span><div><strong>Данные не пропадают</strong><p class="muted">в preview вход и настройки сохраняются в этом браузере.</p></div></div>
+              </div>
+            </div>
+            <span class="pill blue" id="authInviteHint">Invite A7K42Q</span>
+          </aside>
+          <section class="auth-main">
+            <div class="card-title"><div><p class="eyebrow">Регистрация</p><h2>Кто сейчас входит?</h2></div><button class="btn secondary" id="closeAuth" type="button">Закрыть</button></div>
+            <div class="auth-role-grid">
+              <button class="role-card active" type="button" data-role="parent"><span class="pill peach">взрослый</span><strong>Я родитель</strong><p class="muted">Создать или открыть семейное пространство.</p></button>
+              <button class="role-card" type="button" data-role="child"><span class="pill blue">ребёнок</span><strong>Я ребёнок</strong><p class="muted">Подключиться по invite code и выбрать свой профиль.</p></button>
+            </div>
+            <form class="auth-panel active" id="parentAuthPanel" data-auth-panel="parent">
+              <div class="form-row">
+                <label class="form-label">Имя взрослого<input class="field" id="parentNameInput" placeholder="Мария или Павел" value="Мария" /></label>
+                <label class="form-label">Email<input class="field" id="parentEmailInput" type="email" placeholder="family@example.com" /></label>
+              </div>
+              <label class="form-label">Название семьи<input class="field" id="familyNameInput" placeholder="Например: Семья Марии и Павла" value="Семья Марии и Павла" /></label>
+              <div class="form-row">
+                <label class="form-label">Пароль<input class="field" id="parentPasswordInput" type="password" placeholder="Минимум 6 символов" /></label>
+                <label class="form-label">Invite code для детей<input class="field" id="parentInviteInput" value="A7K42Q" /></label>
+              </div>
+              <button class="btn" id="parentAuthSubmit" type="submit">Создать семейное пространство</button>
+            </form>
+            <form class="auth-panel" id="childAuthPanel" data-auth-panel="child">
+              <div class="form-row">
+                <label class="form-label">Кто входит?<select id="childLoginName"><option>Яна</option><option>Ева</option></select></label>
+                <label class="form-label">Invite code<input class="field" id="childInviteInput" placeholder="A7K42Q" value="A7K42Q" /></label>
+              </div>
+              <label class="form-label">Короткий пароль или пин<input class="field" id="childPinInput" type="password" placeholder="Можно простой семейный пин" /></label>
+              <button class="btn" id="childAuthSubmit" type="submit">Войти в мой план</button>
+            </form>
+            <div class="auth-result" id="authResult"></div>
+          </section>
         </div>
       </div>
     </div>
@@ -1818,6 +1987,7 @@
         "Яна": [],
         "Ева": []
       };
+      let authProfile = savedState.authProfile || null;
 
       function collectLaneHtml() {
         const lanes = {};
@@ -1833,6 +2003,7 @@
           childStatuses,
           selectedChild,
           checklistTasks,
+          authProfile,
           planStore: typeof planStore !== "undefined" ? planStore : savedState.planStore,
           selectedDate: typeof selectedDate !== "undefined" ? isoDate(selectedDate) : savedState.selectedDate,
           calendarMonth: typeof calendarMonth !== "undefined" ? isoDate(calendarMonth) : savedState.calendarMonth,
@@ -1987,6 +2158,27 @@
         notice.textContent = message;
         document.body.appendChild(notice);
         setTimeout(() => notice.remove(), 2200);
+      }
+
+      function renderAuthProfile() {
+        const profileName = document.getElementById("profileName");
+        const profileInitial = document.getElementById("profileInitial");
+        const inviteBadge = document.getElementById("inviteCodeBadge");
+        const authInviteHint = document.getElementById("authInviteHint");
+        const familyNameInput = document.getElementById("familyNameInput");
+        const parentInviteInput = document.getElementById("parentInviteInput");
+        const childInviteInput = document.getElementById("childInviteInput");
+        const inviteText = inviteBadge?.textContent || "Invite A7K42Q";
+        if (authInviteHint) authInviteHint.textContent = inviteText;
+        if (parentInviteInput && inviteText.startsWith("Invite ")) parentInviteInput.value = inviteText.replace("Invite ", "");
+        if (childInviteInput && inviteText.startsWith("Invite ")) childInviteInput.value = inviteText.replace("Invite ", "");
+        if (!authProfile) return;
+        if (profileName) profileName.textContent = authProfile.role === "child" ? `${authProfile.name} · ребёнок` : `${authProfile.name} · взрослый`;
+        if (profileInitial) profileInitial.textContent = authProfile.name.slice(0, 1).toUpperCase();
+        if (familyNameInput && authProfile.familyName) familyNameInput.value = authProfile.familyName;
+        if (document.querySelector(".family-name h2") && authProfile.familyName) {
+          document.querySelector(".family-name h2").textContent = authProfile.familyName;
+        }
       }
 
       function updateReports() {
@@ -2428,6 +2620,7 @@
         document.querySelectorAll("#messages .activity-item").forEach(addDeleteHandler);
         updateMessageCount();
         updateLaneCounts();
+        renderAuthProfile();
         updateReports();
       }
 
@@ -2451,18 +2644,69 @@
 
       const modal = document.getElementById("authModal");
       function showAuth() {
+        renderAuthProfile();
         modal.classList.add("show");
       }
       document.getElementById("openAuth").addEventListener("click", showAuth);
       document.getElementById("openAuth2").addEventListener("click", showAuth);
       document.getElementById("closeAuth").addEventListener("click", () => modal.classList.remove("show"));
-      document.querySelectorAll(".tab").forEach((tab) => {
-        tab.addEventListener("click", () => {
-          document.querySelectorAll(".tab").forEach((item) => item.classList.remove("active"));
-          tab.classList.add("active");
+      document.querySelectorAll(".role-card").forEach((card) => {
+        card.addEventListener("click", () => {
+          const role = card.dataset.role;
+          document.querySelectorAll(".role-card").forEach((item) => item.classList.toggle("active", item === card));
+          document.querySelectorAll(".auth-panel").forEach((panel) => {
+            panel.classList.toggle("active", panel.dataset.authPanel === role);
+          });
+          document.getElementById("authResult").classList.remove("show");
         });
       });
-      document.getElementById("authSubmit").addEventListener("click", () => modal.classList.remove("show"));
+      document.getElementById("parentAuthPanel").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const name = document.getElementById("parentNameInput").value.trim() || "Взрослый";
+        const familyName = document.getElementById("familyNameInput").value.trim() || "Family OS";
+        const inviteCode = document.getElementById("parentInviteInput").value.trim().toUpperCase() || "A7K42Q";
+        authProfile = {
+          role: "parent",
+          name,
+          familyName,
+          email: document.getElementById("parentEmailInput").value.trim(),
+          inviteCode
+        };
+        document.getElementById("inviteCodeBadge").textContent = `Invite ${inviteCode}`;
+        document.getElementById("authResult").classList.add("show");
+        document.getElementById("authResult").innerHTML = `<strong>${escapeHtml(name)}, семейное пространство готово.</strong><br />Код для Яны и Евы: <span class="pill blue">Invite ${escapeHtml(inviteCode)}</span>`;
+        renderAuthProfile();
+        logActivity(`${name} вошёл(ла) как взрослый`);
+        saveState();
+        showNotice("Семейное пространство сохранено.");
+      });
+      document.getElementById("childAuthPanel").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const name = document.getElementById("childLoginName").value;
+        const inviteCode = document.getElementById("childInviteInput").value.trim().toUpperCase();
+        const expected = document.getElementById("inviteCodeBadge").textContent.replace("Invite ", "").trim().toUpperCase();
+        const result = document.getElementById("authResult");
+        result.classList.add("show");
+        if (inviteCode !== expected) {
+          result.innerHTML = `<strong>Код не совпал.</strong><br />Попроси Марию или Павла прислать актуальный invite code из настроек.`;
+          showNotice("Invite code не совпал.");
+          return;
+        }
+        authProfile = {
+          role: "child",
+          name,
+          familyName: document.querySelector(".family-name h2")?.textContent || "Family OS",
+          inviteCode
+        };
+        selectedChild = name;
+        renderAuthProfile();
+        renderChildStatus();
+        result.innerHTML = `<strong>${escapeHtml(name)}, вход готов.</strong><br />Открываю твой чек-лист и план дня.`;
+        logActivity(`${name} вошла как ребёнок`);
+        saveState();
+        showNotice(`${name}, добро пожаловать в Family OS.`);
+        go("tasks");
+      });
 
       document.getElementById("openNotifications").addEventListener("click", () => {
         showNotice("Пока новых уведомлений нет. Они появятся после задач, отчётов и сообщений.");
@@ -2600,6 +2844,7 @@
       document.getElementById("createInviteCode").addEventListener("click", () => {
         const code = Math.random().toString(36).slice(2, 8).toUpperCase();
         document.getElementById("inviteCodeBadge").textContent = `Invite ${code}`;
+        renderAuthProfile();
         showNotice(`Новый invite code: ${code}`);
         logActivity("Создан новый invite code");
         saveState();
@@ -2613,7 +2858,7 @@
       });
 
       window.addEventListener("beforeunload", (event) => {
-        const openDraft = document.querySelector("#taskModal.show input, #taskModal.show textarea, #childModal.show input, #rewardModal.show input, #materialModal.show input, #materialModal.show textarea, #skillModal.show input, #skillModal.show textarea");
+        const openDraft = document.querySelector("#authModal.show input, #taskModal.show input, #taskModal.show textarea, #childModal.show input, #rewardModal.show input, #materialModal.show input, #materialModal.show textarea, #skillModal.show input, #skillModal.show textarea");
         if (!openDraft || !openDraft.value.trim()) return;
         event.preventDefault();
         event.returnValue = "";
