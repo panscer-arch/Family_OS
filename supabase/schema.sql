@@ -1,6 +1,6 @@
 create extension if not exists pgcrypto;
 
-create type public.user_role as enum ('parent', 'child');
+create type public.user_role as enum ('parent', 'child', 'admin');
 create type public.task_priority as enum ('low', 'medium', 'high');
 create type public.task_status as enum ('todo', 'submitted', 'approved', 'rejected', 'overdue');
 create type public.day_block as enum ('morning', 'school', 'homework', 'sport', 'walk', 'chores', 'evening', 'sleep');
@@ -72,12 +72,18 @@ create table public.tasks (
   created_by uuid not null references public.profiles(id) on delete cascade,
   title text not null,
   description text,
+  category text not null default 'plan',
   deadline timestamptz,
   priority public.task_priority not null default 'medium',
   status public.task_status not null default 'todo',
   repeat_rule text,
   requires_parent_approval boolean not null default true,
   points integer not null default 10,
+  child_comment text,
+  report_url text,
+  submitted_at timestamptz,
+  approved_at timestamptz,
+  updated_at timestamptz not null default now(),
   plan_block public.day_block,
   created_at timestamptz not null default now()
 );
@@ -227,6 +233,18 @@ create table public.reports (
   created_at timestamptz not null default now()
 );
 
+create table public.activity_log (
+  id uuid primary key default gen_random_uuid(),
+  family_id uuid not null references public.families(id) on delete cascade,
+  actor_id uuid references public.profiles(id) on delete set null,
+  child_id uuid references public.profiles(id) on delete set null,
+  entity_type text not null,
+  entity_id uuid,
+  action text not null,
+  details jsonb not null default '{}'::jsonb,
+  created_at timestamptz not null default now()
+);
+
 create table public.notifications (
   id uuid primary key default gen_random_uuid(),
   family_id uuid not null references public.families(id) on delete cascade,
@@ -260,7 +278,7 @@ create or replace function public.is_family_parent(target_family uuid)
 returns boolean language sql stable security definer set search_path = public as $$
   select exists (
     select 1 from public.family_members
-    where family_id = target_family and user_id = auth.uid() and role = 'parent'
+    where family_id = target_family and user_id = auth.uid() and role in ('parent', 'admin')
   );
 $$;
 
@@ -290,6 +308,7 @@ alter table public.library_items enable row level security;
 alter table public.skills enable row level security;
 alter table public.skill_steps enable row level security;
 alter table public.reports enable row level security;
+alter table public.activity_log enable row level security;
 alter table public.notifications enable row level security;
 alter table public.shopping_list enable row level security;
 alter table public.chores enable row level security;
@@ -393,6 +412,9 @@ create policy "skill steps participants write" on public.skill_steps for all usi
 
 create policy "reports parent read" on public.reports for select using (public.is_family_parent(family_id));
 create policy "reports parent manage" on public.reports for all using (public.is_family_parent(family_id)) with check (public.is_family_parent(family_id));
+
+create policy "activity log family read" on public.activity_log for select using (public.is_family_member(family_id));
+create policy "activity log family insert" on public.activity_log for insert with check (public.is_family_member(family_id));
 
 create policy "notifications own read" on public.notifications for select using (user_id = auth.uid());
 create policy "notifications own update" on public.notifications for update using (user_id = auth.uid());
