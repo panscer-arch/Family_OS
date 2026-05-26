@@ -709,6 +709,59 @@
         border-color: rgba(255, 143, 177, 0.24);
       }
 
+      .pill.status-done,
+      .status-done .mini-icon {
+        color: var(--green);
+        border-color: rgba(126, 226, 168, 0.28);
+        background: rgba(126, 226, 168, 0.1);
+      }
+
+      .pill.status-overdue,
+      .status-overdue .mini-icon {
+        color: var(--rose);
+        border-color: rgba(255, 143, 177, 0.3);
+        background: rgba(255, 143, 177, 0.1);
+      }
+
+      .pill.status-waiting_confirmation,
+      .status-waiting_confirmation .mini-icon {
+        color: var(--yellow);
+        border-color: rgba(247, 215, 116, 0.3);
+        background: rgba(247, 215, 116, 0.1);
+      }
+
+      .pill.status-in_progress,
+      .status-in_progress .mini-icon {
+        color: var(--blue);
+        border-color: rgba(143, 199, 255, 0.3);
+        background: rgba(143, 199, 255, 0.1);
+      }
+
+      .pill.status-todo,
+      .pill.status-returned {
+        color: var(--soft);
+      }
+
+      .xp-pop {
+        position: fixed;
+        right: 28px;
+        bottom: 106px;
+        z-index: 40;
+        border: 1px solid rgba(126, 226, 168, 0.28);
+        border-radius: 999px;
+        background: rgba(126, 226, 168, 0.13);
+        color: var(--green);
+        padding: 12px 16px;
+        box-shadow: var(--shadow);
+        animation: xpPop 1100ms ease forwards;
+      }
+
+      @keyframes xpPop {
+        0% { transform: translateY(12px) scale(0.96); opacity: 0; }
+        18% { transform: translateY(0) scale(1); opacity: 1; }
+        100% { transform: translateY(-22px) scale(0.98); opacity: 0; }
+      }
+
       .report-fields {
         display: grid;
         gap: 8px;
@@ -726,6 +779,14 @@
         grid-template-columns: auto 1fr auto;
         gap: 12px;
         align-items: center;
+      }
+
+      .activity.timeline {
+        position: relative;
+      }
+
+      .activity.timeline .activity-item {
+        border-left: 2px solid rgba(143, 199, 255, 0.24);
       }
 
       .mini-icon {
@@ -1418,6 +1479,51 @@
         transform: translateX(20px);
       }
 
+      .quick-actions {
+        position: fixed;
+        left: 50%;
+        bottom: 18px;
+        z-index: 20;
+        display: flex;
+        gap: 8px;
+        padding: 8px;
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        background: rgba(11, 15, 23, 0.82);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(24px);
+        transform: translateX(-50%);
+      }
+
+      .quick-actions.parent-only {
+        display: none;
+      }
+
+      .quick-action {
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.055);
+        color: var(--soft);
+        min-height: 44px;
+        padding: 0 13px;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: 180ms ease;
+      }
+
+      .quick-action:hover {
+        transform: translateY(-2px);
+        color: white;
+        border-color: rgba(142, 230, 200, 0.24);
+        background: rgba(142, 230, 200, 0.09);
+      }
+
+      .quick-action.primary {
+        color: #08111b;
+        background: linear-gradient(135deg, var(--mint), var(--blue));
+      }
+
       @media (max-width: 1180px) {
         .app {
           grid-template-columns: 236px minmax(0, 1fr);
@@ -1435,13 +1541,46 @@
       }
 
       @media (max-width: 860px) {
+        body {
+          padding-bottom: 82px;
+        }
+
         .app {
           grid-template-columns: 1fr;
         }
 
         .sidebar {
-          position: static;
+          position: fixed;
+          inset: auto 0 0 0;
+          z-index: 18;
           height: auto;
+          padding: 8px;
+          border-right: 0;
+          border-top: 1px solid var(--line);
+        }
+
+        .brand,
+        .nav-label,
+        .sidebar-card {
+          display: none;
+        }
+
+        .nav-group {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 6px;
+        }
+
+        .nav-btn {
+          justify-content: center;
+          min-height: 50px;
+          padding: 8px;
+          font-size: 12px;
+          border-radius: 14px;
+        }
+
+        .nav-btn svg {
+          display: none;
         }
 
         .topbar {
@@ -1466,6 +1605,20 @@
         .children-grid,
         .kanban {
           grid-template-columns: 1fr;
+        }
+
+        .quick-actions {
+          left: 10px;
+          right: 10px;
+          bottom: 72px;
+          overflow-x: auto;
+          transform: none;
+          justify-content: flex-start;
+        }
+
+        .quick-action {
+          white-space: nowrap;
+          min-width: max-content;
         }
       }
     </style>
@@ -1591,9 +1744,10 @@
                 <p class="muted" id="childDashboardSubtitle" style="margin-top: 8px">Здесь только твой план, твои задачи, баллы и награды.</p>
                 <div class="grid cols-3" style="margin-top: 18px">
                   <div><p class="muted">Мой прогресс</p><h2 id="childProgressValue">0%</h2></div>
-                  <div><p class="muted">Мои баллы</p><h2 id="childPointsValue">0</h2></div>
-                  <div><p class="muted">Ждёт проверки</p><h2 id="childPendingValue">0</h2></div>
+                  <div><p class="muted">XP</p><h2 id="childPointsValue">0</h2></div>
+                  <div><p class="muted">Streak</p><h2 id="childStreakValue">0</h2></div>
                 </div>
+                <p class="muted" style="margin-top: 12px">Уровень <strong id="childLevelValue" style="color: var(--mint)">1</strong> · ждёт взрослого: <strong id="childPendingValue" style="color: var(--yellow)">0</strong></p>
                 <div class="task-actions"><button class="btn big-action" data-route-jump="tasks">Открыть мои задачи</button><button class="btn secondary big-action" data-route-jump="rewards">Мои награды</button></div>
               </article>
               <article class="card">
@@ -1687,7 +1841,7 @@
 
                 <article class="card">
                   <div class="card-title"><h2>Последние действия</h2><span class="pill rose">авто</span></div>
-                  <div class="activity" id="dashboardActivity"><div class="onboarding-card"><h3>Запустите первое действие</h3><p class="muted">Создайте задачу, и история семьи начнёт собираться автоматически.</p><button class="btn secondary" type="button" data-route-jump="tasks">Создать задачу</button></div></div>
+                  <div class="activity timeline" id="dashboardActivity"><div class="onboarding-card"><h3>Запустите первое действие</h3><p class="muted">Создайте задачу, и история семьи начнёт собираться автоматически.</p><button class="btn secondary" type="button" data-route-jump="tasks">Создать задачу</button></div></div>
                 </article>
 
                 <article class="card">
@@ -1707,12 +1861,12 @@
             <div class="grid children-grid" id="childrenGrid">
               <article class="card">
                 <div class="child-top"><div class="child-meta"><span class="avatar">Я</span><div><h2>Яна</h2><p class="muted">8 лет · младшая сестра</p></div></div><span class="pill">готова к плану</span></div>
-                <div class="grid cols-3" style="margin-top: 18px"><div><p class="muted">Уровень</p><h2>старт</h2></div><div><p class="muted">Streak</p><h2>старт</h2></div><div><p class="muted">Баллы</p><h2 data-child-points="Яна">0</h2></div></div>
+                <div class="grid cols-3" style="margin-top: 18px"><div><p class="muted">Уровень</p><h2 data-child-level="Яна">1</h2></div><div><p class="muted">Streak</p><h2 data-child-streak="Яна">0</h2></div><div><p class="muted">XP</p><h2 data-child-points="Яна">0</h2></div></div>
                 <div class="progress"><span data-child-progress="Яна" style="--value: 0%"></span></div>
               </article>
               <article class="card">
                 <div class="child-top"><div class="child-meta"><span class="avatar blue">Е</span><div><h2>Ева</h2><p class="muted">12 лет · старшая сестра</p></div></div><span class="pill blue">готова к плану</span></div>
-                <div class="grid cols-3" style="margin-top: 18px"><div><p class="muted">Уровень</p><h2>старт</h2></div><div><p class="muted">Streak</p><h2>старт</h2></div><div><p class="muted">Баллы</p><h2 data-child-points="Ева">0</h2></div></div>
+                <div class="grid cols-3" style="margin-top: 18px"><div><p class="muted">Уровень</p><h2 data-child-level="Ева">1</h2></div><div><p class="muted">Streak</p><h2 data-child-streak="Ева">0</h2></div><div><p class="muted">XP</p><h2 data-child-points="Ева">0</h2></div></div>
                 <div class="progress"><span data-child-progress="Ева" style="--value: 0%"></span></div>
               </article>
             </div>
@@ -1858,17 +2012,17 @@
             </div>
             <article class="card" style="margin-top: 18px">
               <div class="card-title"><h2>История изменений</h2><span class="pill blue" id="activityLogCount">0</span></div>
-              <div class="activity" id="activityLog"><div class="onboarding-card"><h3>История действий</h3><p class="muted">Создание задач, “Я сделал”, подтверждения, баллы и награды будут записываться сюда.</p><button class="btn secondary" type="button" data-route-jump="tasks">Создать событие через задачу</button></div></div>
+              <div class="activity timeline" id="activityLog"><div class="onboarding-card"><h3>История действий</h3><p class="muted">Создание задач, “Я сделал”, подтверждения, баллы и награды будут записываться сюда.</p><button class="btn secondary" type="button" data-route-jump="tasks">Создать событие через задачу</button></div></div>
             </article>
           </section>
 
           <section class="page" id="rewards">
             <div class="page-head"><div><p class="eyebrow">Rewards</p><h1>Награды и мотивация</h1><p class="muted" style="margin-top: 8px">Конкретные семейные награды, которые можно купить за баллы.</p></div><button class="btn" id="openRewardModal">Создать награду</button></div>
             <div class="grid cols-4" id="rewardsGrid">
-              <article class="reward-card"><div><span class="pill">маленькая</span><h2 style="margin-top: 18px">Кино вечером</h2><p class="muted" style="margin-top: 8px">Выбор фильма и общий просмотр дома</p></div><strong style="color: var(--peach)">120 баллов</strong></article>
-              <article class="reward-card"><div><span class="pill blue">активная</span><h2 style="margin-top: 18px">Бассейн</h2><p class="muted" style="margin-top: 8px">Сходить в бассейн всей семьёй</p></div><strong style="color: var(--peach)">350 баллов</strong></article>
-              <article class="reward-card"><div><span class="pill peach">покупка</span><h2 style="margin-top: 18px">Купить вещь</h2><p class="muted" style="margin-top: 8px">Игрушка, книга, материал для хобби или полезная покупка</p></div><strong style="color: var(--peach)">500 баллов</strong></article>
-              <article class="reward-card"><div><span class="pill rose">большая</span><h2 style="margin-top: 18px">Поездка с семьёй</h2><p class="muted" style="margin-top: 8px">Однодневная семейная поездка или интересное место</p></div><strong style="color: var(--peach)">1200 баллов</strong></article>
+              <article class="reward-card" data-reward-cost="120"><div><span class="pill">магазин</span><h2 style="margin-top: 18px">Кино вечером</h2><p class="muted" style="margin-top: 8px">Выбор фильма и общий просмотр дома</p></div><strong style="color: var(--peach)">120 XP</strong><button class="btn secondary" type="button" data-buy-reward="Кино вечером" data-cost="120">Получить</button></article>
+              <article class="reward-card" data-reward-cost="350"><div><span class="pill blue">магазин</span><h2 style="margin-top: 18px">Бассейн</h2><p class="muted" style="margin-top: 8px">Сходить в бассейн всей семьёй</p></div><strong style="color: var(--peach)">350 XP</strong><button class="btn secondary" type="button" data-buy-reward="Бассейн" data-cost="350">Получить</button></article>
+              <article class="reward-card" data-reward-cost="500"><div><span class="pill peach">магазин</span><h2 style="margin-top: 18px">Купить вещь</h2><p class="muted" style="margin-top: 8px">Игрушка, книга, материал для хобби или полезная покупка</p></div><strong style="color: var(--peach)">500 XP</strong><button class="btn secondary" type="button" data-buy-reward="Купить вещь" data-cost="500">Получить</button></article>
+              <article class="reward-card" data-reward-cost="1200"><div><span class="pill rose">магазин</span><h2 style="margin-top: 18px">Поездка с семьёй</h2><p class="muted" style="margin-top: 8px">Однодневная семейная поездка или интересное место</p></div><strong style="color: var(--peach)">1200 XP</strong><button class="btn secondary" type="button" data-buy-reward="Поездка с семьёй" data-cost="1200">Получить</button></article>
             </div>
           </section>
 
@@ -1999,6 +2153,14 @@
       </div>
     </div>
 
+    <div class="quick-actions" aria-label="Быстрые действия">
+      <button class="quick-action primary" id="fixedQuickTask" type="button">+ задача</button>
+      <button class="quick-action" id="fixedQuickChild" type="button" data-access="parent">+ ребёнок</button>
+      <button class="quick-action" id="fixedQuickReward" type="button" data-access="parent">+ награда</button>
+      <button class="quick-action" id="fixedQuickBuildDay" type="button" data-access="parent">собрать день</button>
+      <button class="quick-action" id="fixedQuickApproveAll" type="button" data-access="parent">подтвердить всё</button>
+    </div>
+
     <div class="modal-backdrop" id="taskModal">
       <div class="modal">
         <div class="card-title"><div><p class="eyebrow">Tasks</p><h2>Создать задачу</h2></div><button class="btn secondary" id="closeTaskModal" type="button">Закрыть</button></div>
@@ -2033,7 +2195,7 @@
             <label class="form-label">Баллы<input class="field" id="taskPointsInput" type="number" min="0" value="10" /></label>
             <label class="form-label">Подтверждение<select id="taskApprovalInput"><option value="true">нужно подтверждение взрослого</option><option value="false">сразу засчитывать</option></select></label>
           </div>
-          <label class="form-label">Повтор<select id="taskRepeatInput"><option value="once">разово</option><option value="daily">повторять каждый день</option></select></label>
+          <label class="form-label">Повтор<select id="taskRepeatInput"><option value="once">разово</option><option value="daily">ежедневно</option><option value="weekdays">по будням</option><option value="weekly">еженедельно</option><option value="custom">кастомные дни</option></select></label>
           <textarea class="field" id="taskDescriptionInput" placeholder="Комментарий, ссылка или что нужно приложить"></textarea>
           <button class="btn">Добавить задачу</button>
         </form>
@@ -2185,6 +2347,10 @@
         "Яна": 0,
         "Ева": 0
       };
+      const childStats = savedState.childStats || {
+        "Яна": { streak: 0, level: 1, achievements: [] },
+        "Ева": { streak: 0, level: 1, achievements: [] }
+      };
 
       function collectLaneHtml() {
         const lanes = {};
@@ -2201,6 +2367,7 @@
           selectedChild,
           checklistTasks,
           childPoints,
+          childStats,
           authProfile,
           onboarded: Boolean(authProfile),
           planStore: typeof planStore !== "undefined" ? planStore : savedState.planStore,
@@ -2220,13 +2387,13 @@
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       }
 
-      function logActivity(message) {
+      function logActivity(message, tone = "blue") {
         const log = document.getElementById("activityLog");
         if (!log) return;
         const empty = log.querySelector(".empty-state, .onboarding-card");
         if (empty) empty.remove();
         const item = document.createElement("div");
-        item.className = "activity-item";
+        item.className = `activity-item status-${tone}`;
         const now = new Date();
         item.innerHTML = `<span class="mini-icon">i</span><div><h3>${escapeHtml(message)}</h3><p class="muted">${now.toLocaleDateString("ru-RU")} · ${now.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" })}</p></div>`;
         log.prepend(item);
@@ -2282,8 +2449,48 @@
           in_progress: "в работе",
           waiting_confirmation: "ждёт подтверждения",
           done: "готово",
+          overdue: "просрочено",
           returned: "вернули"
         }[status] || "нужно сделать";
+      }
+
+      function repeatLabel(repeat) {
+        return {
+          once: "разово",
+          daily: "ежедневно",
+          weekdays: "по будням",
+          weekly: "еженедельно",
+          custom: "кастомные дни"
+        }[repeat] || "разово";
+      }
+
+      function taskVisualStatus(task) {
+        if (task.deadline && task.status !== "done" && new Date(task.deadline) < new Date()) return "overdue";
+        return task.status || "todo";
+      }
+
+      function statusPillClass(task) {
+        return `pill status-${taskVisualStatus(task)}`;
+      }
+
+      function animateXp(child, xp) {
+        const pop = document.createElement("div");
+        pop.className = "xp-pop";
+        pop.textContent = `${child} +${xp} XP`;
+        document.body.appendChild(pop);
+        setTimeout(() => pop.remove(), 1200);
+      }
+
+      function grantXp(child, xp) {
+        childPoints[child] = (childPoints[child] || 0) + Number(xp || 0);
+        if (!childStats[child]) childStats[child] = { streak: 0, level: 1, achievements: [] };
+        childStats[child].streak = Math.max(childStats[child].streak || 0, 1) + 1;
+        childStats[child].level = Math.max(1, Math.floor((childPoints[child] || 0) / 100) + 1);
+        if ((childPoints[child] || 0) >= 100 && !childStats[child].achievements.includes("Первый уровень")) {
+          childStats[child].achievements.push("Первый уровень");
+          logActivity(`${child} получила achievement: Первый уровень`, "done");
+        }
+        animateXp(child, xp);
       }
 
       function findTask(child, id) {
@@ -2401,7 +2608,7 @@
           const child = container.dataset.checkChild;
           const task = updateTask(child, container.dataset.taskId, { status: "in_progress" });
           if (!task) return;
-          logActivity(`${child} начала задачу: ${task.title}`);
+          logActivity(`${child} начала задачу: ${task.title}`, "in_progress");
           renderDailyChecklist();
           updateDashboard();
           showNotice("Задача в работе.");
@@ -2412,7 +2619,7 @@
           const child = container.dataset.checkChild;
           const task = updateTask(child, container.dataset.taskId, { status: "in_progress", comment: "Нужна помощь" });
           if (!task) return;
-          logActivity(`${child} попросила помощь по задаче: ${task.title}`);
+          logActivity(`${child} попросила помощь по задаче: ${task.title}`, "waiting_confirmation");
           renderDailyChecklist();
           updateDashboard();
           showNotice("Взрослым видно, что нужна помощь.");
@@ -2427,7 +2634,7 @@
             reportUrl: container.querySelector("[data-task-report]")?.value || ""
           });
           if (!task) return;
-          logActivity(`${child} отправила задачу на подтверждение: ${task.title}`);
+          logActivity(`${child} отправила задачу на подтверждение: ${task.title}`, "waiting_confirmation");
           renderDailyChecklist();
           updateDashboard();
           showNotice("Задача отправлена взрослому.");
@@ -2438,8 +2645,8 @@
           const child = container.dataset.checkChild;
           const task = updateTask(child, container.dataset.taskId, { status: "done", done: true });
           if (!task) return;
-          childPoints[child] = (childPoints[child] || 0) + Number(task.points || 0);
-          logActivity(`Взрослый подтвердил задачу ${child}: ${task.title} (+${task.points} баллов)`);
+          grantXp(child, task.points);
+          logActivity(`Взрослый подтвердил задачу ${child}: ${task.title} (+${task.points} XP)`, "done");
           renderDailyChecklist();
           updateDashboard();
           showNotice("Задача подтверждена, баллы начислены.");
@@ -2450,7 +2657,7 @@
           const child = container.dataset.checkChild;
           const task = updateTask(child, container.dataset.taskId, { status: "returned", done: false });
           if (!task) return;
-          logActivity(`Взрослый вернул задачу ${child}: ${task.title}`);
+          logActivity(`Взрослый вернул задачу ${child}: ${task.title}`, "returned");
           renderDailyChecklist();
           updateDashboard();
           showNotice("Задача возвращена ребёнку.");
@@ -2506,7 +2713,11 @@
         const app = document.querySelector(".app");
         app?.classList.toggle("child-mode", authProfile?.role === "child");
         app?.classList.toggle("locked", !authProfile);
+        document.querySelector(".quick-actions")?.classList.toggle("parent-only", !authProfile);
         document.getElementById("authModal")?.classList.toggle("gate", !authProfile);
+        document.querySelectorAll(".quick-actions [data-access='parent']").forEach((node) => {
+          node.style.display = authProfile?.role === "child" || !authProfile ? "none" : "";
+        });
         const profileName = document.getElementById("profileName");
         const profileInitial = document.getElementById("profileInitial");
         const inviteBadge = document.getElementById("inviteCodeBadge");
@@ -2552,6 +2763,7 @@
         const summaryCount = document.getElementById("eveningSummaryCount");
         const summaryText = document.getElementById("eveningSummaryText");
         const overdueValue = document.getElementById("reportOverdueCount");
+        const weeklyChart = document.getElementById("weeklyChart");
         if (todayValue) todayValue.textContent = `${percent}%`;
         if (weekValue) weekValue.textContent = `${percent}%`;
         if (todayCaption) todayCaption.textContent = total ? `${done} из ${total} подтверждено, ${pending} ждёт взрослого` : "создайте задачу или соберите день из плана";
@@ -2560,6 +2772,13 @@
         if (logCount) logCount.textContent = String(activityCount);
         if (summaryCount) summaryCount.textContent = `${activityCount} событий`;
         if (summaryText) summaryText.textContent = total ? `Сегодня подтверждено ${done} из ${total} задач. Ждёт взрослого: ${pending}. История действий: ${activityCount}.` : "Создайте задачу или соберите день из недельного плана, и сводка начнёт считаться сама.";
+        if (weeklyChart) {
+          const base = total ? percent : 18;
+          weeklyChart.innerHTML = Array.from({ length: 7 }, (_, index) => {
+            const height = Math.max(18, Math.min(96, base + (index - 3) * 6));
+            return `<div class="bar" style="height:${height}%"></div>`;
+          }).join("");
+        }
       }
 
       function renderMiniTaskList(targetId, tasks, emptyText) {
@@ -2576,8 +2795,8 @@
         }
         tasks.slice(0, 5).forEach((task) => {
           const item = document.createElement("div");
-          item.className = "activity-item";
-          item.innerHTML = `<span class="mini-icon">${escapeHtml((task.child || "С").slice(0, 1))}</span><div><h3>${escapeHtml(task.title)}</h3><p class="muted">${escapeHtml(task.child)} · ${escapeHtml(task.time || "без времени")} · ${escapeHtml(taskStatusLabel(task.status))}</p></div><span class="pill">${escapeHtml(task.points)} б.</span>`;
+          item.className = `activity-item status-${taskVisualStatus(task)}`;
+          item.innerHTML = `<span class="mini-icon">${escapeHtml((task.child || "С").slice(0, 1))}</span><div><h3>${escapeHtml(task.title)}</h3><p class="muted">${escapeHtml(task.child)} · ${escapeHtml(task.time || "без времени")} · ${escapeHtml(taskStatusLabel(taskVisualStatus(task)))}</p></div><span class="${statusPillClass(task)}">${escapeHtml(task.points)} XP</span>`;
           target.appendChild(item);
         });
       }
@@ -2591,9 +2810,9 @@
         const withProof = tasks.filter((task) => task.comment || task.reportUrl).length;
         const noTaskChildren = ["Яна", "Ева"].filter((child) => !(checklistTasks[child] || []).length);
         const attentionItems = [
-          ...tasks.filter((task) => task.status === "waiting_confirmation").map((task) => ({ title: `${task.child}: ждёт подтверждения`, text: task.title, tone: "rose" })),
-          ...tasks.filter((task) => task.deadline && task.status !== "done" && new Date(task.deadline) < new Date()).map((task) => ({ title: `${task.child}: просрочено`, text: task.title, tone: "peach" })),
-          ...noTaskChildren.map((child) => ({ title: `${child}: нет задач на сегодня`, text: "Соберите день из недельного плана", tone: "blue" }))
+          ...tasks.filter((task) => task.status === "waiting_confirmation").map((task) => ({ title: `${task.child}: ждёт подтверждения`, text: task.title, tone: "waiting_confirmation" })),
+          ...tasks.filter((task) => task.deadline && task.status !== "done" && new Date(task.deadline) < new Date()).map((task) => ({ title: `${task.child}: просрочено`, text: task.title, tone: "overdue" })),
+          ...noTaskChildren.map((child) => ({ title: `${child}: нет задач на сегодня`, text: "Соберите день из недельного плана", tone: "in_progress" }))
         ];
         const setText = (id, value) => {
           const node = document.getElementById(id);
@@ -2613,8 +2832,8 @@
           } else {
             attentionItems.slice(0, 5).forEach((entry) => {
               const item = document.createElement("div");
-              item.className = "activity-item";
-              item.innerHTML = `<span class="mini-icon">!</span><div><h3>${escapeHtml(entry.title)}</h3><p class="muted">${escapeHtml(entry.text)}</p></div><span class="pill ${entry.tone}">важно</span>`;
+              item.className = `activity-item status-${entry.tone}`;
+              item.innerHTML = `<span class="mini-icon">!</span><div><h3>${escapeHtml(entry.title)}</h3><p class="muted">${escapeHtml(entry.text)}</p></div><span class="pill status-${entry.tone}">важно</span>`;
               attention.appendChild(item);
             });
           }
@@ -2632,12 +2851,16 @@
           const doneForChild = tasksForChild.filter((task) => task.status === "done").length;
           const progress = tasksForChild.length ? Math.round((doneForChild / tasksForChild.length) * 100) : 0;
           document.querySelector(`[data-child-points="${name}"]`)?.replaceChildren(String(childPoints[name] || 0));
+          document.querySelector(`[data-child-streak="${name}"]`)?.replaceChildren(String(childStats[name]?.streak || 0));
+          document.querySelector(`[data-child-level="${name}"]`)?.replaceChildren(String(childStats[name]?.level || 1));
           document.querySelector(`[data-child-progress="${name}"]`)?.style.setProperty("--value", `${progress}%`);
         });
         setText("childDashboardTitle", `${childName}, твой день`);
         setText("childDashboardSubtitle", childTasks.length ? "Отмечай задачи кнопкой “Я сделал” и добавляй комментарий или ссылку." : "Взрослый может собрать день из недельного плана.");
         setText("childProgressValue", `${childPercent}%`);
         setText("childPointsValue", String(childPoints[childName] || 0));
+        setText("childStreakValue", String(childStats[childName]?.streak || 0));
+        setText("childLevelValue", String(childStats[childName]?.level || 1));
         setText("childPendingValue", String(childPending));
         setText("childTaskCount", String(childTasks.length));
         renderMiniTaskList("childDashboardTasks", childTasks, "Мои задачи ещё не собраны");
@@ -2661,7 +2884,7 @@
         card.draggable = true;
         card.dataset.taskId = task.id;
         card.dataset.child = task.child;
-        card.innerHTML = `<h3>${escapeHtml(task.title)}</h3><p class="muted" style="margin-top: 7px">${escapeHtml(task.child)} · ${escapeHtml(task.time || "без времени")} · ${escapeHtml(task.points)} баллов</p><div class="task-tags"><span class="pill blue">${escapeHtml(task.tag)}</span><span class="pill peach">${escapeHtml(taskStatusLabel(task.status))}</span></div>${task.description ? `<p class="muted" style="margin-top: 10px">${escapeHtml(task.description)}</p>` : ""}<div class="task-footer"><span>создано вручную</span><span>${task.approvalRequired ? "нужно подтверждение" : "сразу засчитывать"}</span></div>`;
+        card.innerHTML = `<h3>${escapeHtml(task.title)}</h3><p class="muted" style="margin-top: 7px">${escapeHtml(task.child)} · ${escapeHtml(task.time || "без времени")} · ${escapeHtml(task.points)} XP</p><div class="task-tags"><span class="pill blue">${escapeHtml(task.tag)}</span><span class="${statusPillClass(task)}">${escapeHtml(taskStatusLabel(taskVisualStatus(task)))}</span></div>${task.description ? `<p class="muted" style="margin-top: 10px">${escapeHtml(task.description)}</p>` : ""}<div class="task-footer"><span>${escapeHtml(repeatLabel(task.repeat))}</span><span>${task.approvalRequired ? "нужно подтверждение" : "сразу засчитывать"}</span></div>`;
         const laneStatus = task.status === "in_progress" ? "in_progress" : task.status === "done" ? "done" : "todo";
         document.querySelector(`.lane[data-status="${laneStatus}"] .task-list`)?.appendChild(card);
         bindTaskCard(card);
@@ -2679,7 +2902,7 @@
         const isApproved = task.status === "done";
         const parentActions = isParentMode() && task.status === "waiting_confirmation" ? `<div class="task-actions"><button class="mini-action approve" type="button" data-approve-task>Подтвердить</button><button class="mini-action return" type="button" data-return-task>Вернуть</button></div>` : "";
         const childActions = isChildMode() && task.status !== "done" ? `<div class="report-fields"><input class="field" data-task-comment placeholder="Комментарий: что сделала?" value="${escapeHtml(task.comment)}" /><input class="field" data-task-report placeholder="Фото или ссылка на отчёт" value="${escapeHtml(task.reportUrl)}" /><div class="task-actions"><button class="btn secondary" type="button" data-start-task>Начать</button><button class="btn secondary" type="button" data-help-task>Нужна помощь</button><button class="btn big-action" type="button" data-submit-task>Я сделал</button></div></div>` : "";
-        label.innerHTML = `<input type="checkbox" ${isApproved ? "checked" : ""} /><div><h3>${escapeHtml(task.title)}</h3><p class="muted">${escapeHtml(task.time || "без времени")} · ${escapeHtml(task.tag)} · ${escapeHtml(task.points)} баллов</p>${task.description ? `<p class="muted" style="margin-top: 6px">${escapeHtml(task.description)}</p>` : ""}${childActions}${parentActions}</div><span class="pill peach">${escapeHtml(taskStatusLabel(task.status))}</span>`;
+        label.innerHTML = `<input type="checkbox" ${isApproved ? "checked" : ""} /><div><h3>${escapeHtml(task.title)}</h3><p class="muted">${escapeHtml(task.time || "без времени")} · ${escapeHtml(task.tag)} · ${escapeHtml(task.points)} XP · ${escapeHtml(repeatLabel(task.repeat))}</p>${task.description ? `<p class="muted" style="margin-top: 6px">${escapeHtml(task.description)}</p>` : ""}${childActions}${parentActions}</div><span class="${statusPillClass(task)}">${escapeHtml(taskStatusLabel(taskVisualStatus(task)))}</span>`;
         if (isApproved) label.classList.add("done");
         bindChecklistItem(label);
         bindChecklistActions(label);
@@ -2747,8 +2970,11 @@
             lane.querySelector(".task-list").appendChild(draggedTask);
             const child = draggedTask.dataset.child;
             const task = updateTask(child, draggedTask.dataset.taskId, { status: lane.dataset.status });
-            const statusPill = draggedTask.querySelector(".task-tags .pill.peach");
-            if (statusPill && task) statusPill.textContent = taskStatusLabel(task.status);
+            const statusPill = draggedTask.querySelector(".task-tags span:last-child");
+            if (statusPill && task) {
+              statusPill.className = statusPillClass(task);
+              statusPill.textContent = taskStatusLabel(taskVisualStatus(task));
+            }
           }
           updateLaneCounts();
           logActivity("Задачу перенесли между статусами");
@@ -3234,6 +3460,7 @@
 
       const rewardModal = document.getElementById("rewardModal");
       document.getElementById("openRewardModal").addEventListener("click", () => rewardModal.classList.add("show"));
+      document.getElementById("fixedQuickReward")?.addEventListener("click", () => rewardModal.classList.add("show"));
       document.getElementById("closeRewardModal").addEventListener("click", () => rewardModal.classList.remove("show"));
       document.getElementById("rewardForm").addEventListener("submit", (event) => {
         event.preventDefault();
@@ -3244,12 +3471,31 @@
         const type = document.getElementById("rewardTypeInput").value;
         const card = document.createElement("article");
         card.className = "reward-card";
-        card.innerHTML = `<div><span class="pill blue">${escapeHtml(type)}</span><h2 style="margin-top: 18px">${escapeHtml(title)}</h2><p class="muted" style="margin-top: 8px">${escapeHtml(description)}</p></div><strong style="color: var(--peach)">${escapeHtml(cost)} баллов</strong>`;
+        card.dataset.rewardCost = cost;
+        card.innerHTML = `<div><span class="pill blue">магазин</span><h2 style="margin-top: 18px">${escapeHtml(title)}</h2><p class="muted" style="margin-top: 8px">${escapeHtml(description)} · ${escapeHtml(type)}</p></div><strong style="color: var(--peach)">${escapeHtml(cost)} XP</strong><button class="btn secondary" type="button" data-buy-reward="${escapeHtml(title)}" data-cost="${escapeHtml(cost)}">Получить</button>`;
         document.getElementById("rewardsGrid").prepend(card);
         document.getElementById("rewardForm").reset();
         document.getElementById("rewardCostInput").value = "300";
         rewardModal.classList.remove("show");
         logActivity(`Создана награда: ${title}`);
+        saveState();
+      });
+      document.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-buy-reward]");
+        if (!button) return;
+        const child = authProfile?.role === "child" ? authProfile.name : selectedChild;
+        const cost = Number(button.dataset.cost || 0);
+        const title = button.dataset.buyReward;
+        if ((childPoints[child] || 0) < cost) {
+          showNotice(`${child}: пока не хватает XP.`);
+          return;
+        }
+        childPoints[child] -= cost;
+        logActivity(`${child} получила награду: ${title} (-${cost} XP)`, "done");
+        button.textContent = "получено";
+        button.disabled = true;
+        updateDashboard();
+        updateReports();
         saveState();
       });
 
@@ -3279,6 +3525,30 @@
         document.getElementById("taskChildInput").value = selectedChild;
         taskModal.classList.add("show");
       }
+      function approveAllWaiting() {
+        let approved = 0;
+        ["Яна", "Ева"].forEach((child) => {
+          (checklistTasks[child] || []).forEach((task, index) => {
+            const normalized = normalizeTask({ ...task, child });
+            if (normalized.status !== "waiting_confirmation") return;
+            const next = normalizeTask({ ...normalized, status: "done", done: true, updatedAt: new Date().toISOString() });
+            checklistTasks[child][index] = next;
+            grantXp(child, next.points);
+            approved += 1;
+          });
+        });
+        if (!approved) {
+          showNotice("Нет задач на подтверждение.");
+          return;
+        }
+        logActivity(`Взрослый подтвердил все задачи: ${approved}`, "done");
+        renderDailyChecklist();
+        renderPlanListFromTasks();
+        updateReports();
+        updateDashboard();
+        saveState();
+        showNotice(`Подтверждено задач: ${approved}. XP начислен.`);
+      }
       document.getElementById("openTaskModal").addEventListener("click", openTaskDialog);
       document.getElementById("quickCreateTask")?.addEventListener("click", openTaskDialog);
       document.getElementById("quickGenerateDay")?.addEventListener("click", () => document.getElementById("generateDayTasks").click());
@@ -3290,6 +3560,12 @@
         go("tasks");
         openTaskDialog();
       });
+      document.getElementById("fixedQuickTask")?.addEventListener("click", () => {
+        go("tasks");
+        openTaskDialog();
+      });
+      document.getElementById("fixedQuickBuildDay")?.addEventListener("click", () => document.getElementById("generateDayTasks").click());
+      document.getElementById("fixedQuickApproveAll")?.addEventListener("click", approveAllWaiting);
       document.getElementById("closeTaskModal").addEventListener("click", () => taskModal.classList.remove("show"));
       document.getElementById("focusMessageInput")?.addEventListener("click", () => document.getElementById("messageText")?.focus());
       document.getElementById("taskCreateForm").addEventListener("submit", (event) => {
@@ -3332,6 +3608,7 @@
 
       const childModal = document.getElementById("childModal");
       document.getElementById("addChild").addEventListener("click", () => childModal.classList.add("show"));
+      document.getElementById("fixedQuickChild")?.addEventListener("click", () => childModal.classList.add("show"));
       document.getElementById("closeChildModal").addEventListener("click", () => childModal.classList.remove("show"));
       document.getElementById("childForm").addEventListener("submit", (event) => {
         event.preventDefault();
@@ -3342,6 +3619,8 @@
         const initial = (document.getElementById("childAvatarInput").value.trim() || name.slice(0, 1)).toUpperCase();
         const color = document.getElementById("childColorInput").value;
         const pin = document.getElementById("childPinCreateInput").value.trim();
+        childPoints[name] = childPoints[name] || 0;
+        childStats[name] = childStats[name] || { streak: 0, level: 1, achievements: [] };
         const card = document.createElement("article");
         card.className = "card";
         card.innerHTML = `<div class="child-top"><div class="child-meta"><span class="avatar ${escapeHtml(color)}">${escapeHtml(initial)}</span><div><h2>${escapeHtml(name)}</h2><p class="muted">${escapeHtml(age)} лет · ребёнок · PIN ${pin ? "задан" : "не задан"}</p></div></div><span class="pill">${escapeHtml(mood)}</span></div><div class="grid cols-3" style="margin-top: 18px"><div><p class="muted">Уровень</p><h2>1</h2></div><div><p class="muted">Streak</p><h2>0</h2></div><div><p class="muted">Баллы</p><h2>0</h2></div></div><div class="progress"><span style="--value: 8%"></span></div>`;
