@@ -59,6 +59,10 @@
         min-height: 100vh;
       }
 
+      .app.locked {
+        display: none;
+      }
+
       .sidebar {
         position: sticky;
         top: 0;
@@ -79,6 +83,10 @@
 
       .app.child-mode .status-card:not(.active),
       .app.child-mode .child-tab:not(.active) {
+        display: none !important;
+      }
+
+      .app.child-mode .kanban {
         display: none !important;
       }
 
@@ -1197,6 +1205,17 @@
         display: grid;
       }
 
+      .modal-backdrop.gate {
+        background:
+          radial-gradient(circle at 18% 0%, rgba(142, 230, 200, 0.16), transparent 34%),
+          radial-gradient(circle at 88% 8%, rgba(197, 163, 255, 0.14), transparent 32%),
+          #0b0f17;
+      }
+
+      .modal-backdrop.gate #closeAuth {
+        display: none;
+      }
+
       .modal {
         width: min(520px, calc(100vw - 40px));
         border: 1px solid var(--line);
@@ -1480,7 +1499,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5V5a2 2 0 0 1 2-2h11"/><path d="M8 7h12v14H8z"/><path d="M12 11h4M12 15h4"/></svg>
             План
           </button>
-          <button class="nav-btn" data-route="plan" data-title="План дня">
+          <button class="nav-btn parent-only" data-route="plan" data-title="План дня" style="display:none">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
             Задачи дня
           </button>
@@ -1488,7 +1507,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
             Отчёты
           </button>
-          <button class="nav-btn" data-route="rewards" data-title="Награды">
+          <button class="nav-btn parent-only" data-route="rewards" data-title="Награды" style="display:none">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
             Награды
           </button>
@@ -1512,8 +1531,8 @@
 
         <div class="sidebar-card">
           <p class="muted">Сегодня</p>
-          <div class="progress"><span style="--value: 0%"></span></div>
-          <p style="margin-top: 12px; font-size: 13px; color: var(--soft)">Данные появятся после задач и отчётов</p>
+          <div class="progress"><span id="sidebarProgress" style="--value: 0%"></span></div>
+          <p id="sidebarProgressText" style="margin-top: 12px; font-size: 13px; color: var(--soft)">Создайте задачу или соберите день из плана</p>
         </div>
       </aside>
 
@@ -1559,9 +1578,9 @@
               </div>
               <div style="display: flex; gap: 10px">
                 <button class="btn secondary" data-route-jump="week">План недели</button>
-                <button class="btn secondary" id="dashboardBuildDay" type="button">Собрать день</button>
+                <button class="btn secondary" id="dashboardBuildDay" type="button" data-access="parent">Собрать день</button>
                 <button class="btn secondary" data-route-jump="tasks" type="button">Добавить отчёт</button>
-                <button class="btn" id="dashboardNewTask">Новая задача</button>
+                <button class="btn" id="dashboardNewTask" data-access="parent">Новая задача</button>
               </div>
             </div>
 
@@ -1635,21 +1654,21 @@
                         <div class="child-meta"><span class="avatar">Я</span><div><h3>Яна</h3><p class="muted">8 лет</p></div></div>
                         <span class="pill" data-top-status="Яна">Учусь</span>
                       </div>
-                      <p class="muted" style="margin-top: 12px">Прогресс появится после задач дня.</p>
+                      <p class="muted" style="margin-top: 12px">Создайте задачу или соберите день из плана.</p>
                     </div>
                     <div class="child-card">
                       <div class="child-top">
                         <div class="child-meta"><span class="avatar blue">Е</span><div><h3>Ева</h3><p class="muted">12 лет</p></div></div>
                         <span class="pill blue" data-top-status="Ева">Читаю книгу</span>
                       </div>
-                      <p class="muted" style="margin-top: 12px">Прогресс появится после задач дня.</p>
+                      <p class="muted" style="margin-top: 12px">Создайте задачу или соберите день из плана.</p>
                     </div>
                     <div class="child-card">
                       <div class="child-top">
                         <div class="child-meta"><span class="avatar mint">С</span><div><h3>Семья</h3><p class="muted">общие дела</p></div></div>
                         <span class="pill peach">план</span>
                       </div>
-                      <p class="muted" style="margin-top: 12px">Семейные дела появятся после заполнения дома и быта.</p>
+                      <p class="muted" style="margin-top: 12px">Добавьте быт в план, чтобы дела попали в чек-листы.</p>
                     </div>
                   </div>
                 </article>
@@ -1657,18 +1676,23 @@
 
               <aside class="grid">
                 <article class="card">
+                  <div class="card-title"><h2>Требует внимания</h2><span class="pill rose" id="attentionCount">0</span></div>
+                  <div class="activity" id="attentionList"><div class="onboarding-card"><h3>Спокойный день</h3><p class="muted">Проверьте план или создайте первую задачу, чтобы начать рабочий сценарий.</p><button class="btn secondary" type="button" data-route-jump="week">Проверить план</button></div></div>
+                </article>
+
+                <article class="card">
                   <div class="card-title"><h2>Календарь</h2><span class="pill" id="dashboardTodayLabel">сегодня</span></div>
                   <div class="calendar" id="dashboardCalendar"></div>
                 </article>
 
                 <article class="card">
                   <div class="card-title"><h2>Последние действия</h2><span class="pill rose">авто</span></div>
-                  <div class="activity" id="dashboardActivity"><div class="empty-state">Здесь появятся реальные действия: задача выполнена, отчёт приложен, ссылка добавлена.</div></div>
+                  <div class="activity" id="dashboardActivity"><div class="onboarding-card"><h3>Запустите первое действие</h3><p class="muted">Создайте задачу, и история семьи начнёт собираться автоматически.</p><button class="btn secondary" type="button" data-route-jump="tasks">Создать задачу</button></div></div>
                 </article>
 
                 <article class="card">
                   <div class="card-title"><h2>Ближайшие задачи</h2><span class="pill peach">из плана</span></div>
-                  <div class="activity" id="dashboardUpcoming"><div class="empty-state">Когда заполните недельный план, ближайшие задачи появятся здесь сами.</div></div>
+                  <div class="activity" id="dashboardUpcoming"><div class="onboarding-card"><h3>Соберите задачи на сегодня</h3><p class="muted">Недельный план превратится в ближайшие задачи.</p><button class="btn secondary" type="button" id="upcomingBuildDay">Собрать день</button></div></div>
                 </article>
               </aside>
             </div>
@@ -1678,18 +1702,18 @@
           <section class="page" id="children">
             <div class="page-head">
               <div><p class="eyebrow">Family</p><h1>Дети и родители</h1><p class="muted" style="margin-top: 8px">Профили детей, взрослых, настроение, уровень, баллы и прогресс.</p></div>
-              <button class="btn" id="addChild">Добавить ребёнка</button>
+              <button class="btn" id="addChild" data-access="parent">Добавить ребёнка</button>
             </div>
             <div class="grid children-grid" id="childrenGrid">
               <article class="card">
-                <div class="child-top"><div class="child-meta"><span class="avatar">Я</span><div><h2>Яна</h2><p class="muted">8 лет · младшая сестра</p></div></div><span class="pill">настроение хорошее</span></div>
-                <div class="grid cols-3" style="margin-top: 18px"><div><p class="muted">Уровень</p><h2>3</h2></div><div><p class="muted">Streak</p><h2>9</h2></div><div><p class="muted">Баллы</p><h2>145</h2></div></div>
-                <div class="progress"><span style="--value: 74%"></span></div>
+                <div class="child-top"><div class="child-meta"><span class="avatar">Я</span><div><h2>Яна</h2><p class="muted">8 лет · младшая сестра</p></div></div><span class="pill">готова к плану</span></div>
+                <div class="grid cols-3" style="margin-top: 18px"><div><p class="muted">Уровень</p><h2>старт</h2></div><div><p class="muted">Streak</p><h2>старт</h2></div><div><p class="muted">Баллы</p><h2 data-child-points="Яна">0</h2></div></div>
+                <div class="progress"><span data-child-progress="Яна" style="--value: 0%"></span></div>
               </article>
               <article class="card">
-                <div class="child-top"><div class="child-meta"><span class="avatar blue">Е</span><div><h2>Ева</h2><p class="muted">12 лет · старшая сестра</p></div></div><span class="pill blue">в фокусе</span></div>
-                <div class="grid cols-3" style="margin-top: 18px"><div><p class="muted">Уровень</p><h2>4</h2></div><div><p class="muted">Streak</p><h2>12</h2></div><div><p class="muted">Баллы</p><h2>210</h2></div></div>
-                <div class="progress"><span style="--value: 86%"></span></div>
+                <div class="child-top"><div class="child-meta"><span class="avatar blue">Е</span><div><h2>Ева</h2><p class="muted">12 лет · старшая сестра</p></div></div><span class="pill blue">готова к плану</span></div>
+                <div class="grid cols-3" style="margin-top: 18px"><div><p class="muted">Уровень</p><h2>старт</h2></div><div><p class="muted">Streak</p><h2>старт</h2></div><div><p class="muted">Баллы</p><h2 data-child-points="Ева">0</h2></div></div>
+                <div class="progress"><span data-child-progress="Ева" style="--value: 0%"></span></div>
               </article>
             </div>
           </section>
@@ -1697,7 +1721,7 @@
           <section class="page" id="tasks">
             <div class="page-head">
               <div><p class="eyebrow">Задачи</p><h1>Задачи: kanban + чек-лист</h1><p class="muted" style="margin-top: 8px">Ребёнок видит чек-лист на день, родители видят, что сейчас в работе.</p></div>
-              <button class="btn" id="openTaskModal">Создать задачу</button>
+              <button class="btn" id="openTaskModal" data-access="parent">Создать задачу</button>
             </div>
             <div class="grid cols-2" style="margin-bottom: 18px">
               <article class="card status-card active" data-status-card="Яна">
@@ -1737,20 +1761,20 @@
                 </div>
                 <span class="pill" id="dailyDate">сегодня</span>
                 <div class="checklist" id="dailyChecklist">
-                  <div class="empty-state">Задачи дня появятся здесь после заполнения недельного плана или создания задачи.</div>
+                <div class="onboarding-card"><h3>Соберите задачи на сегодня</h3><p class="muted">Нажмите “Собрать день”, и план превратится в чек-лист Яны и Евы.</p><button class="btn secondary" type="button" id="emptyChecklistBuildDay">Собрать день</button></div>
                 </div>
               </article>
             </div>
 
             <div class="kanban">
               <div class="lane" data-status="todo"><div class="lane-head"><h3>Нужно сделать</h3><span class="pill" data-lane-count>0</span></div><div class="task-list">
-                <div class="empty-state">Пока задач нет. Добавьте задачу вручную или создайте их из недельного плана.</div>
+                <div class="onboarding-card"><h3>Создать первую задачу</h3><p class="muted">Добавьте задачу ребёнку или всей семье.</p><button class="btn secondary" type="button" data-empty-create-task>Новая задача</button></div>
               </div></div>
-              <div class="lane" data-status="progress"><div class="lane-head"><h3>В работе</h3><span class="pill blue" data-lane-count>0</span></div><div class="task-list">
-                <div class="empty-state">Когда ребёнок начнёт задачу, карточка будет здесь.</div>
+              <div class="lane" data-status="in_progress"><div class="lane-head"><h3>В работе</h3><span class="pill blue" data-lane-count>0</span></div><div class="task-list">
+                <div class="onboarding-card"><h3>Начните выполнение</h3><p class="muted">Когда ребёнок нажмёт “Начать”, задача окажется в работе.</p><button class="btn secondary" type="button" data-route-jump="tasks">Открыть чек-лист</button></div>
               </div></div>
               <div class="lane" data-status="done"><div class="lane-head"><h3>Готово</h3><span class="pill" data-lane-count>0</span></div><div class="task-list">
-                <div class="empty-state">Выполненные задачи появятся здесь после галочки или перетаскивания.</div>
+                <div class="onboarding-card"><h3>Подтвердите результат</h3><p class="muted">После проверки взрослым задача станет выполненной и начислит баллы.</p><button class="btn secondary" type="button" data-route-jump="reports">Открыть отчёты</button></div>
               </div></div>
             </div>
           </section>
@@ -1804,9 +1828,9 @@
             </div>
             <div class="grid cols-2">
               <article class="card">
-                <div class="card-title"><h2>Сегодня</h2><span class="pill">0 задач</span></div>
+                <div class="card-title"><h2>Сегодня</h2><span class="pill" id="planCountBadge">задачи дня</span></div>
                 <div class="plan-list" id="planList">
-                  <div class="empty-state">Пока задач дня нет. Нажмите “Собрать задачи на сегодня” в недельном плане, и сюда попадут задачи Яны и Евы.</div>
+                  <div class="onboarding-card"><h3>Задач дня ещё нет</h3><p class="muted">Сначала заполните недельный план, потом соберите день.</p><button class="btn secondary" type="button" data-route-jump="week">Заполнить недельный план</button></div>
                 </div>
               </article>
               <article class="card">
@@ -1814,27 +1838,27 @@
                 <div class="activity">
                   <div class="activity-item"><span class="mini-icon">1</span><div><h3>Заполнить недельный план</h3><p class="muted">План начинается с выбранной даты и содержит реальные дела семьи.</p></div></div>
                   <div class="activity-item"><span class="mini-icon">2</span><div><h3>Собрать задачи на сегодня</h3><p class="muted">Пункты Яны попадут Яне, пункты Евы - Еве, семейные - обоим.</p></div></div>
-                  <div class="activity-item"><span class="mini-icon">3</span><div><h3>Отмечать выполнение</h3><p class="muted">После отметок начнут появляться отчёты и статистика.</p></div></div>
+                  <div class="activity-item"><span class="mini-icon">3</span><div><h3>Отмечать выполнение</h3><p class="muted">После отметок отчёты и статистика считаются автоматически.</p></div></div>
                 </div>
               </article>
             </div>
           </section>
 
           <section class="page" id="reports">
-            <div class="page-head"><div><p class="eyebrow">Reports</p><h1>Отчёты</h1><p class="muted" style="margin-top: 8px">Пока всё по нулям. Данные появятся после выполненных задач, комментариев, фото и ссылок.</p></div></div>
+            <div class="page-head"><div><p class="eyebrow">Reports</p><h1>Отчёты</h1><p class="muted" style="margin-top: 8px">Отчёты считаются из задач, подтверждений, комментариев и ссылок.</p></div></div>
             <div class="grid cols-4">
-              <article class="card stat"><h3>Сегодня</h3><p class="stat-value" id="reportTodayPercent" style="color: var(--mint)">0%</p><p class="stat-caption" id="reportTodayCaption">пока нет выполненных задач</p></article>
+              <article class="card stat"><h3>Сегодня</h3><p class="stat-value" id="reportTodayPercent" style="color: var(--mint)">0%</p><p class="stat-caption" id="reportTodayCaption">создайте задачу или соберите день</p></article>
               <article class="card stat"><h3>Неделя</h3><p class="stat-value" id="reportWeekPercent" style="color: var(--blue)">0%</p><p class="stat-caption">считается по текущим задачам недели</p></article>
-              <article class="card stat"><h3>Просрочено</h3><p class="stat-value" id="reportOverdueCount" style="color: var(--rose)">0</p><p class="stat-caption">пока нет просроченных задач</p></article>
+              <article class="card stat"><h3>Просрочено</h3><p class="stat-value" id="reportOverdueCount" style="color: var(--rose)">0</p><p class="stat-caption">считается по дедлайнам</p></article>
               <article class="card stat"><h3>Активность</h3><p class="stat-value" id="reportActivityCount" style="color: var(--peach)">0</p><p class="stat-caption">событий в истории</p></article>
             </div>
             <div class="grid cols-2" style="margin-top: 18px">
-              <article class="card"><div class="card-title"><h2>График недели</h2><span class="pill">пока пусто</span></div><div class="empty-state">Когда появятся выполненные задачи, здесь будет график по дням.</div></article>
-              <article class="card"><div class="card-title"><h2>Вечерняя сводка</h2><span class="pill peach" id="eveningSummaryCount">0 событий</span></div><div class="empty-state" id="eveningSummaryText">Сводка появится после того, как Яна и Ева начнут отмечать задачи и добавлять результаты.</div></article>
+              <article class="card"><div class="card-title"><h2>График недели</h2><span class="pill">живые данные</span></div><div class="chart" id="weeklyChart"><div class="bar" style="height:18%"></div><div class="bar" style="height:18%"></div><div class="bar" style="height:18%"></div><div class="bar" style="height:18%"></div><div class="bar" style="height:18%"></div><div class="bar" style="height:18%"></div><div class="bar" style="height:18%"></div></div></article>
+              <article class="card"><div class="card-title"><h2>Вечерняя сводка</h2><span class="pill peach" id="eveningSummaryCount">события</span></div><div class="onboarding-card" id="eveningSummaryText">Создайте задачу, ребёнок отправит отчёт, взрослый подтвердит — здесь будет готовая сводка.</div></article>
             </div>
             <article class="card" style="margin-top: 18px">
               <div class="card-title"><h2>История изменений</h2><span class="pill blue" id="activityLogCount">0</span></div>
-              <div class="activity" id="activityLog"><div class="empty-state">Пока история пустая. Здесь будут сохраняться статусы, задачи, сообщения, награды и изменения плана.</div></div>
+              <div class="activity" id="activityLog"><div class="onboarding-card"><h3>История действий</h3><p class="muted">Создание задач, “Я сделал”, подтверждения, баллы и награды будут записываться сюда.</p><button class="btn secondary" type="button" data-route-jump="tasks">Создать событие через задачу</button></div></div>
             </article>
           </section>
 
@@ -1852,8 +1876,8 @@
             <div class="page-head"><div><p class="eyebrow">Library</p><h1>Библиотека развития</h1><p class="muted" style="margin-top: 8px">Книги, ролики, мастер-классы, материалы и короткие отчёты после изучения.</p></div><button class="btn" id="openMaterialModal">Добавить материал</button></div>
             <div class="grid cols-3" id="libraryGrid">
               <article class="card"><div class="card-title"><h2>К изучению</h2><span class="pill peach">старт</span></div><div class="activity" id="libraryTodo"><div class="activity-item"><span class="mini-icon">МК</span><div><h3>Мастер-класс: снять ролик</h3><p class="muted">Ева · сценарий, свет, звук, монтаж</p></div><span class="pill blue">мастер-класс</span></div><div class="activity-item"><span class="mini-icon">К</span><div><h3>Книга на выбор</h3><p class="muted">Яна · чтение 10 минут в день</p></div><span class="pill">книга</span></div></div></article>
-              <article class="card"><div class="card-title"><h2>В работе</h2><span class="pill blue">0</span></div><div class="empty-state">Материалы появятся здесь, когда Яна или Ева начнут изучать.</div></article>
-              <article class="card"><div class="card-title"><h2>Изучено</h2><span class="pill">0 отчётов</span></div><div class="empty-state">После изучения ребёнок добавит короткий отчёт, ссылку или фото.</div></article>
+              <article class="card"><div class="card-title"><h2>Навыки</h2><span class="pill blue">развитие</span></div><div class="activity"><div class="activity-item"><span class="mini-icon">Н</span><div><h3>Умею заботиться о себе</h3><p class="muted">сон, еда, прогулка, порядок</p></div><span class="pill">жизнь</span></div><div class="activity-item"><span class="mini-icon">Д</span><div><h3>Умею пользоваться техникой</h3><p class="muted">робот-пылесос, микрофон, посудомойка</p></div><span class="pill blue">дом</span></div></div><button class="btn secondary" id="openSkillFromLibrary" type="button" style="margin-top:14px">Добавить навык</button></article>
+              <article class="card"><div class="card-title"><h2>Добавить развитие</h2><span class="pill">быстро</span></div><div class="onboarding-card"><h3>Книга, ролик или мастер-класс</h3><p class="muted">Поставьте материал Яне или Еве, а потом попросите короткий отчёт.</p><button class="btn secondary" id="openMaterialFromEmpty" type="button">Добавить материал</button></div></article>
             </div>
           </section>
 
@@ -1904,7 +1928,7 @@
             </div>
             <div class="grid cols-2" style="margin-top: 18px">
               <article class="card"><div class="card-title"><h2>Как быт попадает в задачи</h2><span class="pill blue">просто</span></div><div class="activity"><div class="activity-item"><span class="mini-icon">1</span><div><h3>Шаблон недели</h3><p class="muted">ежедневный робот, кухня, комната и кошки уже внутри шаблона.</p></div></div><div class="activity-item"><span class="mini-icon">2</span><div><h3>Собрать задачи на сегодня</h3><p class="muted">на выбранную дату задачи попадут в чек-листы Яны и Евы.</p></div></div><div class="activity-item"><span class="mini-icon">3</span><div><h3>Отметить галочкой</h3><p class="muted">после отметок отчёты начнут считать, что сделано дома.</p></div></div></div></article>
-              <article class="card"><div class="card-title"><h2>Семейный чат</h2><span class="pill rose" id="messageCount">0</span></div><form class="grid" id="messageForm"><select id="messageTo"><option>Всем</option><option>Яне</option><option>Еве</option><option>Родителям</option></select><input class="field" id="messageText" placeholder="Написать сообщение" /><button class="btn">Отправить</button></form><div class="activity" id="messages" style="margin-top: 14px"><div class="empty-state">Пока сообщений нет.</div></div></article>
+              <article class="card"><div class="card-title"><h2>Семейный чат</h2><span class="pill rose" id="messageCount">чат</span></div><form class="grid" id="messageForm"><select id="messageTo"><option>Всем</option><option>Яне</option><option>Еве</option><option>Родителям</option></select><input class="field" id="messageText" placeholder="Написать сообщение" /><button class="btn">Отправить</button></form><div class="activity" id="messages" style="margin-top: 14px"><div class="onboarding-card"><h3>Напишите первое семейное сообщение</h3><p class="muted">Например: “Яна, проверь план после завтрака”.</p><button class="btn secondary" type="button" id="focusMessageInput">Написать</button></div></div></article>
             </div>
           </section>
 
@@ -1929,7 +1953,7 @@
               <div class="auth-benefits">
                 <div class="auth-benefit"><span class="mini-icon">1</span><div><strong>Мария или Павел</strong><p class="muted">создают семью, приглашают детей и управляют задачами.</p></div></div>
                 <div class="auth-benefit"><span class="mini-icon">2</span><div><strong>Яна или Ева</strong><p class="muted">заходят по коду, выбирают себя и работают с чек-листом.</p></div></div>
-                <div class="auth-benefit"><span class="mini-icon">3</span><div><strong>Данные не пропадают</strong><p class="muted">в preview вход и настройки сохраняются в этом браузере.</p></div></div>
+                <div class="auth-benefit"><span class="mini-icon">3</span><div><strong>Готово под базу</strong><p class="muted">структура рассчитана на пользователей, семьи, задачи, отчёты и историю.</p></div></div>
               </div>
             </div>
             <span class="pill blue" id="authInviteHint">Invite A7K42Q</span>
@@ -2009,6 +2033,7 @@
             <label class="form-label">Баллы<input class="field" id="taskPointsInput" type="number" min="0" value="10" /></label>
             <label class="form-label">Подтверждение<select id="taskApprovalInput"><option value="true">нужно подтверждение взрослого</option><option value="false">сразу засчитывать</option></select></label>
           </div>
+          <label class="form-label">Повтор<select id="taskRepeatInput"><option value="once">разово</option><option value="daily">повторять каждый день</option></select></label>
           <textarea class="field" id="taskDescriptionInput" placeholder="Комментарий, ссылка или что нужно приложить"></textarea>
           <button class="btn">Добавить задачу</button>
         </form>
@@ -2021,6 +2046,14 @@
         <form class="grid" id="childForm">
           <input class="field" id="childNameInput" placeholder="Имя ребёнка" />
           <input class="field" id="childAgeInput" type="number" min="1" max="18" value="8" />
+          <div class="form-row">
+            <label class="form-label">Аватар<input class="field" id="childAvatarInput" placeholder="Я" maxlength="2" /></label>
+            <label class="form-label">PIN<input class="field" id="childPinCreateInput" type="password" placeholder="PIN для входа" /></label>
+          </div>
+          <div class="form-row">
+            <label class="form-label">Роль<select id="childRoleInput"><option value="child">child</option></select></label>
+            <label class="form-label">Цвет профиля<select id="childColorInput"><option value="mint">мятный</option><option value="blue">синий</option><option value="peach">персиковый</option><option value="rose">розовый</option></select></label>
+          </div>
           <select id="childMoodInput">
             <option>настроение хорошее</option>
             <option>в фокусе</option>
@@ -2096,7 +2129,7 @@
       const routes = document.querySelectorAll(".nav-btn");
       const pages = document.querySelectorAll(".page");
       const routeTitle = document.querySelector(".topbar h2");
-      const STORAGE_KEY = "family-os-preview-state-v3";
+      const STORAGE_KEY = "family-os-state-v4";
 
       function loadSavedState() {
         try {
@@ -2108,6 +2141,7 @@
       }
 
       const savedState = loadSavedState();
+      let authProfile = savedState.authProfile || null;
 
       function go(route) {
         if (authProfile?.role === "child" && ["children", "reports", "settings"].includes(route)) {
@@ -2123,6 +2157,11 @@
 
       routes.forEach((button) => button.addEventListener("click", () => go(button.dataset.route)));
       document.querySelectorAll("[data-route-jump]").forEach((button) => button.addEventListener("click", () => go(button.dataset.routeJump)));
+      document.addEventListener("click", (event) => {
+        const jump = event.target.closest("[data-route-jump]");
+        if (!jump) return;
+        go(jump.dataset.routeJump);
+      });
 
       if (location.hash) {
         const id = location.hash.slice(1);
@@ -2143,10 +2182,9 @@
         "Ева": []
       };
       const childPoints = savedState.childPoints || {
-        "Яна": 145,
-        "Ева": 210
+        "Яна": 0,
+        "Ева": 0
       };
-      let authProfile = savedState.authProfile || null;
 
       function collectLaneHtml() {
         const lanes = {};
@@ -2164,6 +2202,7 @@
           checklistTasks,
           childPoints,
           authProfile,
+          onboarded: Boolean(authProfile),
           planStore: typeof planStore !== "undefined" ? planStore : savedState.planStore,
           selectedDate: typeof selectedDate !== "undefined" ? isoDate(selectedDate) : savedState.selectedDate,
           calendarMonth: typeof calendarMonth !== "undefined" ? isoDate(calendarMonth) : savedState.calendarMonth,
@@ -2184,7 +2223,7 @@
       function logActivity(message) {
         const log = document.getElementById("activityLog");
         if (!log) return;
-        const empty = log.querySelector(".empty-state");
+        const empty = log.querySelector(".empty-state, .onboarding-card");
         if (empty) empty.remove();
         const item = document.createElement("div");
         item.className = "activity-item";
@@ -2200,6 +2239,12 @@
       }
 
       function normalizeTask(task) {
+        const statusMap = {
+          pending: "waiting_confirmation",
+          approved: "done",
+          rejected: "returned"
+        };
+        const rawStatus = task.status || (task.done ? "done" : "todo");
         return {
           id: task.id || makeTaskId(),
           title: task.title || "Задача",
@@ -2208,9 +2253,10 @@
           time: task.time || "",
           deadline: task.deadline || "",
           tag: task.tag || "план",
-          status: task.status || (task.done ? "approved" : "todo"),
+          status: statusMap[rawStatus] || rawStatus,
           points: Number(task.points ?? 10),
           approvalRequired: task.approvalRequired !== false,
+          repeat: task.repeat || "once",
           comment: task.comment || "",
           reportUrl: task.reportUrl || "",
           createdAt: task.createdAt || new Date().toISOString(),
@@ -2234,9 +2280,9 @@
         return {
           todo: "нужно сделать",
           in_progress: "в работе",
-          pending: "ждёт взрослого",
-          approved: "подтверждено",
-          rejected: "вернули"
+          waiting_confirmation: "ждёт подтверждения",
+          done: "готово",
+          returned: "вернули"
         }[status] || "нужно сделать";
       }
 
@@ -2267,7 +2313,7 @@
         if (!tasks.length) {
           const empty = document.createElement("div");
           empty.className = "onboarding-card";
-          empty.innerHTML = `<h3>Соберите задачи для ${selectedChild === "Ева" ? "Евы" : "Яны"}</h3><p class="muted">Заполните недельный план или создайте задачу вручную. После этого здесь появится понятный чек-лист.</p><div class="task-actions"><button class="btn secondary" type="button" data-route-jump="week">Открыть план</button><button class="btn secondary" type="button" data-empty-create-task>Новая задача</button></div>`;
+          empty.innerHTML = `<h3>Соберите задачи для ${selectedChild === "Ева" ? "Евы" : "Яны"}</h3><p class="muted">Заполните недельный план или создайте задачу вручную, чтобы открыть понятный чек-лист.</p><div class="task-actions"><button class="btn secondary" type="button" data-route-jump="week">Открыть план</button><button class="btn secondary" type="button" data-empty-create-task>Новая задача</button></div>`;
           checklist.appendChild(empty);
           empty.querySelector("[data-route-jump]")?.addEventListener("click", () => go("week"));
           empty.querySelector("[data-empty-create-task]")?.addEventListener("click", openTaskDialog);
@@ -2330,14 +2376,14 @@
         label.dataset.bound = "true";
         input.addEventListener("change", () => {
           if (isChildMode()) {
-            input.checked = label.dataset.status === "approved";
+            input.checked = label.dataset.status === "done";
             showNotice("Нажми “Я сделал”, чтобы отправить задачу взрослому.");
             return;
           }
           const child = label.dataset.checkChild;
           const index = Number(label.dataset.checkIndex);
           if (child && Number.isInteger(index) && checklistTasks[child] && checklistTasks[child][index]) {
-            const nextStatus = input.checked ? "approved" : "todo";
+            const nextStatus = input.checked ? "done" : "todo";
             checklistTasks[child][index] = normalizeTask({ ...checklistTasks[child][index], status: nextStatus, done: input.checked });
             label.dataset.status = nextStatus;
           }
@@ -2349,12 +2395,34 @@
       }
 
       function bindChecklistActions(container) {
+        container.querySelector("[data-start-task]")?.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          const child = container.dataset.checkChild;
+          const task = updateTask(child, container.dataset.taskId, { status: "in_progress" });
+          if (!task) return;
+          logActivity(`${child} начала задачу: ${task.title}`);
+          renderDailyChecklist();
+          updateDashboard();
+          showNotice("Задача в работе.");
+        });
+        container.querySelector("[data-help-task]")?.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          const child = container.dataset.checkChild;
+          const task = updateTask(child, container.dataset.taskId, { status: "in_progress", comment: "Нужна помощь" });
+          if (!task) return;
+          logActivity(`${child} попросила помощь по задаче: ${task.title}`);
+          renderDailyChecklist();
+          updateDashboard();
+          showNotice("Взрослым видно, что нужна помощь.");
+        });
         container.querySelector("[data-submit-task]")?.addEventListener("click", (event) => {
           event.preventDefault();
           event.stopPropagation();
           const child = container.dataset.checkChild;
           const task = updateTask(child, container.dataset.taskId, {
-            status: "pending",
+            status: "waiting_confirmation",
             comment: container.querySelector("[data-task-comment]")?.value || "",
             reportUrl: container.querySelector("[data-task-report]")?.value || ""
           });
@@ -2368,7 +2436,7 @@
           event.preventDefault();
           event.stopPropagation();
           const child = container.dataset.checkChild;
-          const task = updateTask(child, container.dataset.taskId, { status: "approved", done: true });
+          const task = updateTask(child, container.dataset.taskId, { status: "done", done: true });
           if (!task) return;
           childPoints[child] = (childPoints[child] || 0) + Number(task.points || 0);
           logActivity(`Взрослый подтвердил задачу ${child}: ${task.title} (+${task.points} баллов)`);
@@ -2380,7 +2448,7 @@
           event.preventDefault();
           event.stopPropagation();
           const child = container.dataset.checkChild;
-          const task = updateTask(child, container.dataset.taskId, { status: "rejected", done: false });
+          const task = updateTask(child, container.dataset.taskId, { status: "returned", done: false });
           if (!task) return;
           logActivity(`Взрослый вернул задачу ${child}: ${task.title}`);
           renderDailyChecklist();
@@ -2397,7 +2465,7 @@
           const badge = lane.querySelector("[data-lane-count]");
           if (badge) badge.textContent = count;
           const list = lane.querySelector(".task-list");
-          const empty = list.querySelector(".empty-state");
+          const empty = list.querySelector(".empty-state, .onboarding-card");
           if (empty) empty.style.display = count ? "none" : "grid";
         });
       }
@@ -2435,7 +2503,10 @@
       }
 
       function renderAuthProfile() {
-        document.querySelector(".app")?.classList.toggle("child-mode", authProfile?.role === "child");
+        const app = document.querySelector(".app");
+        app?.classList.toggle("child-mode", authProfile?.role === "child");
+        app?.classList.toggle("locked", !authProfile);
+        document.getElementById("authModal")?.classList.toggle("gate", !authProfile);
         const profileName = document.getElementById("profileName");
         const profileInitial = document.getElementById("profileInitial");
         const inviteBadge = document.getElementById("inviteCodeBadge");
@@ -2468,9 +2539,9 @@
       function updateReports() {
         const allTasks = Object.values(checklistTasks).flat().map(normalizeTask);
         const total = allTasks.length;
-        const done = allTasks.filter((task) => task.status === "approved").length;
-        const pending = allTasks.filter((task) => task.status === "pending").length;
-        const overdue = allTasks.filter((task) => task.deadline && task.status !== "approved" && new Date(task.deadline) < new Date()).length;
+        const done = allTasks.filter((task) => task.status === "done").length;
+        const pending = allTasks.filter((task) => task.status === "waiting_confirmation").length;
+        const overdue = allTasks.filter((task) => task.deadline && task.status !== "done" && new Date(task.deadline) < new Date()).length;
         const percent = total ? Math.round((done / total) * 100) : 0;
         const activityCount = document.querySelectorAll("#activityLog .activity-item").length;
         const todayValue = document.getElementById("reportTodayPercent");
@@ -2497,8 +2568,9 @@
         target.innerHTML = "";
         if (!tasks.length) {
           const empty = document.createElement("div");
-          empty.className = "empty-state";
-          empty.textContent = emptyText;
+          empty.className = "onboarding-card";
+          empty.innerHTML = `<h3>${escapeHtml(emptyText)}</h3><p class="muted">Создайте задачу или соберите день из недельного плана.</p><button class="btn secondary" type="button" data-route-jump="week">Открыть план</button>`;
+          empty.querySelector("[data-route-jump]")?.addEventListener("click", () => go("week"));
           target.appendChild(empty);
           return;
         }
@@ -2512,11 +2584,17 @@
 
       function updateDashboard() {
         const tasks = allTasks();
-        const done = tasks.filter((task) => task.status === "approved").length;
-        const pending = tasks.filter((task) => task.status === "pending").length;
-        const overdue = tasks.filter((task) => task.deadline && task.status !== "approved" && new Date(task.deadline) < new Date()).length;
+        const done = tasks.filter((task) => task.status === "done").length;
+        const pending = tasks.filter((task) => task.status === "waiting_confirmation").length;
+        const overdue = tasks.filter((task) => task.deadline && task.status !== "done" && new Date(task.deadline) < new Date()).length;
         const percent = tasks.length ? Math.round((done / tasks.length) * 100) : 0;
         const withProof = tasks.filter((task) => task.comment || task.reportUrl).length;
+        const noTaskChildren = ["Яна", "Ева"].filter((child) => !(checklistTasks[child] || []).length);
+        const attentionItems = [
+          ...tasks.filter((task) => task.status === "waiting_confirmation").map((task) => ({ title: `${task.child}: ждёт подтверждения`, text: task.title, tone: "rose" })),
+          ...tasks.filter((task) => task.deadline && task.status !== "done" && new Date(task.deadline) < new Date()).map((task) => ({ title: `${task.child}: просрочено`, text: task.title, tone: "peach" })),
+          ...noTaskChildren.map((child) => ({ title: `${child}: нет задач на сегодня`, text: "Соберите день из недельного плана", tone: "blue" }))
+        ];
         const setText = (id, value) => {
           const node = document.getElementById(id);
           if (node) node.textContent = value;
@@ -2526,25 +2604,50 @@
         setText("dashboardProofCount", String(withProof));
         setText("dashboardOverdueCount", String(overdue));
         setText("weeklyStatsCaption", tasks.length ? `Всего задач: ${tasks.length}. Ждёт взрослого: ${pending}.` : "Соберите день из плана или создайте первую задачу.");
+        setText("attentionCount", String(attentionItems.length));
+        const attention = document.getElementById("attentionList");
+        if (attention) {
+          attention.innerHTML = "";
+          if (!attentionItems.length) {
+            attention.innerHTML = `<div class="onboarding-card"><h3>Спокойный день</h3><p class="muted">Проверьте план или создайте первую задачу, чтобы начать рабочий сценарий.</p><button class="btn secondary" type="button" data-route-jump="week">Проверить план</button></div>`;
+          } else {
+            attentionItems.slice(0, 5).forEach((entry) => {
+              const item = document.createElement("div");
+              item.className = "activity-item";
+              item.innerHTML = `<span class="mini-icon">!</span><div><h3>${escapeHtml(entry.title)}</h3><p class="muted">${escapeHtml(entry.text)}</p></div><span class="pill ${entry.tone}">важно</span>`;
+              attention.appendChild(item);
+            });
+          }
+        }
+        const sidebarProgress = document.getElementById("sidebarProgress");
+        if (sidebarProgress) sidebarProgress.style.setProperty("--value", `${percent}%`);
+        setText("sidebarProgressText", tasks.length ? `${done}/${tasks.length} задач подтверждено` : "Создайте задачу или соберите день из плана");
         const childName = authProfile?.role === "child" ? authProfile.name : selectedChild;
         const childTasks = (checklistTasks[childName] || []).map((task) => normalizeTask({ ...task, child: childName }));
-        const childDone = childTasks.filter((task) => task.status === "approved").length;
-        const childPending = childTasks.filter((task) => task.status === "pending").length;
+        const childDone = childTasks.filter((task) => task.status === "done").length;
+        const childPending = childTasks.filter((task) => task.status === "waiting_confirmation").length;
         const childPercent = childTasks.length ? Math.round((childDone / childTasks.length) * 100) : 0;
+        ["Яна", "Ева"].forEach((name) => {
+          const tasksForChild = (checklistTasks[name] || []).map((task) => normalizeTask({ ...task, child: name }));
+          const doneForChild = tasksForChild.filter((task) => task.status === "done").length;
+          const progress = tasksForChild.length ? Math.round((doneForChild / tasksForChild.length) * 100) : 0;
+          document.querySelector(`[data-child-points="${name}"]`)?.replaceChildren(String(childPoints[name] || 0));
+          document.querySelector(`[data-child-progress="${name}"]`)?.style.setProperty("--value", `${progress}%`);
+        });
         setText("childDashboardTitle", `${childName}, твой день`);
-        setText("childDashboardSubtitle", childTasks.length ? "Отмечай задачи кнопкой “Я сделал” и добавляй комментарий или ссылку." : "Пока задач нет. Взрослый может собрать день из недельного плана.");
+        setText("childDashboardSubtitle", childTasks.length ? "Отмечай задачи кнопкой “Я сделал” и добавляй комментарий или ссылку." : "Взрослый может собрать день из недельного плана.");
         setText("childProgressValue", `${childPercent}%`);
         setText("childPointsValue", String(childPoints[childName] || 0));
         setText("childPendingValue", String(childPending));
         setText("childTaskCount", String(childTasks.length));
-        renderMiniTaskList("childDashboardTasks", childTasks, "Пока задач нет. Когда взрослый соберёт день, они появятся здесь.");
-        renderMiniTaskList("dashboardUpcoming", tasks.filter((task) => task.status !== "approved"), "Создайте задачу или соберите день из плана.");
+        renderMiniTaskList("childDashboardTasks", childTasks, "Мои задачи ещё не собраны");
+        renderMiniTaskList("dashboardUpcoming", tasks.filter((task) => task.status !== "done"), "Создайте задачу или соберите день из плана.");
         const logItems = [...document.querySelectorAll("#activityLog .activity-item")].slice(0, 4);
         const activity = document.getElementById("dashboardActivity");
         if (activity) {
           activity.innerHTML = "";
           if (!logItems.length) {
-            activity.innerHTML = `<div class="empty-state">Здесь появятся реальные действия: задача выполнена, отчёт приложен, ссылка добавлена.</div>`;
+            activity.innerHTML = `<div class="onboarding-card"><h3>Запустите первое действие</h3><p class="muted">Создайте задачу, и история семьи начнёт собираться автоматически.</p><button class="btn secondary" type="button" data-route-jump="tasks">Создать задачу</button></div>`;
           } else {
             logItems.forEach((item) => activity.appendChild(item.cloneNode(true)));
           }
@@ -2559,7 +2662,8 @@
         card.dataset.taskId = task.id;
         card.dataset.child = task.child;
         card.innerHTML = `<h3>${escapeHtml(task.title)}</h3><p class="muted" style="margin-top: 7px">${escapeHtml(task.child)} · ${escapeHtml(task.time || "без времени")} · ${escapeHtml(task.points)} баллов</p><div class="task-tags"><span class="pill blue">${escapeHtml(task.tag)}</span><span class="pill peach">${escapeHtml(taskStatusLabel(task.status))}</span></div>${task.description ? `<p class="muted" style="margin-top: 10px">${escapeHtml(task.description)}</p>` : ""}<div class="task-footer"><span>создано вручную</span><span>${task.approvalRequired ? "нужно подтверждение" : "сразу засчитывать"}</span></div>`;
-        document.querySelector('.lane[data-status="todo"] .task-list').appendChild(card);
+        const laneStatus = task.status === "in_progress" ? "in_progress" : task.status === "done" ? "done" : "todo";
+        document.querySelector(`.lane[data-status="${laneStatus}"] .task-list`)?.appendChild(card);
         bindTaskCard(card);
         updateLaneCounts();
       }
@@ -2572,9 +2676,9 @@
         if (Number.isInteger(index)) label.dataset.checkIndex = String(index);
         label.dataset.taskId = task.id;
         label.dataset.status = task.status;
-        const isApproved = task.status === "approved";
-        const parentActions = isParentMode() && task.status === "pending" ? `<div class="task-actions"><button class="mini-action approve" type="button" data-approve-task>Подтвердить</button><button class="mini-action return" type="button" data-return-task>Вернуть</button></div>` : "";
-        const childActions = isChildMode() && task.status !== "approved" ? `<div class="report-fields"><input class="field" data-task-comment placeholder="Комментарий: что сделала?" value="${escapeHtml(task.comment)}" /><input class="field" data-task-report placeholder="Фото или ссылка на отчёт" value="${escapeHtml(task.reportUrl)}" /><button class="btn big-action" type="button" data-submit-task>Я сделал</button></div>` : "";
+        const isApproved = task.status === "done";
+        const parentActions = isParentMode() && task.status === "waiting_confirmation" ? `<div class="task-actions"><button class="mini-action approve" type="button" data-approve-task>Подтвердить</button><button class="mini-action return" type="button" data-return-task>Вернуть</button></div>` : "";
+        const childActions = isChildMode() && task.status !== "done" ? `<div class="report-fields"><input class="field" data-task-comment placeholder="Комментарий: что сделала?" value="${escapeHtml(task.comment)}" /><input class="field" data-task-report placeholder="Фото или ссылка на отчёт" value="${escapeHtml(task.reportUrl)}" /><div class="task-actions"><button class="btn secondary" type="button" data-start-task>Начать</button><button class="btn secondary" type="button" data-help-task>Нужна помощь</button><button class="btn big-action" type="button" data-submit-task>Я сделал</button></div></div>` : "";
         label.innerHTML = `<input type="checkbox" ${isApproved ? "checked" : ""} /><div><h3>${escapeHtml(task.title)}</h3><p class="muted">${escapeHtml(task.time || "без времени")} · ${escapeHtml(task.tag)} · ${escapeHtml(task.points)} баллов</p>${task.description ? `<p class="muted" style="margin-top: 6px">${escapeHtml(task.description)}</p>` : ""}${childActions}${parentActions}</div><span class="pill peach">${escapeHtml(taskStatusLabel(task.status))}</span>`;
         if (isApproved) label.classList.add("done");
         bindChecklistItem(label);
@@ -2602,10 +2706,13 @@
         if (!list) return;
         const tasks = [...checklistTasks["Яна"], ...checklistTasks["Ева"]].sort((a, b) => (a.time || "").localeCompare(b.time || ""));
         list.innerHTML = "";
+        const planBadge = document.getElementById("planCountBadge");
+        if (planBadge) planBadge.textContent = tasks.length ? `${tasks.length} задач` : "задачи дня";
         if (!tasks.length) {
           const empty = document.createElement("div");
-          empty.className = "empty-state";
-          empty.textContent = "Пока задач дня нет. Нажмите “Собрать задачи на сегодня” в недельном плане, и сюда попадут задачи Яны и Евы.";
+          empty.className = "onboarding-card";
+          empty.innerHTML = `<h3>Задачи дня ещё не собраны</h3><p class="muted">Нажмите “Собрать задачи на сегодня” в недельном плане, и сюда попадут задачи Яны и Евы.</p><button class="btn secondary" type="button" data-route-jump="week">Открыть план</button>`;
+          empty.querySelector("[data-route-jump]")?.addEventListener("click", () => go("week"));
           list.appendChild(empty);
           return;
         }
@@ -2636,7 +2743,13 @@
         lane.addEventListener("dragleave", () => lane.classList.remove("drag-over"));
         lane.addEventListener("drop", () => {
           lane.classList.remove("drag-over");
-          if (draggedTask) lane.querySelector(".task-list").appendChild(draggedTask);
+          if (draggedTask) {
+            lane.querySelector(".task-list").appendChild(draggedTask);
+            const child = draggedTask.dataset.child;
+            const task = updateTask(child, draggedTask.dataset.taskId, { status: lane.dataset.status });
+            const statusPill = draggedTask.querySelector(".task-tags .pill.peach");
+            if (statusPill && task) statusPill.textContent = taskStatusLabel(task.status);
+          }
           updateLaneCounts();
           logActivity("Задачу перенесли между статусами");
         });
@@ -2934,8 +3047,8 @@
 
       function updateMessageCount() {
         const count = document.querySelectorAll("#messages .activity-item").length;
-        document.getElementById("messageCount").textContent = String(count);
-        const empty = document.querySelector("#messages .empty-state");
+        document.getElementById("messageCount").textContent = count ? String(count) : "чат";
+        const empty = document.querySelector("#messages .onboarding-card, #messages .empty-state");
         if (empty) empty.style.display = count ? "none" : "grid";
       }
 
@@ -3008,9 +3121,16 @@
         renderAuthProfile();
         modal.classList.add("show");
       }
+      if (!authProfile) {
+        modal.classList.add("show", "gate");
+        document.querySelector(".app")?.classList.add("locked");
+      }
       document.getElementById("openAuth").addEventListener("click", showAuth);
       document.getElementById("openAuth2").addEventListener("click", showAuth);
-      document.getElementById("closeAuth").addEventListener("click", () => modal.classList.remove("show"));
+      document.getElementById("closeAuth").addEventListener("click", () => {
+        if (!authProfile) return;
+        modal.classList.remove("show");
+      });
       document.querySelectorAll(".role-card").forEach((card) => {
         card.addEventListener("click", () => {
           const role = card.dataset.role;
@@ -3037,6 +3157,7 @@
         document.getElementById("authResult").classList.add("show");
         document.getElementById("authResult").innerHTML = `<strong>${escapeHtml(name)}, семейное пространство готово.</strong><br />Код для Яны и Евы: <span class="pill blue">Invite ${escapeHtml(inviteCode)}</span>`;
         renderAuthProfile();
+        modal.classList.remove("show", "gate");
         logActivity(`${name} вошёл(ла) как взрослый`);
         saveState();
         showNotice("Семейное пространство сохранено.");
@@ -3054,6 +3175,7 @@
         document.getElementById("authResult").classList.add("show");
         document.getElementById("authResult").innerHTML = `<strong>${escapeHtml(name)}, вход выполнен.</strong><br />Роль: <span class="pill blue">${escapeHtml(role)}</span>`;
         renderAuthProfile();
+        modal.classList.remove("show", "gate");
         logActivity(`${name} вошёл(ла) как ${role}`);
         saveState();
         showNotice("Взрослый dashboard открыт.");
@@ -3080,6 +3202,7 @@
         selectedChild = name;
         renderAuthProfile();
         renderChildStatus();
+        modal.classList.remove("show", "gate");
         result.innerHTML = `<strong>${escapeHtml(name)}, вход готов.</strong><br />Открываю твой чек-лист и план дня.`;
         logActivity(`${name} вошла как ребёнок`);
         saveState();
@@ -3091,6 +3214,7 @@
         const name = authProfile?.name || "Пользователь";
         authProfile = null;
         renderAuthProfile();
+        modal.classList.add("show", "gate");
         logActivity(`${name} вышел(ла) из Family OS`);
         saveState();
         showNotice("Вы вышли из профиля.");
@@ -3098,7 +3222,7 @@
       });
 
       document.getElementById("openNotifications").addEventListener("click", () => {
-        showNotice("Пока новых уведомлений нет. Они появятся после задач, отчётов и сообщений.");
+        showNotice("Новых уведомлений нет. Они включатся для задач, отчётов и сообщений.");
       });
 
       document.querySelectorAll(".toggle").forEach((button) => {
@@ -3131,6 +3255,7 @@
 
       const materialModal = document.getElementById("materialModal");
       document.getElementById("openMaterialModal").addEventListener("click", () => materialModal.classList.add("show"));
+      document.getElementById("openMaterialFromEmpty")?.addEventListener("click", () => materialModal.classList.add("show"));
       document.getElementById("closeMaterialModal").addEventListener("click", () => materialModal.classList.remove("show"));
       document.getElementById("materialForm").addEventListener("submit", (event) => {
         event.preventDefault();
@@ -3158,11 +3283,15 @@
       document.getElementById("quickCreateTask")?.addEventListener("click", openTaskDialog);
       document.getElementById("quickGenerateDay")?.addEventListener("click", () => document.getElementById("generateDayTasks").click());
       document.getElementById("dashboardBuildDay")?.addEventListener("click", () => document.getElementById("generateDayTasks").click());
+      document.getElementById("emptyChecklistBuildDay")?.addEventListener("click", () => document.getElementById("generateDayTasks").click());
+      document.getElementById("upcomingBuildDay")?.addEventListener("click", () => document.getElementById("generateDayTasks").click());
+      document.querySelectorAll("[data-empty-create-task]").forEach((button) => button.addEventListener("click", openTaskDialog));
       document.getElementById("dashboardNewTask").addEventListener("click", () => {
         go("tasks");
         openTaskDialog();
       });
       document.getElementById("closeTaskModal").addEventListener("click", () => taskModal.classList.remove("show"));
+      document.getElementById("focusMessageInput")?.addEventListener("click", () => document.getElementById("messageText")?.focus());
       document.getElementById("taskCreateForm").addEventListener("submit", (event) => {
         event.preventDefault();
         const title = document.getElementById("taskTitleInput").value.trim();
@@ -3176,6 +3305,7 @@
           tag: document.getElementById("taskTagInput").value,
           points: Number(document.getElementById("taskPointsInput").value || 10),
           approvalRequired: document.getElementById("taskApprovalInput").value === "true",
+          repeat: document.getElementById("taskRepeatInput").value,
           status: "todo",
           description: document.getElementById("taskDescriptionInput").value.trim(),
           createdAt: new Date().toISOString(),
@@ -3192,6 +3322,7 @@
         document.getElementById("taskTimeInput").value = "18:00";
         document.getElementById("taskPointsInput").value = "10";
         document.getElementById("taskApprovalInput").value = "true";
+        document.getElementById("taskRepeatInput").value = "once";
         taskModal.classList.remove("show");
         showNotice("Задача добавлена в kanban и чек-лист.");
         logActivity(`Создана задача: ${title}`);
@@ -3208,10 +3339,12 @@
         if (!name) return;
         const age = document.getElementById("childAgeInput").value || "8";
         const mood = document.getElementById("childMoodInput").value;
-        const initial = name.slice(0, 1).toUpperCase();
+        const initial = (document.getElementById("childAvatarInput").value.trim() || name.slice(0, 1)).toUpperCase();
+        const color = document.getElementById("childColorInput").value;
+        const pin = document.getElementById("childPinCreateInput").value.trim();
         const card = document.createElement("article");
         card.className = "card";
-        card.innerHTML = `<div class="child-top"><div class="child-meta"><span class="avatar mint">${escapeHtml(initial)}</span><div><h2>${escapeHtml(name)}</h2><p class="muted">${escapeHtml(age)} лет · ребёнок</p></div></div><span class="pill">${escapeHtml(mood)}</span></div><div class="grid cols-3" style="margin-top: 18px"><div><p class="muted">Уровень</p><h2>1</h2></div><div><p class="muted">Streak</p><h2>0</h2></div><div><p class="muted">Баллы</p><h2>0</h2></div></div><div class="progress"><span style="--value: 8%"></span></div>`;
+        card.innerHTML = `<div class="child-top"><div class="child-meta"><span class="avatar ${escapeHtml(color)}">${escapeHtml(initial)}</span><div><h2>${escapeHtml(name)}</h2><p class="muted">${escapeHtml(age)} лет · ребёнок · PIN ${pin ? "задан" : "не задан"}</p></div></div><span class="pill">${escapeHtml(mood)}</span></div><div class="grid cols-3" style="margin-top: 18px"><div><p class="muted">Уровень</p><h2>1</h2></div><div><p class="muted">Streak</p><h2>0</h2></div><div><p class="muted">Баллы</p><h2>0</h2></div></div><div class="progress"><span style="--value: 8%"></span></div>`;
         document.getElementById("childrenGrid").appendChild(card);
         document.getElementById("childForm").reset();
         document.getElementById("childAgeInput").value = "8";
@@ -3223,6 +3356,7 @@
 
       const skillModal = document.getElementById("skillModal");
       document.getElementById("openSkillModal").addEventListener("click", () => skillModal.classList.add("show"));
+      document.getElementById("openSkillFromLibrary")?.addEventListener("click", () => skillModal.classList.add("show"));
       document.getElementById("closeSkillModal").addEventListener("click", () => skillModal.classList.remove("show"));
       document.getElementById("skillForm").addEventListener("submit", (event) => {
         event.preventDefault();

@@ -2,10 +2,10 @@ create extension if not exists pgcrypto;
 
 create type public.user_role as enum ('parent', 'child', 'admin');
 create type public.task_priority as enum ('low', 'medium', 'high');
-create type public.task_status as enum ('todo', 'submitted', 'approved', 'rejected', 'overdue');
-create type public.day_block as enum ('morning', 'school', 'homework', 'sport', 'walk', 'chores', 'evening', 'sleep');
+create type public.task_status as enum ('todo', 'in_progress', 'waiting_confirmation', 'done', 'returned', 'overdue');
+create type public.day_block as enum ('morning', 'study', 'homework', 'sport', 'walk', 'chores', 'evening', 'sleep');
 create type public.submission_status as enum ('pending', 'approved', 'rejected');
-create type public.daily_task_status as enum ('todo', 'in_progress', 'done', 'missed');
+create type public.daily_task_status as enum ('todo', 'in_progress', 'waiting_confirmation', 'done', 'returned', 'missed');
 create type public.library_status as enum ('planned', 'in_progress', 'learned');
 create type public.skill_status as enum ('planned', 'learning', 'mastered');
 
@@ -13,7 +13,10 @@ create table public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   full_name text not null,
   role public.user_role not null,
+  age integer,
   avatar_url text,
+  profile_color text,
+  pin_hash text,
   points integer not null default 0,
   level integer not null default 1,
   streak integer not null default 0,
@@ -60,8 +63,10 @@ create table public.invitations (
   family_id uuid not null references public.families(id) on delete cascade,
   code text not null unique,
   role public.user_role not null default 'child',
+  pin_hash text,
   expires_at timestamptz,
   used_by uuid references public.profiles(id),
+  used_at timestamptz,
   created_at timestamptz not null default now()
 );
 
@@ -545,7 +550,7 @@ begin
     raise exception 'Task not found';
   end if;
 
-  if next_status not in ('approved', 'rejected') then
+  if next_status not in ('done', 'returned') then
     raise exception 'Unsupported review status';
   end if;
 
@@ -558,10 +563,10 @@ begin
   where id = target_task_id;
 
   update public.task_submissions
-  set status = case when next_status = 'approved' then 'approved'::public.submission_status else 'rejected'::public.submission_status end
+  set status = case when next_status = 'done' then 'approved'::public.submission_status else 'rejected'::public.submission_status end
   where task_id = target_task_id and status = 'pending';
 
-  if next_status = 'approved' and target_task.status <> 'approved' then
+  if next_status = 'done' and target_task.status <> 'done' then
     update public.profiles
     set
       points = points + target_task.points,
