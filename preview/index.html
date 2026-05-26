@@ -1554,15 +1554,19 @@
           <section class="page" id="reports">
             <div class="page-head"><div><p class="eyebrow">Reports</p><h1>Отчёты</h1><p class="muted" style="margin-top: 8px">Пока всё по нулям. Данные появятся после выполненных задач, комментариев, фото и ссылок.</p></div></div>
             <div class="grid cols-4">
-              <article class="card stat"><h3>Сегодня</h3><p class="stat-value" style="color: var(--mint)">0%</p><p class="stat-caption">пока нет выполненных задач</p></article>
-              <article class="card stat"><h3>Неделя</h3><p class="stat-value" style="color: var(--blue)">0%</p><p class="stat-caption">появится после недели данных</p></article>
-              <article class="card stat"><h3>Просрочено</h3><p class="stat-value" style="color: var(--rose)">0</p><p class="stat-caption">пока нет просроченных задач</p></article>
-              <article class="card stat"><h3>Активность</h3><p class="stat-value" style="color: var(--peach)">0</p><p class="stat-caption">пока нет событий</p></article>
+              <article class="card stat"><h3>Сегодня</h3><p class="stat-value" id="reportTodayPercent" style="color: var(--mint)">0%</p><p class="stat-caption" id="reportTodayCaption">пока нет выполненных задач</p></article>
+              <article class="card stat"><h3>Неделя</h3><p class="stat-value" id="reportWeekPercent" style="color: var(--blue)">0%</p><p class="stat-caption">считается по текущим задачам недели</p></article>
+              <article class="card stat"><h3>Просрочено</h3><p class="stat-value" id="reportOverdueCount" style="color: var(--rose)">0</p><p class="stat-caption">пока нет просроченных задач</p></article>
+              <article class="card stat"><h3>Активность</h3><p class="stat-value" id="reportActivityCount" style="color: var(--peach)">0</p><p class="stat-caption">событий в истории</p></article>
             </div>
             <div class="grid cols-2" style="margin-top: 18px">
               <article class="card"><div class="card-title"><h2>График недели</h2><span class="pill">пока пусто</span></div><div class="empty-state">Когда появятся выполненные задачи, здесь будет график по дням.</div></article>
-              <article class="card"><div class="card-title"><h2>Вечерняя сводка</h2><span class="pill peach">0 событий</span></div><div class="empty-state">Сводка появится после того, как Яна и Ева начнут отмечать задачи и добавлять результаты.</div></article>
+              <article class="card"><div class="card-title"><h2>Вечерняя сводка</h2><span class="pill peach" id="eveningSummaryCount">0 событий</span></div><div class="empty-state" id="eveningSummaryText">Сводка появится после того, как Яна и Ева начнут отмечать задачи и добавлять результаты.</div></article>
             </div>
+            <article class="card" style="margin-top: 18px">
+              <div class="card-title"><h2>История изменений</h2><span class="pill blue" id="activityLogCount">0</span></div>
+              <div class="activity" id="activityLog"><div class="empty-state">Пока история пустая. Здесь будут сохраняться статусы, задачи, сообщения, награды и изменения плана.</div></div>
+            </article>
           </section>
 
           <section class="page" id="rewards">
@@ -1772,6 +1776,18 @@
       const routes = document.querySelectorAll(".nav-btn");
       const pages = document.querySelectorAll(".page");
       const routeTitle = document.querySelector(".topbar h2");
+      const STORAGE_KEY = "family-os-preview-state-v3";
+
+      function loadSavedState() {
+        try {
+          return JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+        } catch (error) {
+          console.warn("Family OS: saved state is broken", error);
+          return {};
+        }
+      }
+
+      const savedState = loadSavedState();
 
       function go(route) {
         pages.forEach((page) => page.classList.toggle("active", page.id === route));
@@ -1789,23 +1805,64 @@
         if (document.getElementById(id)) go(id);
       }
 
-      document.querySelectorAll(".toggle").forEach((toggle) => {
-        toggle.addEventListener("click", () => toggle.classList.toggle("on"));
-      });
-
-      const childStatuses = {
+      const childStatuses = savedState.childStatuses || {
         "Яна": "Учусь",
         "Ева": "Читаю книгу"
       };
-      let selectedChild = "Яна";
+      let selectedChild = savedState.selectedChild || "Яна";
       const childAges = {
         "Яна": "8 лет",
         "Ева": "12 лет"
       };
-      const checklistTasks = {
+      const checklistTasks = savedState.checklistTasks || {
         "Яна": [],
         "Ева": []
       };
+
+      function collectLaneHtml() {
+        const lanes = {};
+        document.querySelectorAll(".lane").forEach((lane) => {
+          const list = lane.querySelector(".task-list");
+          if (list) lanes[lane.dataset.status] = list.innerHTML;
+        });
+        return lanes;
+      }
+
+      function saveState() {
+        const state = {
+          childStatuses,
+          selectedChild,
+          checklistTasks,
+          planStore: typeof planStore !== "undefined" ? planStore : savedState.planStore,
+          selectedDate: typeof selectedDate !== "undefined" ? isoDate(selectedDate) : savedState.selectedDate,
+          calendarMonth: typeof calendarMonth !== "undefined" ? isoDate(calendarMonth) : savedState.calendarMonth,
+          html: {
+            childrenGrid: document.getElementById("childrenGrid")?.innerHTML || "",
+            rewardsGrid: document.getElementById("rewardsGrid")?.innerHTML || "",
+            libraryTodo: document.getElementById("libraryTodo")?.innerHTML || "",
+            skillsGrid: document.getElementById("skillsGrid")?.innerHTML || "",
+            messages: document.getElementById("messages")?.innerHTML || "",
+            activityLog: document.getElementById("activityLog")?.innerHTML || "",
+            inviteCode: document.getElementById("inviteCodeBadge")?.textContent || "Invite A7K42Q",
+            lanes: collectLaneHtml()
+          }
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      }
+
+      function logActivity(message) {
+        const log = document.getElementById("activityLog");
+        if (!log) return;
+        const empty = log.querySelector(".empty-state");
+        if (empty) empty.remove();
+        const item = document.createElement("div");
+        item.className = "activity-item";
+        const now = new Date();
+        item.innerHTML = `<span class="mini-icon">i</span><div><h3>${escapeHtml(message)}</h3><p class="muted">${now.toLocaleDateString("ru-RU")} · ${now.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" })}</p></div>`;
+        log.prepend(item);
+        updateReports();
+        saveState();
+      }
 
       function renderDailyChecklist() {
         const title = document.getElementById("dailyChecklistTitle");
@@ -1824,7 +1881,7 @@
           checklist.appendChild(empty);
           return;
         }
-        tasks.forEach((task) => checklist.appendChild(createChecklistElement(task)));
+        tasks.forEach((task, index) => checklist.appendChild(createChecklistElement(task, selectedChild, index)));
       }
 
       function renderChildStatus() {
@@ -1850,6 +1907,7 @@
         tab.addEventListener("click", () => {
           selectedChild = tab.dataset.child;
           renderChildStatus();
+          saveState();
         });
       });
 
@@ -1858,6 +1916,7 @@
           selectedChild = button.dataset.child;
           childStatuses[selectedChild] = button.dataset.status;
           renderChildStatus();
+          logActivity(`${selectedChild}: статус “${button.dataset.status}”`);
         });
       });
 
@@ -1871,9 +1930,17 @@
 
       function bindChecklistItem(label) {
         const input = label.querySelector("input");
-        if (!input) return;
+        if (!input || label.dataset.bound === "true") return;
+        label.dataset.bound = "true";
         input.addEventListener("change", () => {
           label.classList.toggle("done", input.checked);
+          const child = label.dataset.checkChild;
+          const index = Number(label.dataset.checkIndex);
+          if (child && Number.isInteger(index) && checklistTasks[child] && checklistTasks[child][index]) {
+            checklistTasks[child][index].done = input.checked;
+          }
+          updateReports();
+          saveState();
         });
       }
 
@@ -1891,6 +1958,8 @@
       }
 
       function bindTaskCard(card) {
+        if (card.dataset.bound === "true") return;
+        card.dataset.bound = "true";
         card.addEventListener("dragstart", () => {
           draggedTask = card;
           setTimeout(() => (card.style.opacity = "0.45"), 0);
@@ -1899,6 +1968,7 @@
           card.style.opacity = "1";
           draggedTask = null;
           updateLaneCounts();
+          saveState();
         });
       }
 
@@ -1919,6 +1989,28 @@
         setTimeout(() => notice.remove(), 2200);
       }
 
+      function updateReports() {
+        const allTasks = Object.values(checklistTasks).flat();
+        const total = allTasks.length;
+        const done = allTasks.filter((task) => task.done).length;
+        const percent = total ? Math.round((done / total) * 100) : 0;
+        const activityCount = document.querySelectorAll("#activityLog .activity-item").length;
+        const todayValue = document.getElementById("reportTodayPercent");
+        const weekValue = document.getElementById("reportWeekPercent");
+        const todayCaption = document.getElementById("reportTodayCaption");
+        const activityValue = document.getElementById("reportActivityCount");
+        const logCount = document.getElementById("activityLogCount");
+        const summaryCount = document.getElementById("eveningSummaryCount");
+        const summaryText = document.getElementById("eveningSummaryText");
+        if (todayValue) todayValue.textContent = `${percent}%`;
+        if (weekValue) weekValue.textContent = `${percent}%`;
+        if (todayCaption) todayCaption.textContent = total ? `${done} из ${total} задач отмечено` : "пока нет выполненных задач";
+        if (activityValue) activityValue.textContent = String(activityCount);
+        if (logCount) logCount.textContent = String(activityCount);
+        if (summaryCount) summaryCount.textContent = `${activityCount} событий`;
+        if (summaryText) summaryText.textContent = total ? `Сегодня отмечено ${done} из ${total} задач. История действий: ${activityCount}.` : "Сводка появится после того, как Яна и Ева начнут отмечать задачи и добавлять результаты.";
+      }
+
       function addTaskCard({ title, child, time, tag, description }) {
         const card = document.createElement("article");
         card.className = "task-card";
@@ -1929,10 +2021,13 @@
         updateLaneCounts();
       }
 
-      function createChecklistElement({ title, time, tag }) {
+      function createChecklistElement({ title, time, tag, done }, child, index) {
         const label = document.createElement("label");
         label.className = "check-item";
-        label.innerHTML = `<input type="checkbox" /><div><h3>${escapeHtml(title)}</h3><p class="muted">${escapeHtml(time || "без времени")} · ${escapeHtml(tag)}</p></div><span class="pill peach">${escapeHtml(tag)}</span>`;
+        if (child) label.dataset.checkChild = child;
+        if (Number.isInteger(index)) label.dataset.checkIndex = String(index);
+        label.innerHTML = `<input type="checkbox" ${done ? "checked" : ""} /><div><h3>${escapeHtml(title)}</h3><p class="muted">${escapeHtml(time || "без времени")} · ${escapeHtml(tag)}</p></div><span class="pill peach">${escapeHtml(tag)}</span>`;
+        if (done) label.classList.add("done");
         bindChecklistItem(label);
         return label;
       }
@@ -1941,11 +2036,14 @@
         const targets = task.child === "Семья" ? ["Яна", "Ева"] : [task.child];
         targets.forEach((child) => {
           if (!checklistTasks[child]) return;
-          checklistTasks[child].push(task);
+          checklistTasks[child].push({ ...task, child, done: false });
         });
         if (targets.includes(selectedChild)) {
           renderDailyChecklist();
         }
+        renderPlanListFromTasks();
+        updateReports();
+        saveState();
       }
 
       function renderPlanListFromTasks() {
@@ -1989,6 +2087,7 @@
           lane.classList.remove("drag-over");
           if (draggedTask) lane.querySelector(".task-list").appendChild(draggedTask);
           updateLaneCounts();
+          logActivity("Задачу перенесли между статусами");
         });
       });
 
@@ -1998,9 +2097,9 @@
       const monthNamesShort = ["янв", "фев", "мар", "апр", "мая", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"];
       const weekdayShort = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
       const today = new Date();
-      let selectedDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-      let calendarMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
-      const planStore = {
+      let selectedDate = savedState.selectedDate ? new Date(savedState.selectedDate) : new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      let calendarMonth = savedState.calendarMonth ? new Date(savedState.calendarMonth) : new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+      const planStore = savedState.planStore || {
         "2026-05-17": { child: "Семья", items: makeFamilyDayTemplate(new Date(2026, 4, 17)) }
       };
 
@@ -2103,6 +2202,7 @@
             calendarMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
             renderMonthCalendar();
             renderWeekPlan();
+            saveState();
           });
           grid.appendChild(button);
         }
@@ -2161,6 +2261,7 @@
             day.classList.add("active");
             renderMonthCalendar();
             syncDayEditor();
+            saveState();
           });
           weekGrid.appendChild(day);
         }
@@ -2196,6 +2297,7 @@
         activeWeekDay().querySelector(".week-items").appendChild(item);
         document.getElementById("weekItemTitle").value = "";
         renderMonthCalendar();
+        logActivity(`В план добавлено: ${owner} · ${title}`);
       });
 
       document.getElementById("copyPrevDay").addEventListener("click", () => {
@@ -2204,6 +2306,7 @@
         target.items = [...source.items];
         renderWeekPlan();
         renderMonthCalendar();
+        logActivity("План дня скопирован с предыдущего дня");
       });
 
       document.getElementById("insertTemplate").addEventListener("click", () => {
@@ -2212,6 +2315,7 @@
         target.items = makeFamilyDayTemplate(selectedDate);
         renderWeekPlan();
         renderMonthCalendar();
+        logActivity("Вставлен семейный шаблон дня");
       });
 
       document.getElementById("generateDayTasks").addEventListener("click", () => {
@@ -2222,12 +2326,14 @@
         plan.items.map((item) => parsePlanItem(item, plan.child)).forEach((task) => {
           const targets = task.child === "Семья" ? ["Яна", "Ева"] : [task.child];
           targets.forEach((child) => {
-            if (checklistTasks[child]) checklistTasks[child].push({ ...task, child });
+            if (checklistTasks[child]) checklistTasks[child].push({ ...task, child, done: false });
           });
         });
         renderPlanListFromTasks();
         document.getElementById("dailyDate").textContent = day.dataset.date;
         showChecklistForChild(selectedChild);
+        updateReports();
+        logActivity("Задачи дня собраны из недельного плана");
         go("tasks");
       });
 
@@ -2246,16 +2352,19 @@
         renderWeekPlan();
         renderMonthCalendar();
         document.getElementById("generateDayTasks").click();
+        logActivity("Быт добавлен в план и задачи дня");
       });
 
       document.getElementById("prevMonth").addEventListener("click", () => {
         calendarMonth = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1, 1);
         renderMonthCalendar();
+        saveState();
       });
 
       document.getElementById("nextMonth").addEventListener("click", () => {
         calendarMonth = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1);
         renderMonthCalendar();
+        saveState();
       });
 
       document.getElementById("todayButton").addEventListener("click", () => {
@@ -2263,11 +2372,13 @@
         calendarMonth = new Date(today.getFullYear(), today.getMonth(), 1);
         renderMonthCalendar();
         renderWeekPlan();
+        saveState();
       });
 
       renderMonthCalendar();
       renderWeekPlan();
       renderDashboardCalendar();
+      renderPlanListFromTasks();
 
       function updateMessageCount() {
         const count = document.querySelectorAll("#messages .activity-item").length;
@@ -2280,10 +2391,47 @@
         const button = item.querySelector(".delete-message");
         if (!button) return;
         button.addEventListener("click", () => {
+          if (!confirm("Удалить это сообщение из семейного чата?")) return;
           item.remove();
           updateMessageCount();
+          logActivity("Сообщение удалено из семейного чата");
+          saveState();
         });
       }
+
+      function restoreHtml(id, html) {
+        if (!html) return;
+        const node = document.getElementById(id);
+        if (node) node.innerHTML = html;
+      }
+
+      function restoreSavedHtml() {
+        const html = savedState.html || {};
+        restoreHtml("childrenGrid", html.childrenGrid);
+        restoreHtml("rewardsGrid", html.rewardsGrid);
+        restoreHtml("libraryTodo", html.libraryTodo);
+        restoreHtml("skillsGrid", html.skillsGrid);
+        restoreHtml("messages", html.messages);
+        restoreHtml("activityLog", html.activityLog);
+        if (html.inviteCode) document.getElementById("inviteCodeBadge").textContent = html.inviteCode;
+        if (html.lanes) {
+          Object.entries(html.lanes).forEach(([status, laneHtml]) => {
+            const list = document.querySelector(`.lane[data-status="${status}"] .task-list`);
+            if (list && laneHtml) list.innerHTML = laneHtml;
+          });
+        }
+        document.querySelectorAll("[data-bound]").forEach((node) => {
+          delete node.dataset.bound;
+        });
+        document.querySelectorAll(".check-item").forEach(bindChecklistItem);
+        document.querySelectorAll(".task-card").forEach(bindTaskCard);
+        document.querySelectorAll("#messages .activity-item").forEach(addDeleteHandler);
+        updateMessageCount();
+        updateLaneCounts();
+        updateReports();
+      }
+
+      restoreSavedHtml();
 
       document.getElementById("messageForm").addEventListener("submit", (event) => {
         event.preventDefault();
@@ -2297,10 +2445,9 @@
         addDeleteHandler(item);
         updateMessageCount();
         input.value = "";
+        logActivity(`Сообщение отправлено: ${to}`);
+        saveState();
       });
-
-      document.querySelectorAll("#messages .activity-item").forEach(addDeleteHandler);
-      updateMessageCount();
 
       const modal = document.getElementById("authModal");
       function showAuth() {
@@ -2322,7 +2469,10 @@
       });
 
       document.querySelectorAll(".toggle").forEach((button) => {
-        button.addEventListener("click", () => button.classList.toggle("on"));
+        button.addEventListener("click", () => {
+          button.classList.toggle("on");
+          saveState();
+        });
       });
 
       const rewardModal = document.getElementById("rewardModal");
@@ -2342,6 +2492,8 @@
         document.getElementById("rewardForm").reset();
         document.getElementById("rewardCostInput").value = "300";
         rewardModal.classList.remove("show");
+        logActivity(`Создана награда: ${title}`);
+        saveState();
       });
 
       const materialModal = document.getElementById("materialModal");
@@ -2360,6 +2512,8 @@
         document.getElementById("libraryTodo").prepend(item);
         document.getElementById("materialForm").reset();
         materialModal.classList.remove("show");
+        logActivity(`Добавлен материал: ${title}`);
+        saveState();
       });
 
       const taskModal = document.getElementById("taskModal");
@@ -2395,6 +2549,8 @@
         document.getElementById("taskTimeInput").value = "18:00";
         taskModal.classList.remove("show");
         showNotice("Задача добавлена в kanban и чек-лист.");
+        logActivity(`Создана задача: ${title}`);
+        saveState();
       });
 
       const childModal = document.getElementById("childModal");
@@ -2415,6 +2571,8 @@
         document.getElementById("childAgeInput").value = "8";
         childModal.classList.remove("show");
         showNotice(`${name} добавлен(а) в профили.`);
+        logActivity(`Добавлен ребёнок: ${name}`);
+        saveState();
       });
 
       const skillModal = document.getElementById("skillModal");
@@ -2435,12 +2593,16 @@
         document.getElementById("skillProgressInput").value = "10";
         skillModal.classList.remove("show");
         showNotice("Навык добавлен.");
+        logActivity(`Добавлен навык: ${title}`);
+        saveState();
       });
 
       document.getElementById("createInviteCode").addEventListener("click", () => {
         const code = Math.random().toString(36).slice(2, 8).toUpperCase();
         document.getElementById("inviteCodeBadge").textContent = `Invite ${code}`;
         showNotice(`Новый invite code: ${code}`);
+        logActivity("Создан новый invite code");
+        saveState();
       });
 
       document.getElementById("globalSearch").addEventListener("input", (event) => {
@@ -2448,6 +2610,13 @@
         document.querySelectorAll(".task-card, .child-card, .reward-card, .activity-item").forEach((item) => {
           item.style.outline = value && item.innerText.toLowerCase().includes(value) ? "1px solid rgba(142,230,200,.45)" : "";
         });
+      });
+
+      window.addEventListener("beforeunload", (event) => {
+        const openDraft = document.querySelector("#taskModal.show input, #taskModal.show textarea, #childModal.show input, #rewardModal.show input, #materialModal.show input, #materialModal.show textarea, #skillModal.show input, #skillModal.show textarea");
+        if (!openDraft || !openDraft.value.trim()) return;
+        event.preventDefault();
+        event.returnValue = "";
       });
     </script>
   </body>
