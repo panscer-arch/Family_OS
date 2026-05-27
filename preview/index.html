@@ -1287,27 +1287,18 @@
       }
 
       .modal.auth-modal {
-        width: min(860px, calc(100vw - 48px));
-        padding: 0;
-        overflow: hidden;
-        background:
-          linear-gradient(135deg, rgba(142, 230, 200, 0.08), rgba(143, 199, 255, 0.04)),
-          #101621;
+        width: min(560px, calc(100vw - 32px));
+        padding: 24px;
+        background: #101621;
       }
 
       .auth-shell {
         display: grid;
-        grid-template-columns: 0.9fr 1.1fr;
-        min-height: 560px;
+        min-height: auto;
       }
 
       .auth-aside {
-        border-right: 1px solid var(--line);
-        padding: 28px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        background: rgba(255, 255, 255, 0.035);
+        display: none;
       }
 
       .auth-aside h2 {
@@ -1337,31 +1328,38 @@
       }
 
       .auth-main {
-        padding: 28px;
+        padding: 0;
       }
 
       .auth-role-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 12px;
-        margin: 18px 0;
+        margin: 20px 0;
       }
 
       .role-card {
         border: 1px solid var(--line);
-        border-radius: 18px;
+        border-radius: 22px;
         background: rgba(255, 255, 255, 0.045);
         color: var(--soft);
-        padding: 16px;
-        text-align: left;
+        min-height: 138px;
+        padding: 18px;
+        text-align: center;
         transition: 180ms ease;
+      }
+
+      .role-icon {
+        display: block;
+        font-size: 34px;
+        line-height: 1;
       }
 
       .role-card strong {
         display: block;
         color: white;
-        margin: 10px 0 5px;
-        font-size: 16px;
+        margin: 14px 0 5px;
+        font-size: 20px;
       }
 
       .role-card.active,
@@ -1397,8 +1395,9 @@
       .auth-result {
         display: none;
         border: 1px solid rgba(142, 230, 200, 0.18);
-        border-radius: 18px;
-        padding: 14px;
+        margin-top: 12px;
+        border-radius: 16px;
+        padding: 12px;
         background: rgba(142, 230, 200, 0.08);
         color: var(--soft);
         line-height: 1.45;
@@ -1415,10 +1414,7 @@
           grid-template-columns: 1fr;
         }
 
-        .auth-aside {
-          border-right: 0;
-          border-bottom: 1px solid var(--line);
-        }
+        .auth-aside { display: none; }
       }
 
       .tabs {
@@ -2085,36 +2081,22 @@
       <div class="modal auth-modal">
         <div class="auth-shell">
           <aside class="auth-aside">
-            <div>
-              <p class="eyebrow">Family OS Access</p>
-              <h2>Вход для всей семьи без путаницы</h2>
-              <p class="muted" style="margin-top: 12px">Взрослый создаёт семейное пространство. Ребёнок заходит по invite code и видит только свой план, задачи и награды.</p>
-              <div class="auth-benefits">
-                <div class="auth-benefit"><span class="mini-icon">1</span><div><strong>Мария или Павел</strong><p class="muted">создают семью, приглашают детей и управляют задачами.</p></div></div>
-                <div class="auth-benefit"><span class="mini-icon">2</span><div><strong>Яна или Ева</strong><p class="muted">заходят по коду, выбирают себя и работают с чек-листом.</p></div></div>
-                <div class="auth-benefit"><span class="mini-icon">3</span><div><strong>Готово под базу</strong><p class="muted">структура рассчитана на пользователей, семьи, задачи, отчёты и историю.</p></div></div>
-              </div>
-            </div>
+            <div></div>
             <span class="pill blue" id="authInviteHint">Invite A7K42Q</span>
           </aside>
           <section class="auth-main">
-            <div class="card-title"><div><p class="eyebrow">Регистрация</p><h2>Кто сейчас входит?</h2></div><button class="btn secondary" id="closeAuth" type="button">Закрыть</button></div>
+            <div class="card-title"><div><p class="eyebrow">Family OS</p><h2>Кто входит?</h2></div><button class="btn secondary" id="closeAuth" type="button">Закрыть</button></div>
             <div class="auth-role-grid">
-              <button class="role-card active" type="button" data-role="parent"><span class="pill peach">регистрация</span><strong>Создать семью</strong><p class="muted">Для Марии, Павла или администратора.</p></button>
-              <button class="role-card" type="button" data-role="adultLogin"><span class="pill">вход</span><strong>Войти взрослому</strong><p class="muted">Открыть родительский dashboard.</p></button>
-              <button class="role-card" type="button" data-role="child"><span class="pill blue">ребёнок</span><strong>Я ребёнок</strong><p class="muted">Войти по invite code и PIN.</p></button>
+              <button class="role-card active" type="button" data-role="parent"><span class="role-icon">👨</span><strong>Родитель</strong><p class="muted">Управление семьёй</p></button>
+              <button class="role-card" type="button" data-role="child"><span class="role-icon">👧</span><strong>Ребёнок</strong><p class="muted">Мои задачи</p></button>
             </div>
             <form class="auth-panel active" id="parentAuthPanel" data-auth-panel="parent">
-              <div class="form-row">
-                <label class="form-label">Имя взрослого<input class="field" id="parentNameInput" placeholder="Мария или Павел" value="Мария" /></label>
-                <label class="form-label">Email<input class="field" id="parentEmailInput" type="email" placeholder="family@example.com" /></label>
-              </div>
-              <label class="form-label">Название семьи<input class="field" id="familyNameInput" placeholder="Например: Семья Марии и Павла" value="Семья Марии и Павла" /></label>
-              <div class="form-row">
-                <label class="form-label">Пароль<input class="field" id="parentPasswordInput" type="password" placeholder="Минимум 6 символов" /></label>
-                <label class="form-label">Invite code для детей<input class="field" id="parentInviteInput" value="A7K42Q" /></label>
-              </div>
-              <button class="btn" id="parentAuthSubmit" type="submit">Создать семейное пространство</button>
+              <input class="field" id="parentNameInput" placeholder="Имя" value="Мария" />
+              <input class="field" id="parentEmailInput" type="email" placeholder="Email" />
+              <input class="field" id="parentPasswordInput" type="password" placeholder="Пароль" />
+              <input class="field" id="familyNameInput" type="hidden" value="Семья Марии и Павла" />
+              <input class="field" id="parentInviteInput" type="hidden" value="A7K42Q" />
+              <button class="btn" id="parentAuthSubmit" type="submit">Войти</button>
             </form>
             <form class="auth-panel" id="adultLoginPanel" data-auth-panel="adultLogin">
               <div class="form-row">
@@ -2125,12 +2107,10 @@
               <button class="btn" id="adultLoginSubmit" type="submit">Войти как взрослый</button>
             </form>
             <form class="auth-panel" id="childAuthPanel" data-auth-panel="child">
-              <div class="form-row">
-                <label class="form-label">Кто входит?<select id="childLoginName"><option>Яна</option><option>Ева</option></select></label>
-                <label class="form-label">Invite code<input class="field" id="childInviteInput" placeholder="A7K42Q" value="A7K42Q" /></label>
-              </div>
-              <label class="form-label">Короткий пароль или пин<input class="field" id="childPinInput" type="password" placeholder="Можно простой семейный пин" /></label>
-              <button class="btn" id="childAuthSubmit" type="submit">Войти в мой план</button>
+              <select id="childLoginName"><option value="Яна">👧 Яна</option><option value="Ева">👧 Ева</option></select>
+              <input class="field" id="childInviteInput" placeholder="Invite code" value="A7K42Q" />
+              <input class="field" id="childPinInput" type="password" placeholder="PIN" />
+              <button class="btn" id="childAuthSubmit" type="submit">Войти</button>
             </form>
             <div class="auth-result" id="authResult"></div>
           </section>
@@ -3368,7 +3348,7 @@
         };
         document.getElementById("inviteCodeBadge").textContent = `Invite ${inviteCode}`;
         document.getElementById("authResult").classList.add("show");
-        document.getElementById("authResult").innerHTML = `<strong>${escapeHtml(name)}, семейное пространство готово.</strong><br />Код для Яны и Евы: <span class="pill blue">Invite ${escapeHtml(inviteCode)}</span>`;
+        document.getElementById("authResult").innerHTML = `<strong>Готово</strong>`;
         renderAuthProfile();
         modal.classList.remove("show", "gate");
         logActivity(`${name} вошёл(ла) как взрослый`);
@@ -3386,7 +3366,7 @@
           inviteCode: document.getElementById("inviteCodeBadge").textContent.replace("Invite ", "").trim()
         };
         document.getElementById("authResult").classList.add("show");
-        document.getElementById("authResult").innerHTML = `<strong>${escapeHtml(name)}, вход выполнен.</strong><br />Роль: <span class="pill blue">${escapeHtml(role)}</span>`;
+        document.getElementById("authResult").innerHTML = `<strong>Готово</strong>`;
         renderAuthProfile();
         modal.classList.remove("show", "gate");
         logActivity(`${name} вошёл(ла) как ${role}`);
@@ -3402,7 +3382,7 @@
         const result = document.getElementById("authResult");
         result.classList.add("show");
         if (inviteCode !== expected) {
-          result.innerHTML = `<strong>Код не совпал.</strong><br />Попроси Марию или Павла прислать актуальный invite code из настроек.`;
+          result.innerHTML = `<strong>Неверный код</strong>`;
           showNotice("Invite code не совпал.");
           return;
         }
@@ -3416,7 +3396,7 @@
         renderAuthProfile();
         renderChildStatus();
         modal.classList.remove("show", "gate");
-        result.innerHTML = `<strong>${escapeHtml(name)}, вход готов.</strong><br />Открываю твой чек-лист и план дня.`;
+        result.innerHTML = `<strong>Готово</strong>`;
         logActivity(`${name} вошла как ребёнок`);
         saveState();
         showNotice(`${name}, добро пожаловать в Family OS.`);
