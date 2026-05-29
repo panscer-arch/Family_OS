@@ -1950,9 +1950,9 @@
                 <form class="grid" id="weekItemForm">
                   <input class="field" id="weekItemTime" type="time" value="18:00" />
                   <select id="weekItemOwner"><option>Семья</option><option>Яна</option><option>Ева</option></select>
-                  <input class="field" id="weekItemTitle" placeholder="Добавить пункт в выбранный день" />
+                  <input class="field" id="weekItemTitle" placeholder="Добавить пункт в выбранный день" required />
                   <select id="weekItemTag"><option>режим</option><option>учёба</option><option>дом</option><option>кухня</option><option>комната</option><option>робот-пылесос</option><option>кошки</option><option>контент</option><option>еда</option><option>прогулка</option><option>спорт</option><option>сон</option><option>навык</option><option>библиотека</option></select>
-                  <button class="btn">Добавить в день</button>
+                  <button class="btn" type="submit">Добавить в день</button>
                 </form>
               </article>
               <article class="card"><h2>Закреплено</h2><p class="muted" style="margin-top: 8px">Подъём, умывание, завтрак, чтение, прогулка, готовка, учёба и контент-задачи. Акробатика автоматически во вторник и четверг.</p><div class="activity" style="margin-top: 14px"><span class="pill">режим</span><span class="pill blue">акробатика</span><span class="pill peach">контент</span></div></article>
@@ -2063,7 +2063,7 @@
             </div>
             <div class="grid cols-2" style="margin-top: 18px">
               <article class="card"><div class="card-title"><h2>Как быт попадает в задачи</h2><span class="pill blue">просто</span></div><div class="activity"><div class="activity-item"><span class="mini-icon">1</span><div><h3>Шаблон недели</h3><p class="muted">ежедневный робот, кухня, комната и кошки уже внутри шаблона.</p></div></div><div class="activity-item"><span class="mini-icon">2</span><div><h3>Собрать задачи на сегодня</h3><p class="muted">на выбранную дату задачи попадут в чек-листы Яны и Евы.</p></div></div><div class="activity-item"><span class="mini-icon">3</span><div><h3>Отметить галочкой</h3><p class="muted">после отметок отчёты начнут считать, что сделано дома.</p></div></div></div></article>
-              <article class="card"><div class="card-title"><h2>Семейный чат</h2><span class="pill rose" id="messageCount">чат</span></div><form class="grid" id="messageForm"><select id="messageTo"><option>Всем</option><option>Яне</option><option>Еве</option><option>Родителям</option></select><input class="field" id="messageText" placeholder="Написать сообщение" /><button class="btn">Отправить</button></form><div class="activity" id="messages" style="margin-top: 14px"><div class="onboarding-card"><h3>Напишите первое семейное сообщение</h3><p class="muted">Например: “Яна, проверь план после завтрака”.</p><button class="btn secondary" type="button" id="focusMessageInput">Написать</button></div></div></article>
+              <article class="card"><div class="card-title"><h2>Семейный чат</h2><span class="pill rose" id="messageCount">чат</span></div><form class="grid" id="messageForm"><select id="messageTo"><option>Всем</option><option>Яне</option><option>Еве</option><option>Родителям</option></select><input class="field" id="messageText" placeholder="Написать сообщение" required /><button class="btn" type="submit">Отправить</button></form><div class="activity" id="messages" style="margin-top: 14px"><div class="onboarding-card"><h3>Напишите первое семейное сообщение</h3><p class="muted">Например: “Яна, проверь план после завтрака”.</p><button class="btn secondary" type="button" id="focusMessageInput">Написать</button></div></div></article>
             </div>
           </section>
 
@@ -2075,7 +2075,7 @@
                 <div class="card-title"><div><h2>Кладовые</h2><p class="muted" style="margin-top: 6px">Три кладовые: что лежит, что продать, что отдать.</p></div><span class="pill blue" id="storageCount">0 вещей</span></div>
                 <form class="grid cols-4" id="storageForm">
                   <select id="storageRoomInput"><option>Кладовая 1</option><option>Кладовая 2</option><option>Кладовая 3</option></select>
-                  <input class="field" id="storageItemInput" placeholder="Что на фото? Например: мяч" />
+                  <input class="field" id="storageItemInput" placeholder="Что на фото? Например: мяч" required />
                   <select id="storageStatusInput"><option value="keep">оставить</option><option value="sell">продать</option><option value="give">отдать</option></select>
                   <button class="btn" type="submit">Добавить вещь</button>
                   <input class="field" id="storageNoteInput" style="grid-column: 1 / -1" placeholder="Подпись, фото или заметка: где лежит, состояние, кому отдать" />
@@ -2141,7 +2141,7 @@
       <div class="modal">
         <div class="card-title"><div><p class="eyebrow">Tasks</p><h2>Создать задачу</h2></div><button class="btn secondary" id="closeTaskModal" type="button">Закрыть</button></div>
         <form class="grid" id="taskCreateForm">
-          <input class="field" id="taskTitleInput" placeholder="Название задачи" />
+          <input class="field" id="taskTitleInput" placeholder="Название задачи" required />
           <select id="taskChildInput">
             <option>Яна</option>
             <option>Ева</option>
@@ -2173,7 +2173,7 @@
           </div>
           <label class="form-label">Повтор<select id="taskRepeatInput"><option value="once">разово</option><option value="daily">ежедневно</option><option value="weekdays">по будням</option><option value="weekly">еженедельно</option><option value="custom">кастомные дни</option></select></label>
           <textarea class="field" id="taskDescriptionInput" placeholder="Комментарий, ссылка или что нужно приложить"></textarea>
-          <button class="btn">Добавить задачу</button>
+          <button class="btn" type="submit">Добавить задачу</button>
         </form>
       </div>
     </div>
@@ -2182,7 +2182,7 @@
       <div class="modal">
         <div class="card-title"><div><p class="eyebrow">Family</p><h2>Добавить ребёнка</h2></div><button class="btn secondary" id="closeChildModal" type="button">Закрыть</button></div>
         <form class="grid" id="childForm">
-          <input class="field" id="childNameInput" placeholder="Имя ребёнка" />
+          <input class="field" id="childNameInput" placeholder="Имя ребёнка" required />
           <input class="field" id="childAgeInput" type="number" min="1" max="18" value="8" />
           <div class="form-row">
             <label class="form-label">Аватар<input class="field" id="childAvatarInput" placeholder="Я" maxlength="2" /></label>
@@ -2198,7 +2198,7 @@
             <option>отдыхает</option>
             <option>нужна помощь</option>
           </select>
-          <button class="btn">Добавить ребёнка</button>
+          <button class="btn" type="submit">Добавить ребёнка</button>
         </form>
       </div>
     </div>
@@ -2207,7 +2207,7 @@
       <div class="modal">
         <div class="card-title"><div><p class="eyebrow">Skills</p><h2>Добавить навык</h2></div><button class="btn secondary" id="closeSkillModal" type="button">Закрыть</button></div>
         <form class="grid" id="skillForm">
-          <input class="field" id="skillTitleInput" placeholder="Название навыка" />
+          <input class="field" id="skillTitleInput" placeholder="Название навыка" required />
           <input class="field" id="skillDescriptionInput" placeholder="Простое объяснение для ребёнка" />
           <select id="skillTypeInput">
             <option>жизнь</option>
@@ -2217,7 +2217,7 @@
             <option>безопасность</option>
           </select>
           <input class="field" id="skillProgressInput" type="number" min="0" max="100" value="10" />
-          <button class="btn">Добавить навык</button>
+          <button class="btn" type="submit">Добавить навык</button>
         </form>
       </div>
     </div>
@@ -2226,7 +2226,7 @@
       <div class="modal">
         <div class="card-title"><div><p class="eyebrow">Rewards</p><h2>Создать награду</h2></div><button class="btn secondary" id="closeRewardModal" type="button">Закрыть</button></div>
         <form class="grid" id="rewardForm">
-          <input class="field" id="rewardTitleInput" placeholder="Название награды" />
+          <input class="field" id="rewardTitleInput" placeholder="Название награды" required />
           <input class="field" id="rewardDescriptionInput" placeholder="Описание" />
           <input class="field" id="rewardCostInput" type="number" min="1" value="300" />
           <select id="rewardTypeInput">
@@ -2235,7 +2235,7 @@
             <option>покупка</option>
             <option>большая</option>
           </select>
-          <button class="btn">Добавить награду</button>
+          <button class="btn" type="submit">Добавить награду</button>
         </form>
       </div>
     </div>
@@ -2244,7 +2244,7 @@
       <div class="modal">
         <div class="card-title"><div><p class="eyebrow">Library</p><h2>Добавить материал</h2></div><button class="btn secondary" id="closeMaterialModal" type="button">Закрыть</button></div>
         <form class="grid" id="materialForm">
-          <input class="field" id="materialTitleInput" placeholder="Название материала" />
+          <input class="field" id="materialTitleInput" placeholder="Название материала" required />
           <select id="materialChildInput">
             <option>Ева</option>
             <option>Яна</option>
@@ -2258,7 +2258,7 @@
             <option>ссылка</option>
           </select>
           <textarea class="field" id="materialDescriptionInput" placeholder="Что изучить, ссылка или короткое описание"></textarea>
-          <button class="btn">Добавить материал</button>
+          <button class="btn" type="submit">Добавить материал</button>
         </form>
       </div>
     </div>
@@ -2688,6 +2688,12 @@
         document.body.appendChild(notice);
         setTimeout(() => notice.remove(), 2200);
       }
+
+      document.addEventListener("invalid", (event) => {
+        const field = event.target;
+        if (!(field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement || field instanceof HTMLSelectElement)) return;
+        showNotice("Заполните главное поле, и кнопка сработает.");
+      }, true);
 
       function renderAuthProfile() {
         const app = document.querySelector(".app");
