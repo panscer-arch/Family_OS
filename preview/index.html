@@ -654,6 +654,16 @@
         gap: 12px;
       }
 
+      .collapsible-body {
+        display: grid;
+        gap: 12px;
+        margin-top: 14px;
+      }
+
+      .collapsible-body.collapsed {
+        display: none;
+      }
+
       .activity-item,
       .child-card,
       .task-card,
@@ -1855,6 +1865,17 @@
                 <div class="progress"><span data-child-progress="Ева" style="--value: 0%"></span></div>
               </article>
             </div>
+            <article class="card" id="storageCard" style="margin-top: 18px">
+              <div class="card-title"><div><h2>Кладовые</h2><p class="muted" style="margin-top: 6px">Три кладовые: что лежит, что продать, что отдать.</p></div><span class="pill blue" id="storageCount">0 вещей</span></div>
+              <form class="grid cols-4" id="storageForm">
+                <select id="storageRoomInput"><option>Кладовая 1</option><option>Кладовая 2</option><option>Кладовая 3</option></select>
+                <input class="field" id="storageItemInput" placeholder="Что на фото? Например: мяч" required />
+                <select id="storageStatusInput"><option value="keep">оставить</option><option value="sell">продать</option><option value="give">отдать</option></select>
+                <button class="btn" type="submit">Добавить вещь</button>
+                <input class="field" id="storageNoteInput" style="grid-column: 1 / -1" placeholder="Подпись, фото или заметка: где лежит, состояние, кому отдать" />
+              </form>
+              <div class="activity" id="storageInventory" style="margin-top: 16px"></div>
+            </article>
           </section>
 
           <section class="page" id="tasks">
@@ -2064,23 +2085,14 @@
           </section>
 
           <section class="page" id="settings">
-            <div class="page-head"><div><p class="eyebrow">Settings</p><h1>Настройки</h1><p class="muted" style="margin-top: 8px">Кладовые, доступ семьи, invite code и последние действия.</p></div><button class="btn" id="openAuth2">Регистрация</button></div>
+            <div class="page-head"><div><p class="eyebrow">Settings</p><h1>Настройки</h1><p class="muted" style="margin-top: 8px">Доступ семьи, invite code и служебные действия.</p></div><button class="btn" id="openAuth2">Регистрация</button></div>
             <div class="grid">
-              <article class="card" id="storageCard">
-                <div class="card-title"><div><h2>Кладовые</h2><p class="muted" style="margin-top: 6px">Три кладовые: что лежит, что продать, что отдать.</p></div><span class="pill blue" id="storageCount">0 вещей</span></div>
-                <form class="grid cols-4" id="storageForm">
-                  <select id="storageRoomInput"><option>Кладовая 1</option><option>Кладовая 2</option><option>Кладовая 3</option></select>
-                  <input class="field" id="storageItemInput" placeholder="Что на фото? Например: мяч" required />
-                  <select id="storageStatusInput"><option value="keep">оставить</option><option value="sell">продать</option><option value="give">отдать</option></select>
-                  <button class="btn" type="submit">Добавить вещь</button>
-                  <input class="field" id="storageNoteInput" style="grid-column: 1 / -1" placeholder="Подпись, фото или заметка: где лежит, состояние, кому отдать" />
-                </form>
-                <div class="activity" id="storageInventory" style="margin-top: 16px"></div>
-              </article>
               <article class="card"><div class="card-title"><h2>Доступ семьи</h2><span class="pill peach" id="inviteCodeBadge">Invite A7K42Q</span></div><div class="activity"><div class="settings-row"><div><h3>Дети и родители</h3><p class="muted">каждый подключается по invite code и получает свою роль</p></div><button class="btn secondary" id="createInviteCode">Создать код</button></div><div class="settings-row"><div><h3>Детский вход</h3><p class="muted">отдельная роль и ограниченный доступ</p></div><button class="toggle on" type="button"><span></span></button></div></div></article>
               <article class="card">
-                <div class="card-title"><h2>Последние действия</h2><span class="pill blue" id="activityLogCount">0</span></div>
-                <div class="activity timeline" id="activityLog"><div class="onboarding-card"><h3>История действий</h3><p class="muted">Создание задач, “Я сделал”, подтверждения, баллы и изменения будут записываться сюда.</p><button class="btn secondary" type="button" data-route-jump="tasks">Создать событие через задачу</button></div></div>
+                <div class="card-title"><h2>Последние действия</h2><div style="display: flex; gap: 8px; align-items: center"><span class="pill blue" id="activityLogCount">0</span><button class="btn secondary" id="toggleActivityLog" type="button">Открыть</button></div></div>
+                <div class="collapsible-body collapsed" id="activityLogPanel">
+                  <div class="activity timeline" id="activityLog"><div class="onboarding-card"><h3>История действий</h3><p class="muted">Создание задач, “Я сделал”, подтверждения, баллы и изменения будут записываться сюда.</p><button class="btn secondary" type="button" data-route-jump="tasks">Создать событие через задачу</button></div></div>
+                </div>
               </article>
             </div>
           </section>
@@ -3509,6 +3521,14 @@
           button.classList.toggle("on");
           saveState();
         });
+      });
+
+      document.getElementById("toggleActivityLog")?.addEventListener("click", () => {
+        const panel = document.getElementById("activityLogPanel");
+        const button = document.getElementById("toggleActivityLog");
+        if (!panel || !button) return;
+        const isCollapsed = panel.classList.toggle("collapsed");
+        button.textContent = isCollapsed ? "Открыть" : "Закрыть";
       });
 
       const rewardModal = document.getElementById("rewardModal");
