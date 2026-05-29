@@ -1991,10 +1991,6 @@
               <article class="card stat"><h3>Просрочено</h3><p class="stat-value" id="reportOverdueCount" style="color: var(--rose)">0</p><p class="stat-caption">считается по дедлайнам</p></article>
               <article class="card stat"><h3>Активность</h3><p class="stat-value" id="reportActivityCount" style="color: var(--peach)">0</p><p class="stat-caption">событий в истории</p></article>
             </div>
-            <article class="card" style="margin-top: 18px">
-              <div class="card-title"><h2>История</h2><span class="pill blue" id="activityLogCount">0</span></div>
-              <div class="activity timeline" id="activityLog"><div class="onboarding-card"><h3>История действий</h3><p class="muted">Создание задач, “Я сделал”, подтверждения, баллы и награды будут записываться сюда.</p><button class="btn secondary" type="button" data-route-jump="tasks">Создать событие через задачу</button></div></div>
-            </article>
           </section>
 
           <section class="page" id="rewards">
@@ -2068,9 +2064,8 @@
           </section>
 
           <section class="page" id="settings">
-            <div class="page-head"><div><p class="eyebrow">Settings</p><h1>Настройки</h1><p class="muted" style="margin-top: 8px">Роли, invite code и безопасность семейного пространства.</p></div><button class="btn" id="openAuth2">Регистрация</button></div>
+            <div class="page-head"><div><p class="eyebrow">Settings</p><h1>Настройки</h1><p class="muted" style="margin-top: 8px">Кладовые, доступ семьи, invite code и последние действия.</p></div><button class="btn" id="openAuth2">Регистрация</button></div>
             <div class="grid">
-              <article class="card"><div class="card-title"><h2>Семья</h2><span class="pill peach" id="inviteCodeBadge">Invite A7K42Q</span></div><div class="activity"><div class="settings-row"><div><h3>Дети и родители</h3><p class="muted">каждый подключается по invite code и получает свою роль</p></div><button class="btn secondary" id="createInviteCode">Создать код</button></div><div class="settings-row"><div><h3>Детский вход</h3><p class="muted">отдельная роль и ограниченный доступ</p></div><button class="toggle on" type="button"><span></span></button></div></div></article>
               <article class="card" id="storageCard">
                 <div class="card-title"><div><h2>Кладовые</h2><p class="muted" style="margin-top: 6px">Три кладовые: что лежит, что продать, что отдать.</p></div><span class="pill blue" id="storageCount">0 вещей</span></div>
                 <form class="grid cols-4" id="storageForm">
@@ -2081,6 +2076,11 @@
                   <input class="field" id="storageNoteInput" style="grid-column: 1 / -1" placeholder="Подпись, фото или заметка: где лежит, состояние, кому отдать" />
                 </form>
                 <div class="activity" id="storageInventory" style="margin-top: 16px"></div>
+              </article>
+              <article class="card"><div class="card-title"><h2>Доступ семьи</h2><span class="pill peach" id="inviteCodeBadge">Invite A7K42Q</span></div><div class="activity"><div class="settings-row"><div><h3>Дети и родители</h3><p class="muted">каждый подключается по invite code и получает свою роль</p></div><button class="btn secondary" id="createInviteCode">Создать код</button></div><div class="settings-row"><div><h3>Детский вход</h3><p class="muted">отдельная роль и ограниченный доступ</p></div><button class="toggle on" type="button"><span></span></button></div></div></article>
+              <article class="card">
+                <div class="card-title"><h2>Последние действия</h2><span class="pill blue" id="activityLogCount">0</span></div>
+                <div class="activity timeline" id="activityLog"><div class="onboarding-card"><h3>История действий</h3><p class="muted">Создание задач, “Я сделал”, подтверждения, баллы и изменения будут записываться сюда.</p><button class="btn secondary" type="button" data-route-jump="tasks">Создать событие через задачу</button></div></div>
               </article>
             </div>
           </section>
