@@ -2071,6 +2071,17 @@
             <div class="page-head"><div><p class="eyebrow">Settings</p><h1>Настройки</h1><p class="muted" style="margin-top: 8px">Роли, invite code и безопасность семейного пространства.</p></div><button class="btn" id="openAuth2">Регистрация</button></div>
             <div class="grid">
               <article class="card"><div class="card-title"><h2>Семья</h2><span class="pill peach" id="inviteCodeBadge">Invite A7K42Q</span></div><div class="activity"><div class="settings-row"><div><h3>Дети и родители</h3><p class="muted">каждый подключается по invite code и получает свою роль</p></div><button class="btn secondary" id="createInviteCode">Создать код</button></div><div class="settings-row"><div><h3>Детский вход</h3><p class="muted">отдельная роль и ограниченный доступ</p></div><button class="toggle on" type="button"><span></span></button></div></div></article>
+              <article class="card" id="storageCard">
+                <div class="card-title"><div><h2>Кладовые</h2><p class="muted" style="margin-top: 6px">Три кладовые: что лежит, что продать, что отдать.</p></div><span class="pill blue" id="storageCount">0 вещей</span></div>
+                <form class="grid cols-4" id="storageForm">
+                  <select id="storageRoomInput"><option>Кладовая 1</option><option>Кладовая 2</option><option>Кладовая 3</option></select>
+                  <input class="field" id="storageItemInput" placeholder="Что на фото? Например: мяч" />
+                  <select id="storageStatusInput"><option value="keep">оставить</option><option value="sell">продать</option><option value="give">отдать</option></select>
+                  <button class="btn" type="submit">Добавить вещь</button>
+                  <input class="field" id="storageNoteInput" style="grid-column: 1 / -1" placeholder="Подпись, фото или заметка: где лежит, состояние, кому отдать" />
+                </form>
+                <div class="activity" id="storageInventory" style="margin-top: 16px"></div>
+              </article>
             </div>
           </section>
         </div>
@@ -2318,6 +2329,7 @@
         "Яна": { streak: 0, level: 1, achievements: [] },
         "Ева": { streak: 0, level: 1, achievements: [] }
       };
+      const pantryItems = savedState.pantryItems || [];
 
       function collectLaneHtml() {
         const lanes = {};
@@ -2335,6 +2347,7 @@
           checklistTasks,
           childPoints,
           childStats,
+          pantryItems,
           authProfile,
           onboarded: Boolean(authProfile),
           planStore: typeof planStore !== "undefined" ? planStore : savedState.planStore,
@@ -3245,6 +3258,41 @@
         if (empty) empty.style.display = count ? "none" : "grid";
       }
 
+      function storageStatusLabel(status) {
+        return {
+          keep: "оставить",
+          sell: "продать",
+          give: "отдать"
+        }[status] || "оставить";
+      }
+
+      function storageStatusTone(status) {
+        return {
+          keep: "blue",
+          sell: "peach",
+          give: "mint"
+        }[status] || "blue";
+      }
+
+      function renderPantryItems() {
+        const inventory = document.getElementById("storageInventory");
+        const count = document.getElementById("storageCount");
+        if (!inventory) return;
+        inventory.innerHTML = "";
+        if (count) count.textContent = `${pantryItems.length} вещей`;
+        if (!pantryItems.length) {
+          inventory.innerHTML = `<div class="onboarding-card"><h3>Кладовые пока пустые</h3><p class="muted">Потом пришлёте фото вещей, а здесь будут подписи, даты и решение: оставить, продать или отдать.</p></div>`;
+          return;
+        }
+        pantryItems.forEach((item) => {
+          const row = document.createElement("div");
+          row.className = "activity-item";
+          row.dataset.storageId = item.id;
+          row.innerHTML = `<span class="mini-icon">${escapeHtml(item.room.replace("Кладовая ", "К"))}</span><div><h3>${escapeHtml(item.title)}</h3><p class="muted">${escapeHtml(item.room)} · ${escapeHtml(item.date)}${item.note ? ` · ${escapeHtml(item.note)}` : ""}</p></div><span class="pill ${storageStatusTone(item.status)}">${escapeHtml(storageStatusLabel(item.status))}</span><button class="delete-message" type="button" data-delete-storage="${escapeHtml(item.id)}">Удалить</button>`;
+          inventory.appendChild(row);
+        });
+      }
+
       function addDeleteHandler(item) {
         const button = item.querySelector(".delete-message");
         if (!button) return;
@@ -3285,6 +3333,7 @@
         document.querySelectorAll(".task-card").forEach(bindTaskCard);
         document.querySelectorAll("#messages .activity-item").forEach(addDeleteHandler);
         updateMessageCount();
+        renderPantryItems();
         updateLaneCounts();
         renderAuthProfile();
         updateReports();
@@ -3306,6 +3355,37 @@
         updateMessageCount();
         input.value = "";
         logActivity(`Сообщение отправлено: ${to}`);
+        saveState();
+      });
+
+      document.getElementById("storageForm")?.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const title = document.getElementById("storageItemInput").value.trim();
+        if (!title) return;
+        const item = {
+          id: `storage-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+          room: document.getElementById("storageRoomInput").value,
+          title,
+          status: document.getElementById("storageStatusInput").value,
+          note: document.getElementById("storageNoteInput").value.trim(),
+          date: new Date().toLocaleDateString("ru-RU")
+        };
+        pantryItems.unshift(item);
+        document.getElementById("storageItemInput").value = "";
+        document.getElementById("storageNoteInput").value = "";
+        renderPantryItems();
+        logActivity(`Добавлена вещь в ${item.room}: ${item.title}`);
+        saveState();
+      });
+
+      document.getElementById("storageInventory")?.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-delete-storage]");
+        if (!button) return;
+        const index = pantryItems.findIndex((item) => item.id === button.dataset.deleteStorage);
+        if (index < 0) return;
+        const [removed] = pantryItems.splice(index, 1);
+        renderPantryItems();
+        logActivity(`Удалена вещь из кладовой: ${removed.title}`);
         saveState();
       });
 
