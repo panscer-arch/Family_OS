@@ -654,6 +654,20 @@
         gap: 12px;
       }
 
+      .helper-panel {
+        border: 1px solid rgba(143, 199, 255, 0.16);
+        border-radius: 18px;
+        padding: 16px;
+        background: linear-gradient(135deg, rgba(143, 199, 255, 0.1), rgba(142, 230, 200, 0.07));
+      }
+
+      .helper-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
       .collapsible-body {
         display: grid;
         gap: 12px;
@@ -1867,6 +1881,14 @@
             </div>
             <article class="card" id="storageCard" style="margin-top: 18px">
               <div class="card-title"><div><h2>Кладовые</h2><p class="muted" style="margin-top: 6px">Три кладовые: что лежит, что продать, что отдать.</p></div><span class="pill blue" id="storageCount">0 вещей</span></div>
+              <div class="helper-panel" id="storageHelper">
+                <div class="card-title"><div><h3>Помощник по кладовым</h3><p class="muted" id="storageHelperText" style="margin-top: 6px">Начните с фото первой полки: подпишите вещь и выберите, оставить её, продать или отдать.</p></div><span class="pill" id="storageHelperStats">0 / 0 / 0</span></div>
+                <div class="helper-actions">
+                  <button class="btn secondary" type="button" data-storage-preset="sell">Вещь на продажу</button>
+                  <button class="btn secondary" type="button" data-storage-preset="give">Вещь отдать</button>
+                  <button class="btn secondary" type="button" data-storage-preset="keep">Оставить дома</button>
+                </div>
+              </div>
               <form class="grid cols-4" id="storageForm">
                 <select id="storageRoomInput"><option>Кладовая 1</option><option>Кладовая 2</option><option>Кладовая 3</option></select>
                 <input class="field" id="storageItemInput" placeholder="Что на фото? Например: мяч" required />
@@ -3292,12 +3314,37 @@
         }[status] || "blue";
       }
 
+      function updateStorageHelper() {
+        const text = document.getElementById("storageHelperText");
+        const stats = document.getElementById("storageHelperStats");
+        if (!text || !stats) return;
+        const totals = pantryItems.reduce((acc, item) => {
+          acc[item.status] = (acc[item.status] || 0) + 1;
+          return acc;
+        }, { keep: 0, sell: 0, give: 0 });
+        stats.textContent = `${totals.keep || 0} оставить · ${totals.sell || 0} продать · ${totals.give || 0} отдать`;
+        if (!pantryItems.length) {
+          text.textContent = "Начните с фото первой полки: подпишите вещь и выберите, оставить её, продать или отдать.";
+          return;
+        }
+        if (!totals.sell && !totals.give) {
+          text.textContent = "Уже есть вещи. Теперь удобно разобрать: что точно не нужно, что можно продать, а что отдать.";
+          return;
+        }
+        if (totals.sell > totals.give) {
+          text.textContent = "Есть вещи на продажу. Следующий шаг: добавьте заметку про состояние и цену, чтобы не потерять мысль.";
+          return;
+        }
+        text.textContent = "Кладовые разбираются. Продолжайте добавлять вещи по фото: название, кладовая, решение и короткая заметка.";
+      }
+
       function renderPantryItems() {
         const inventory = document.getElementById("storageInventory");
         const count = document.getElementById("storageCount");
         if (!inventory) return;
         inventory.innerHTML = "";
         if (count) count.textContent = `${pantryItems.length} вещей`;
+        updateStorageHelper();
         if (!pantryItems.length) {
           inventory.innerHTML = `<div class="onboarding-card"><h3>Кладовые пока пустые</h3><p class="muted">Потом пришлёте фото вещей, а здесь будут подписи, даты и решение: оставить, продать или отдать.</p></div>`;
           return;
@@ -3394,6 +3441,26 @@
         renderPantryItems();
         logActivity(`Добавлена вещь в ${item.room}: ${item.title}`);
         saveState();
+      });
+
+      document.querySelectorAll("[data-storage-preset]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const status = button.dataset.storagePreset;
+          const titleInput = document.getElementById("storageItemInput");
+          const statusInput = document.getElementById("storageStatusInput");
+          const noteInput = document.getElementById("storageNoteInput");
+          if (!titleInput || !statusInput || !noteInput) return;
+          statusInput.value = status;
+          const templates = {
+            keep: { title: "Вещь оставить", note: "где лежит, зачем нужна" },
+            sell: { title: "Вещь на продажу", note: "состояние, примерная цена, где продавать" },
+            give: { title: "Вещь отдать", note: "кому отдать или куда передать" }
+          };
+          titleInput.value = templates[status]?.title || "";
+          noteInput.value = templates[status]?.note || "";
+          titleInput.focus();
+          showNotice("Шаблон кладовой вставлен. Можно дописать название.");
+        });
       });
 
       document.getElementById("storageInventory")?.addEventListener("click", (event) => {
