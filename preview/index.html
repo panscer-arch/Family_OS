@@ -1733,7 +1733,7 @@
         <div class="sidebar-card">
           <p class="muted">Сегодня</p>
           <div class="progress"><span id="sidebarProgress" style="--value: 0%"></span></div>
-          <p id="sidebarProgressText" style="margin-top: 12px; font-size: 13px; color: var(--soft)">Создайте задачу или соберите день из плана</p>
+          <p id="sidebarProgressText" style="margin-top: 12px; font-size: 13px; color: var(--soft)">Создайте задачу или создайте задачи из плана</p>
         </div>
       </aside>
 
@@ -1778,7 +1778,7 @@
                 <p class="muted" style="margin-top: 8px">Один экран: кто чем занят, что сделать сейчас и что ждёт взрослого.</p>
               </div>
               <div style="display: flex; gap: 10px">
-                <button class="btn secondary" id="dashboardBuildDay" type="button" data-access="parent">Собрать день</button>
+                <button class="btn secondary" id="dashboardBuildDay" type="button" data-access="parent">Создать задачи из плана</button>
                 <button class="btn secondary" id="dashboardApproveAll" type="button" data-access="parent">Подтвердить всё</button>
                 <button class="btn" id="dashboardNewTask" data-access="parent">Новая задача</button>
               </div>
@@ -1833,13 +1833,13 @@
                   <div class="card-title">
                     <div>
                       <h2>Что сделать сейчас</h2>
-                      <p class="muted" id="weeklyStatsCaption" style="margin-top: 5px">Создайте задачу, соберите день или подтвердите готовое.</p>
+                      <p class="muted" id="weeklyStatsCaption" style="margin-top: 5px">Создайте задачу, создайте задачи из плана или подтвердите готовое.</p>
                     </div>
                     <span class="pill blue">фокус</span>
                   </div>
                   <div class="grid cols-3" id="onboardingActions">
                     <div class="onboarding-card"><h3>Новая задача</h3><p class="muted">Добавить дело Яне, Еве или семье.</p><button class="btn secondary" id="quickCreateTask" type="button">Создать</button></div>
-                    <div class="onboarding-card"><h3>Собрать день</h3><p class="muted">Перенести план в чек-лист.</p><button class="btn secondary" id="quickGenerateDay" type="button">Собрать</button></div>
+                    <div class="onboarding-card"><h3>Создать задачи из плана</h3><p class="muted">Перенести план в чек-лист.</p><button class="btn secondary" id="quickGenerateDay" type="button">Создать задачи</button></div>
                     <div class="onboarding-card"><h3>Подтвердить</h3><p class="muted">Зачесть готовые задачи и XP.</p><button class="btn secondary" id="quickApproveAll" type="button">Подтвердить всё</button></div>
                   </div>
                 </article>
@@ -1879,7 +1879,7 @@
 
                 <article class="card">
                   <div class="card-title"><h2>Задачи сегодня</h2><span class="pill peach">сейчас</span></div>
-                  <div class="activity" id="dashboardUpcoming"><div class="onboarding-card"><h3>Соберите задачи на сегодня</h3><p class="muted">Недельный план превратится в ближайшие задачи.</p><button class="btn secondary" type="button" id="upcomingBuildDay">Собрать день</button></div></div>
+                  <div class="activity" id="dashboardUpcoming"><div class="onboarding-card"><h3>Создайте задачи из плана</h3><p class="muted">Недельный план превратится в ближайшие задачи.</p><button class="btn secondary" type="button" id="upcomingBuildDay">Создать задачи из плана</button></div></div>
                 </article>
               </aside>
             </div>
@@ -1983,7 +1983,7 @@
                 </div>
                 <span class="pill" id="dailyDate">сегодня</span>
                 <div class="checklist" id="dailyChecklist">
-                <div class="onboarding-card"><h3>Соберите задачи на сегодня</h3><p class="muted">Нажмите “Собрать день”, и план превратится в чек-лист Яны и Евы.</p><button class="btn secondary" type="button" id="emptyChecklistBuildDay">Собрать день</button></div>
+                <div class="onboarding-card"><h3>Создайте задачи из плана</h3><p class="muted">Нажмите “Создать задачи из плана”, и план превратится в чек-лист Яны и Евы.</p><button class="btn secondary" type="button" id="emptyChecklistBuildDay">Создать задачи из плана</button></div>
                 </div>
               </article>
             </div>
@@ -2004,7 +2004,7 @@
           <section class="page" id="week">
             <div class="page-head">
               <div><p class="eyebrow">Неделя</p><h1>Недельный план</h1><p class="muted" style="margin-top: 8px">В воскресенье дети заполняют неделю: понедельник-воскресенье. Из плана автоматически рождаются задачи дня.</p></div>
-              <div style="display: flex; gap: 10px"><button class="btn secondary" id="copyPrevDay">Скопировать вчера</button><button class="btn secondary" id="insertTemplate">Вставить семейный шаблон</button><button class="btn" id="generateDayTasks">Собрать задачи на сегодня</button></div>
+              <div style="display: flex; gap: 10px"><button class="btn secondary" id="copyPrevDay">Скопировать вчера</button><button class="btn secondary" id="insertTemplate">Вставить семейный шаблон</button><button class="btn" id="generateDayTasks">Создать задачи из плана</button></div>
             </div>
             <div class="card" style="margin-bottom: 18px">
               <div class="calendar-shell">
@@ -2052,14 +2052,14 @@
               <article class="card">
                 <div class="card-title"><h2>Сегодня</h2><span class="pill" id="planCountBadge">задачи дня</span></div>
                 <div class="plan-list" id="planList">
-                  <div class="onboarding-card"><h3>Задач дня ещё нет</h3><p class="muted">Сначала заполните недельный план, потом соберите день.</p><button class="btn secondary" type="button" data-route-jump="week">Заполнить недельный план</button></div>
+                  <div class="onboarding-card"><h3>Задач дня ещё нет</h3><p class="muted">Сначала заполните недельный план, потом создайте задачи из плана.</p><button class="btn secondary" type="button" data-route-jump="week">Заполнить недельный план</button></div>
                 </div>
               </article>
               <article class="card">
                 <div class="card-title"><h2>Как это работает</h2><span class="pill blue">авто</span></div>
                 <div class="activity">
                   <div class="activity-item"><span class="mini-icon">1</span><div><h3>Заполнить недельный план</h3><p class="muted">План начинается с выбранной даты и содержит реальные дела семьи.</p></div></div>
-                  <div class="activity-item"><span class="mini-icon">2</span><div><h3>Собрать задачи на сегодня</h3><p class="muted">Пункты Яны попадут Яне, пункты Евы - Еве, семейные - обоим.</p></div></div>
+                  <div class="activity-item"><span class="mini-icon">2</span><div><h3>Создать задачи из плана</h3><p class="muted">Пункты Яны попадут Яне, пункты Евы - Еве, семейные - обоим.</p></div></div>
                   <div class="activity-item"><span class="mini-icon">3</span><div><h3>Отмечать выполнение</h3><p class="muted">После отметок отчёты и статистика считаются автоматически.</p></div></div>
                 </div>
               </article>
@@ -2069,7 +2069,7 @@
           <section class="page" id="reports">
             <div class="page-head"><div><p class="eyebrow">Progress</p><h1>Прогресс</h1><p class="muted" style="margin-top: 8px">Коротко: сколько сделано, что просрочено, сколько действий было сегодня.</p></div></div>
             <div class="grid cols-4">
-              <article class="card stat"><h3>Сегодня</h3><p class="stat-value" id="reportTodayPercent" style="color: var(--mint)">0%</p><p class="stat-caption" id="reportTodayCaption">создайте задачу или соберите день</p></article>
+              <article class="card stat"><h3>Сегодня</h3><p class="stat-value" id="reportTodayPercent" style="color: var(--mint)">0%</p><p class="stat-caption" id="reportTodayCaption">создайте задачу или создайте задачи из плана</p></article>
               <article class="card stat"><h3>Неделя</h3><p class="stat-value" id="reportWeekPercent" style="color: var(--blue)">0%</p><p class="stat-caption">по текущим задачам</p></article>
               <article class="card stat"><h3>Просрочено</h3><p class="stat-value" id="reportOverdueCount" style="color: var(--rose)">0</p><p class="stat-caption">считается по дедлайнам</p></article>
               <article class="card stat"><h3>Активность</h3><p class="stat-value" id="reportActivityCount" style="color: var(--peach)">0</p><p class="stat-caption">событий в истории</p></article>
@@ -2111,7 +2111,7 @@
               <div><p class="eyebrow">Home</p><h1>Дом и быт</h1><p class="muted" style="margin-top: 8px">Ежедневная рутина дома: кухня, еда, комнаты, робот-пылесос и семейные сообщения.</p></div>
               <button class="btn" id="sendHomeToPlan">Добавить быт в задачи дня</button>
             </div>
-            <div class="home-note" style="margin-bottom: 18px">Быт не живёт отдельно: ежедневные домашние дела уже добавлены в семейный шаблон недели и попадают в чек-листы Яны и Евы после кнопки “Собрать задачи на сегодня”.</div>
+            <div class="home-note" style="margin-bottom: 18px">Быт не живёт отдельно: ежедневные домашние дела уже добавлены в семейный шаблон недели и попадают в чек-листы Яны и Евы после кнопки “Создать задачи из плана”.</div>
             <div class="home-board">
               <article class="card home-column">
                 <div class="card-title"><h2>Каждый день</h2><span class="pill">авто в план</span></div>
@@ -2141,7 +2141,7 @@
               </article>
             </div>
             <div class="grid cols-2" style="margin-top: 18px">
-              <article class="card"><div class="card-title"><h2>Как быт попадает в задачи</h2><span class="pill blue">просто</span></div><div class="activity"><div class="activity-item"><span class="mini-icon">1</span><div><h3>Шаблон недели</h3><p class="muted">ежедневный робот, кухня, комната и кошки уже внутри шаблона.</p></div></div><div class="activity-item"><span class="mini-icon">2</span><div><h3>Собрать задачи на сегодня</h3><p class="muted">на выбранную дату задачи попадут в чек-листы Яны и Евы.</p></div></div><div class="activity-item"><span class="mini-icon">3</span><div><h3>Отметить галочкой</h3><p class="muted">после отметок отчёты начнут считать, что сделано дома.</p></div></div></div></article>
+              <article class="card"><div class="card-title"><h2>Как быт попадает в задачи</h2><span class="pill blue">просто</span></div><div class="activity"><div class="activity-item"><span class="mini-icon">1</span><div><h3>Шаблон недели</h3><p class="muted">ежедневный робот, кухня, комната и кошки уже внутри шаблона.</p></div></div><div class="activity-item"><span class="mini-icon">2</span><div><h3>Создать задачи из плана</h3><p class="muted">на выбранную дату задачи попадут в чек-листы Яны и Евы.</p></div></div><div class="activity-item"><span class="mini-icon">3</span><div><h3>Отметить галочкой</h3><p class="muted">после отметок отчёты начнут считать, что сделано дома.</p></div></div></div></article>
               <article class="card"><div class="card-title"><h2>Семейный чат</h2><span class="pill rose" id="messageCount">чат</span></div><form class="grid" id="messageForm"><select id="messageTo"><option>Всем</option><option>Яне</option><option>Еве</option><option>Родителям</option></select><input class="field" id="messageText" placeholder="Написать сообщение" required /><button class="btn" type="submit">Отправить</button></form><div class="activity" id="messages" style="margin-top: 14px"><div class="onboarding-card"><h3>Напишите первое семейное сообщение</h3><p class="muted">Например: “Яна, проверь план после завтрака”.</p><button class="btn secondary" type="button" id="focusMessageInput">Написать</button></div></div></article>
             </div>
           </section>
@@ -2207,7 +2207,7 @@
       <button class="quick-action primary" id="fixedQuickTask" type="button">+ задача</button>
       <button class="quick-action" id="fixedQuickChild" type="button" data-access="parent">+ ребёнок</button>
       <button class="quick-action simplified-hidden" id="fixedQuickReward" type="button">+ награда</button>
-      <button class="quick-action" id="fixedQuickBuildDay" type="button" data-access="parent">собрать день</button>
+      <button class="quick-action" id="fixedQuickBuildDay" type="button" data-access="parent">создать задачи</button>
       <button class="quick-action" id="fixedQuickApproveAll" type="button" data-access="parent">подтвердить всё</button>
     </div>
 
@@ -2484,9 +2484,15 @@
           repeat: task.repeat || "once",
           comment: task.comment || "",
           reportUrl: task.reportUrl || "",
+          sourceKey: task.sourceKey || "",
+          source: task.source || "",
           createdAt: task.createdAt || new Date().toISOString(),
           updatedAt: task.updatedAt || new Date().toISOString()
         };
+      }
+
+      function planTaskSourceKey(date, child, task) {
+        return [isoDate(date), child, task.time || "", task.title || "", task.tag || "план"].join("|");
       }
 
       function allTasks() {
@@ -2578,7 +2584,7 @@
         if (!tasks.length) {
           const empty = document.createElement("div");
           empty.className = "onboarding-card";
-          empty.innerHTML = `<h3>Соберите задачи для ${selectedChild === "Ева" ? "Евы" : "Яны"}</h3><p class="muted">Соберите день или создайте задачу вручную, чтобы открыть чек-лист.</p><div class="task-actions"><button class="btn secondary" type="button" data-build-day>Собрать день</button><button class="btn secondary" type="button" data-empty-create-task>Новая задача</button></div>`;
+          empty.innerHTML = `<h3>Создайте задачи для ${selectedChild === "Ева" ? "Евы" : "Яны"}</h3><p class="muted">Создайте задачи из плана или добавьте задачу вручную, чтобы открыть чек-лист.</p><div class="task-actions"><button class="btn secondary" type="button" data-build-day>Создать задачи из плана</button><button class="btn secondary" type="button" data-empty-create-task>Новая задача</button></div>`;
           checklist.appendChild(empty);
           empty.querySelector("[data-build-day]")?.addEventListener("click", () => document.getElementById("generateDayTasks")?.click());
           empty.querySelector("[data-empty-create-task]")?.addEventListener("click", openTaskDialog);
@@ -2648,8 +2654,13 @@
           const child = label.dataset.checkChild;
           const index = Number(label.dataset.checkIndex);
           if (child && Number.isInteger(index) && checklistTasks[child] && checklistTasks[child][index]) {
+            const previous = normalizeTask(checklistTasks[child][index]);
             const nextStatus = input.checked ? "done" : "todo";
             checklistTasks[child][index] = normalizeTask({ ...checklistTasks[child][index], status: nextStatus, done: input.checked });
+            if (input.checked && previous.status !== "done") {
+              grantXp(child, checklistTasks[child][index].points);
+              logActivity(`Взрослый отметил задачу ${child}: ${checklistTasks[child][index].title} (+${checklistTasks[child][index].points} XP)`, "done");
+            }
             label.dataset.status = nextStatus;
           }
           label.classList.toggle("done", input.checked);
@@ -2686,16 +2697,25 @@
           event.preventDefault();
           event.stopPropagation();
           const child = container.dataset.checkChild;
+          const currentTask = normalizeTask((checklistTasks[child] || []).find((item) => item.id === container.dataset.taskId) || {});
+          const nextStatus = currentTask.approvalRequired ? "waiting_confirmation" : "done";
           const task = updateTask(child, container.dataset.taskId, {
-            status: "waiting_confirmation",
+            status: nextStatus,
+            done: nextStatus === "done",
             comment: container.querySelector("[data-task-comment]")?.value || "",
             reportUrl: container.querySelector("[data-task-report]")?.value || ""
           });
           if (!task) return;
-          logActivity(`${child} отправила задачу на подтверждение: ${task.title}`, "waiting_confirmation");
+          if (nextStatus === "done") {
+            grantXp(child, task.points);
+            logActivity(`${child} выполнила задачу: ${task.title} (+${task.points} XP)`, "done");
+            showNotice("Задача засчитана, XP начислен.");
+          } else {
+            logActivity(`${child} отправила задачу на подтверждение: ${task.title}`, "waiting_confirmation");
+            showNotice("Задача отправлена взрослому.");
+          }
           renderDailyChecklist();
           updateDashboard();
-          showNotice("Задача отправлена взрослому.");
         });
         container.querySelector("[data-approve-task]")?.addEventListener("click", (event) => {
           event.preventDefault();
@@ -2830,12 +2850,12 @@
         const weeklyChart = document.getElementById("weeklyChart");
         if (todayValue) todayValue.textContent = `${percent}%`;
         if (weekValue) weekValue.textContent = `${percent}%`;
-        if (todayCaption) todayCaption.textContent = total ? `${done} из ${total} подтверждено, ${pending} ждёт взрослого` : "создайте задачу или соберите день из плана";
+        if (todayCaption) todayCaption.textContent = total ? `${done} из ${total} подтверждено, ${pending} ждёт взрослого` : "создайте задачу или создайте задачи из плана";
         if (overdueValue) overdueValue.textContent = String(overdue);
         if (activityValue) activityValue.textContent = String(activityCount);
         if (logCount) logCount.textContent = String(activityCount);
         if (summaryCount) summaryCount.textContent = `${activityCount} событий`;
-        if (summaryText) summaryText.textContent = total ? `Сегодня подтверждено ${done} из ${total} задач. Ждёт взрослого: ${pending}. История действий: ${activityCount}.` : "Создайте задачу или соберите день из недельного плана, и сводка начнёт считаться сама.";
+        if (summaryText) summaryText.textContent = total ? `Сегодня подтверждено ${done} из ${total} задач. Ждёт взрослого: ${pending}. История действий: ${activityCount}.` : "Создайте задачу или создайте задачи из плана из недельного плана, и сводка начнёт считаться сама.";
         if (weeklyChart) {
           const base = total ? percent : 18;
           weeklyChart.innerHTML = Array.from({ length: 7 }, (_, index) => {
@@ -2852,7 +2872,7 @@
         if (!tasks.length) {
           const empty = document.createElement("div");
           empty.className = "onboarding-card";
-          empty.innerHTML = `<h3>${escapeHtml(emptyText)}</h3><p class="muted">Создайте задачу или соберите день.</p><button class="btn secondary" type="button" data-build-day>Собрать день</button>`;
+          empty.innerHTML = `<h3>${escapeHtml(emptyText)}</h3><p class="muted">Создайте задачу или задачи из плана.</p><button class="btn secondary" type="button" data-build-day>Создать задачи из плана</button>`;
           empty.querySelector("[data-build-day]")?.addEventListener("click", () => document.getElementById("generateDayTasks")?.click());
           target.appendChild(empty);
           return;
@@ -2876,17 +2896,17 @@
         const attentionItems = [
           ...tasks.filter((task) => task.status === "waiting_confirmation").map((task) => ({ title: `${task.child}: ждёт подтверждения`, text: task.title, tone: "waiting_confirmation" })),
           ...tasks.filter((task) => task.deadline && task.status !== "done" && new Date(task.deadline) < new Date()).map((task) => ({ title: `${task.child}: просрочено`, text: task.title, tone: "overdue" })),
-          ...noTaskChildren.map((child) => ({ title: `${child}: нет задач на сегодня`, text: "Соберите день или создайте задачу", tone: "in_progress" }))
+          ...noTaskChildren.map((child) => ({ title: `${child}: нет задач на сегодня`, text: "Создайте задачи из плана или создайте задачу", tone: "in_progress" }))
         ];
         const setText = (id, value) => {
           const node = document.getElementById(id);
           if (node) node.textContent = value;
         };
         setText("dashboardTodayPercent", `${percent}%`);
-        setText("dashboardTodayCaption", tasks.length ? `${done} подтверждено, ${pending} ждёт взрослого` : "Создайте задачу или соберите день из плана");
+        setText("dashboardTodayCaption", tasks.length ? `${done} подтверждено, ${pending} ждёт взрослого` : "Создайте задачу или создайте задачи из плана");
         setText("dashboardProofCount", String(withProof));
         setText("dashboardOverdueCount", String(overdue));
-        setText("weeklyStatsCaption", tasks.length ? `Сегодня задач: ${tasks.length}. Ждёт взрослого: ${pending}.` : "Создайте задачу или соберите день.");
+        setText("weeklyStatsCaption", tasks.length ? `Сегодня задач: ${tasks.length}. Ждёт взрослого: ${pending}.` : "Создайте задачу или задачи из плана.");
         setText("attentionCount", String(attentionItems.length));
         const attention = document.getElementById("attentionList");
         if (attention) {
@@ -2904,7 +2924,7 @@
         }
         const sidebarProgress = document.getElementById("sidebarProgress");
         if (sidebarProgress) sidebarProgress.style.setProperty("--value", `${percent}%`);
-        setText("sidebarProgressText", tasks.length ? `${done}/${tasks.length} задач подтверждено` : "Создайте задачу или соберите день из плана");
+        setText("sidebarProgressText", tasks.length ? `${done}/${tasks.length} задач подтверждено` : "Создайте задачу или создайте задачи из плана");
         const childName = authProfile?.role === "child" ? authProfile.name : selectedChild;
         const childTasks = (checklistTasks[childName] || []).map((task) => normalizeTask({ ...task, child: childName }));
         const childDone = childTasks.filter((task) => task.status === "done").length;
@@ -2920,7 +2940,7 @@
           document.querySelector(`[data-child-progress="${name}"]`)?.style.setProperty("--value", `${progress}%`);
         });
         setText("childDashboardTitle", `${childName}, твой день`);
-        setText("childDashboardSubtitle", childTasks.length ? "Отмечай задачи кнопкой “Я сделал” и добавляй комментарий или ссылку." : "Взрослый может собрать день из недельного плана.");
+        setText("childDashboardSubtitle", childTasks.length ? "Отмечай задачи кнопкой “Я сделал” и добавляй комментарий или ссылку." : "Взрослый может создать задачи из недельного плана.");
         setText("childProgressValue", `${childPercent}%`);
         setText("childPointsValue", String(childPoints[childName] || 0));
         setText("childStreakValue", String(childStats[childName]?.streak || 0));
@@ -2928,7 +2948,7 @@
         setText("childPendingValue", String(childPending));
         setText("childTaskCount", String(childTasks.length));
         renderMiniTaskList("childDashboardTasks", childTasks, "Мои задачи ещё не собраны");
-        renderMiniTaskList("dashboardUpcoming", tasks.filter((task) => task.status !== "done"), "Создайте задачу или соберите день из плана.");
+        renderMiniTaskList("dashboardUpcoming", tasks.filter((task) => task.status !== "done"), "Создайте задачу или создайте задачи из плана.");
         const logItems = [...document.querySelectorAll("#activityLog .activity-item")].slice(0, 4);
         const activity = document.getElementById("dashboardActivity");
         if (activity) {
@@ -2998,8 +3018,8 @@
         if (!tasks.length) {
           const empty = document.createElement("div");
           empty.className = "onboarding-card";
-          empty.innerHTML = `<h3>Задачи дня ещё не собраны</h3><p class="muted">Нажмите “Собрать задачи на сегодня” в недельном плане, и сюда попадут задачи Яны и Евы.</p><button class="btn secondary" type="button" data-route-jump="week">Открыть план</button>`;
-          empty.querySelector("[data-route-jump]")?.addEventListener("click", () => go("week"));
+          empty.innerHTML = `<h3>Задачи дня ещё не собраны</h3><p class="muted">Нажмите “Создать задачи из плана” в недельном плане, и сюда попадут задачи Яны и Евы.</p><button class="btn secondary" type="button" data-build-day>Создать задачи из плана</button>`;
+          empty.querySelector("[data-build-day]")?.addEventListener("click", () => document.getElementById("generateDayTasks")?.click());
           list.appendChild(empty);
           return;
         }
@@ -3275,12 +3295,23 @@
       document.getElementById("generateDayTasks").addEventListener("click", () => {
         const day = activeWeekDay();
         const plan = ensurePlan(selectedDate);
-        checklistTasks["Яна"] = [];
-        checklistTasks["Ева"] = [];
+        let added = 0;
+        let skipped = 0;
         plan.items.map((item) => parsePlanItem(item, plan.child)).forEach((task) => {
           const targets = task.child === "Семья" ? ["Яна", "Ева"] : [task.child];
           targets.forEach((child) => {
-            if (checklistTasks[child]) checklistTasks[child].push(normalizeTask({ ...task, child, status: "todo", points: task.tag === "режим" ? 5 : 10 }));
+            if (!checklistTasks[child]) return;
+            const sourceKey = planTaskSourceKey(selectedDate, child, task);
+            const exists = checklistTasks[child].some((existing) => {
+              const normalized = normalizeTask(existing);
+              return normalized.sourceKey === sourceKey || (!normalized.sourceKey && normalized.title === task.title && normalized.time === task.time && normalized.tag === task.tag);
+            });
+            if (exists) {
+              skipped += 1;
+              return;
+            }
+            checklistTasks[child].push(normalizeTask({ ...task, child, status: "todo", points: task.tag === "режим" ? 5 : 10, source: "week-plan", sourceKey }));
+            added += 1;
           });
         });
         renderPlanListFromTasks();
@@ -3288,7 +3319,9 @@
         showChecklistForChild(selectedChild);
         updateReports();
         updateDashboard();
-        logActivity("Задачи дня собраны из недельного плана");
+        logActivity(`Задачи из плана добавлены: ${added}${skipped ? `, уже были: ${skipped}` : ""}`);
+        showNotice(added ? `Добавлено задач из плана: ${added}` : "Все задачи из плана уже есть в чек-листах.");
+        saveState();
         go("tasks");
       });
 
