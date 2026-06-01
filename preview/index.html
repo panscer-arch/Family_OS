@@ -107,7 +107,7 @@
         display: none !important;
       }
 
-      .plan-only .nav-btn:not([data-route="week"]),
+      .plan-only .nav-btn:not([data-route="week"]):not([data-route="content"]),
       .plan-only .sidebar-card,
       .plan-only .search,
       .plan-only .top-actions,
@@ -1171,44 +1171,6 @@
         color: var(--mint);
       }
 
-      .note-launcher {
-        position: fixed;
-        right: 22px;
-        bottom: 22px;
-        z-index: 24;
-        border: 1px solid rgba(142, 230, 200, 0.26);
-        border-radius: 999px;
-        background: linear-gradient(135deg, rgba(142, 230, 200, 0.18), rgba(143, 199, 255, 0.12));
-        color: var(--text);
-        box-shadow: var(--shadow);
-        padding: 13px 18px;
-        font-weight: 820;
-        transition: 180ms ease;
-      }
-
-      .note-launcher:hover {
-        transform: translateY(-2px);
-        border-color: rgba(142, 230, 200, 0.45);
-      }
-
-      .note-list {
-        display: grid;
-        gap: 10px;
-        max-height: 320px;
-        overflow: auto;
-      }
-
-      .note-item {
-        display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 10px;
-        align-items: start;
-        border: 1px solid rgba(255, 255, 255, 0.075);
-        border-radius: 16px;
-        background: rgba(255, 255, 255, 0.045);
-        padding: 12px;
-      }
-
       .check-item {
         display: grid;
         grid-template-columns: auto 1fr auto;
@@ -1768,6 +1730,10 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5V5a2 2 0 0 1 2-2h11"/><path d="M8 7h12v14H8z"/><path d="M12 11h4M12 15h4"/></svg>
             План
           </button>
+          <button class="nav-btn" data-route="content" data-title="Контент">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3V9Z"/></svg>
+            Контент
+          </button>
           <button class="nav-btn parent-only" data-route="plan" data-title="План дня" style="display:none">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
             Задачи дня
@@ -2084,6 +2050,41 @@
             </div>
           </section>
 
+          <section class="page" id="content">
+            <div class="page-head">
+              <div><p class="eyebrow">Content</p><h1>Контент</h1><p class="muted" style="margin-top: 8px">Отдельное место для роликов Евы: идея, сценарий, съёмка, монтаж и ссылка на результат.</p></div>
+            </div>
+            <div class="grid cols-2">
+              <article class="card">
+                <div class="card-title"><h2>Текущий ролик</h2><span class="pill blue" id="contentStatusBadge">идея</span></div>
+                <form class="grid" id="contentForm">
+                  <input class="field" id="contentTitleInput" placeholder="Название ролика" required />
+                  <input class="field" id="contentTopicInput" placeholder="Тема / о чём ролик" />
+                  <select id="contentStatusInput">
+                    <option>идея</option>
+                    <option>сценарий</option>
+                    <option>снято</option>
+                    <option>монтаж</option>
+                    <option>опубликовано</option>
+                  </select>
+                  <input class="field" id="contentDraftInput" placeholder="Ссылка на черновик" />
+                  <input class="field" id="contentEditInput" placeholder="Ссылка на монтаж" />
+                  <input class="field" id="contentPublishedInput" placeholder="Ссылка на опубликованный ролик" />
+                  <textarea class="field" id="contentResultInput" placeholder="Что сегодня сделано по ролику?"></textarea>
+                  <button class="btn" type="submit">Сохранить ролик</button>
+                </form>
+              </article>
+              <article class="card">
+                <div class="card-title"><h2>Карточка ролика</h2><button class="btn secondary" id="archiveContentVideo" type="button">В архив</button></div>
+                <div class="activity" id="currentContentCard"></div>
+              </article>
+            </div>
+            <article class="card" style="margin-top: 18px">
+              <div class="card-title"><h2>Архив роликов</h2><span class="pill" id="contentArchiveCount">0</span></div>
+              <div class="activity" id="contentArchive"></div>
+            </article>
+          </section>
+
           <section class="page" id="plan">
             <div class="page-head">
               <div><p class="eyebrow">День</p><h1>Задачи дня</h1><p class="muted" style="margin-top: 8px">Этот экран заполняется автоматически из недельного плана и выполненных задач.</p></div>
@@ -2252,19 +2253,6 @@
       <button class="quick-action" id="fixedQuickApproveAll" type="button" data-access="parent">подтвердить всё</button>
     </div>
 
-    <button class="note-launcher" id="openQuickNote" type="button">Заметка</button>
-
-    <div class="modal-backdrop" id="quickNoteModal">
-      <div class="modal">
-        <div class="card-title"><div><p class="eyebrow">Quick note</p><h2>Заметки</h2></div><button class="btn secondary" id="closeQuickNote" type="button">Закрыть</button></div>
-        <form class="grid" id="quickNoteForm">
-          <input class="field" id="quickNoteInput" placeholder="Записать мысль, идею или что добавить потом" required />
-          <button class="btn" type="submit">Сохранить заметку</button>
-        </form>
-        <div class="note-list" id="quickNoteList" style="margin-top: 16px"></div>
-      </div>
-    </div>
-
     <div class="modal-backdrop" id="taskModal">
       <div class="modal">
         <div class="card-title"><div><p class="eyebrow">Tasks</p><h2>Создать задачу</h2></div><button class="btn secondary" id="closeTaskModal" type="button">Закрыть</button></div>
@@ -2411,7 +2399,7 @@
       let authProfile = SOLO_MODE ? { role: "solo", name: "Ева", familyName: "План Евы", inviteCode: "" } : (savedState.authProfile || null);
 
       function go(route) {
-        const publicRoutes = PLAN_ONLY_MODE ? ["week"] : (SOLO_MODE ? ["dashboard", "tasks", "children", "week", "reports"] : ["dashboard", "tasks", "children", "reports", "settings"]);
+        const publicRoutes = PLAN_ONLY_MODE ? ["week", "content"] : (SOLO_MODE ? ["dashboard", "tasks", "children", "week", "reports"] : ["dashboard", "tasks", "children", "reports", "settings"]);
         if (!publicRoutes.includes(route)) route = PLAN_ONLY_MODE ? "week" : "dashboard";
         if (authProfile?.role === "child" && ["children", "reports", "settings"].includes(route)) {
           route = "dashboard";
@@ -2421,6 +2409,7 @@
         routes.forEach((button) => button.classList.toggle("active", button.dataset.route === route));
         const active = [...routes].find((button) => button.dataset.route === route);
         if (active) routeTitle.textContent = active.dataset.title;
+        if (route === "content") renderContentWorkspace();
         location.hash = route;
       }
 
@@ -2456,7 +2445,7 @@
         "Ева": savedState.childStats?.["Ева"] || { streak: 0, level: 1, achievements: [] }
       };
       const pantryItems = savedState.pantryItems || [];
-      const quickNotes = savedState.quickNotes || [];
+      const contentWorkspace = savedState.contentWorkspace || { archive: [] };
       let selectedStorageRoom = savedState.selectedStorageRoom || "Кладовая 1";
       let storageFilter = savedState.storageFilter || "all";
 
@@ -2477,7 +2466,7 @@
           childPoints,
           childStats,
           pantryItems,
-          quickNotes,
+          contentWorkspace,
           selectedStorageRoom,
           storageFilter,
           authProfile,
@@ -2841,56 +2830,75 @@
         setTimeout(() => notice.remove(), 2200);
       }
 
-      function renderQuickNotes() {
-        const list = document.getElementById("quickNoteList");
-        if (!list) return;
-        list.innerHTML = "";
-        if (!quickNotes.length) {
-          list.innerHTML = `<div class="onboarding-card"><h3>Заметок пока нет</h3><p class="muted">Сюда можно быстро скидывать мысли, идеи и что добавить потом.</p></div>`;
+      function contentLink(label, url) {
+        if (!url) return "";
+        return `<a class="pill blue" href="${escapeHtml(url)}" target="_blank" rel="noreferrer">${escapeHtml(label)}</a>`;
+      }
+
+      function renderContentWorkspace() {
+        const statusBadge = document.getElementById("contentStatusBadge");
+        const current = document.getElementById("currentContentCard");
+        const archive = document.getElementById("contentArchive");
+        const archiveCount = document.getElementById("contentArchiveCount");
+        if (!current || !archive) return;
+        if (statusBadge) statusBadge.textContent = contentWorkspace.status || "идея";
+        current.innerHTML = contentWorkspace.title ? `
+          <div class="activity-item">
+            <span class="mini-icon">▶</span>
+            <div>
+              <h3>${escapeHtml(contentWorkspace.title)}</h3>
+              <p class="muted">${escapeHtml(contentWorkspace.topic || "тема не указана")} · ${escapeHtml(contentWorkspace.status || "идея")}</p>
+              ${contentWorkspace.result ? `<p class="muted" style="margin-top: 8px">${escapeHtml(contentWorkspace.result)}</p>` : ""}
+              <div class="task-actions">${contentLink("черновик", contentWorkspace.draftUrl)}${contentLink("монтаж", contentWorkspace.editUrl)}${contentLink("публикация", contentWorkspace.publishedUrl)}</div>
+            </div>
+          </div>` : `<div class="onboarding-card"><h3>Ролик ещё не добавлен</h3><p class="muted">Заполните карточку слева: название, статус и ссылки.</p></div>`;
+        archive.innerHTML = "";
+        const items = contentWorkspace.archive || [];
+        if (archiveCount) archiveCount.textContent = String(items.length);
+        if (!items.length) {
+          archive.innerHTML = `<div class="onboarding-card"><h3>Архив пуст</h3><p class="muted">Когда ролик готов, отправьте его в архив.</p></div>`;
           return;
         }
-        quickNotes.forEach((note) => {
-          const item = document.createElement("div");
-          item.className = "note-item";
-          item.innerHTML = `<div><h3>${escapeHtml(note.text)}</h3><p class="muted">${escapeHtml(note.createdAt)}</p></div><button class="delete-message" type="button" data-delete-note="${escapeHtml(note.id)}">Удалить</button>`;
-          list.appendChild(item);
+        items.forEach((item) => {
+          const row = document.createElement("div");
+          row.className = "activity-item";
+          row.innerHTML = `<span class="mini-icon">✓</span><div><h3>${escapeHtml(item.title)}</h3><p class="muted">${escapeHtml(item.date)} · ${escapeHtml(item.topic || "без темы")}</p><div class="task-actions">${contentLink("ссылка", item.publishedUrl)}</div></div>`;
+          archive.appendChild(row);
         });
       }
 
-      document.getElementById("openQuickNote")?.addEventListener("click", () => {
-        renderQuickNotes();
-        document.getElementById("quickNoteModal")?.classList.add("show");
-        setTimeout(() => document.getElementById("quickNoteInput")?.focus(), 50);
-      });
-
-      document.getElementById("closeQuickNote")?.addEventListener("click", () => {
-        document.getElementById("quickNoteModal")?.classList.remove("show");
-      });
-
-      document.getElementById("quickNoteForm")?.addEventListener("submit", (event) => {
+      document.getElementById("contentForm")?.addEventListener("submit", (event) => {
         event.preventDefault();
-        const input = document.getElementById("quickNoteInput");
-        const text = input.value.trim();
-        if (!text) return;
-        quickNotes.unshift({
-          id: `note-${Date.now()}`,
-          text,
-          createdAt: new Date().toLocaleString("ru-RU", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })
-        });
-        input.value = "";
-        renderQuickNotes();
+        contentWorkspace.title = document.getElementById("contentTitleInput").value.trim();
+        contentWorkspace.topic = document.getElementById("contentTopicInput").value.trim();
+        contentWorkspace.status = document.getElementById("contentStatusInput").value;
+        contentWorkspace.draftUrl = document.getElementById("contentDraftInput").value.trim();
+        contentWorkspace.editUrl = document.getElementById("contentEditInput").value.trim();
+        contentWorkspace.publishedUrl = document.getElementById("contentPublishedInput").value.trim();
+        contentWorkspace.result = document.getElementById("contentResultInput").value.trim();
+        renderContentWorkspace();
         saveState();
-        showNotice("Заметка сохранена.");
+        showNotice("Ролик сохранён.");
       });
 
-      document.getElementById("quickNoteList")?.addEventListener("click", (event) => {
-        const button = event.target.closest("[data-delete-note]");
-        if (!button) return;
-        const index = quickNotes.findIndex((note) => note.id === button.dataset.deleteNote);
-        if (index < 0) return;
-        quickNotes.splice(index, 1);
-        renderQuickNotes();
+      document.getElementById("archiveContentVideo")?.addEventListener("click", () => {
+        if (!contentWorkspace.title) {
+          showNotice("Сначала добавьте ролик.");
+          return;
+        }
+        contentWorkspace.archive = contentWorkspace.archive || [];
+        contentWorkspace.archive.unshift({
+          title: contentWorkspace.title,
+          topic: contentWorkspace.topic || "",
+          publishedUrl: contentWorkspace.publishedUrl || "",
+          date: new Date().toLocaleDateString("ru-RU")
+        });
+        ["title", "topic", "draftUrl", "editUrl", "publishedUrl", "result"].forEach((key) => { contentWorkspace[key] = ""; });
+        contentWorkspace.status = "идея";
+        document.getElementById("contentForm")?.reset();
+        renderContentWorkspace();
         saveState();
+        showNotice("Ролик отправлен в архив.");
       });
 
       document.addEventListener("invalid", (event) => {
