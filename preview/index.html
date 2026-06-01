@@ -1171,6 +1171,44 @@
         color: var(--mint);
       }
 
+      .note-launcher {
+        position: fixed;
+        right: 22px;
+        bottom: 22px;
+        z-index: 24;
+        border: 1px solid rgba(142, 230, 200, 0.26);
+        border-radius: 999px;
+        background: linear-gradient(135deg, rgba(142, 230, 200, 0.18), rgba(143, 199, 255, 0.12));
+        color: var(--text);
+        box-shadow: var(--shadow);
+        padding: 13px 18px;
+        font-weight: 820;
+        transition: 180ms ease;
+      }
+
+      .note-launcher:hover {
+        transform: translateY(-2px);
+        border-color: rgba(142, 230, 200, 0.45);
+      }
+
+      .note-list {
+        display: grid;
+        gap: 10px;
+        max-height: 320px;
+        overflow: auto;
+      }
+
+      .note-item {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+        align-items: start;
+        border: 1px solid rgba(255, 255, 255, 0.075);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.045);
+        padding: 12px;
+      }
+
       .check-item {
         display: grid;
         grid-template-columns: auto 1fr auto;
@@ -2214,6 +2252,19 @@
       <button class="quick-action" id="fixedQuickApproveAll" type="button" data-access="parent">подтвердить всё</button>
     </div>
 
+    <button class="note-launcher" id="openQuickNote" type="button">Заметка</button>
+
+    <div class="modal-backdrop" id="quickNoteModal">
+      <div class="modal">
+        <div class="card-title"><div><p class="eyebrow">Quick note</p><h2>Заметки</h2></div><button class="btn secondary" id="closeQuickNote" type="button">Закрыть</button></div>
+        <form class="grid" id="quickNoteForm">
+          <input class="field" id="quickNoteInput" placeholder="Записать мысль, идею или что добавить потом" required />
+          <button class="btn" type="submit">Сохранить заметку</button>
+        </form>
+        <div class="note-list" id="quickNoteList" style="margin-top: 16px"></div>
+      </div>
+    </div>
+
     <div class="modal-backdrop" id="taskModal">
       <div class="modal">
         <div class="card-title"><div><p class="eyebrow">Tasks</p><h2>Создать задачу</h2></div><button class="btn secondary" id="closeTaskModal" type="button">Закрыть</button></div>
@@ -2405,6 +2456,7 @@
         "Ева": savedState.childStats?.["Ева"] || { streak: 0, level: 1, achievements: [] }
       };
       const pantryItems = savedState.pantryItems || [];
+      const quickNotes = savedState.quickNotes || [];
       let selectedStorageRoom = savedState.selectedStorageRoom || "Кладовая 1";
       let storageFilter = savedState.storageFilter || "all";
 
@@ -2425,6 +2477,7 @@
           childPoints,
           childStats,
           pantryItems,
+          quickNotes,
           selectedStorageRoom,
           storageFilter,
           authProfile,
@@ -2787,6 +2840,58 @@
         document.body.appendChild(notice);
         setTimeout(() => notice.remove(), 2200);
       }
+
+      function renderQuickNotes() {
+        const list = document.getElementById("quickNoteList");
+        if (!list) return;
+        list.innerHTML = "";
+        if (!quickNotes.length) {
+          list.innerHTML = `<div class="onboarding-card"><h3>Заметок пока нет</h3><p class="muted">Сюда можно быстро скидывать мысли, идеи и что добавить потом.</p></div>`;
+          return;
+        }
+        quickNotes.forEach((note) => {
+          const item = document.createElement("div");
+          item.className = "note-item";
+          item.innerHTML = `<div><h3>${escapeHtml(note.text)}</h3><p class="muted">${escapeHtml(note.createdAt)}</p></div><button class="delete-message" type="button" data-delete-note="${escapeHtml(note.id)}">Удалить</button>`;
+          list.appendChild(item);
+        });
+      }
+
+      document.getElementById("openQuickNote")?.addEventListener("click", () => {
+        renderQuickNotes();
+        document.getElementById("quickNoteModal")?.classList.add("show");
+        setTimeout(() => document.getElementById("quickNoteInput")?.focus(), 50);
+      });
+
+      document.getElementById("closeQuickNote")?.addEventListener("click", () => {
+        document.getElementById("quickNoteModal")?.classList.remove("show");
+      });
+
+      document.getElementById("quickNoteForm")?.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const input = document.getElementById("quickNoteInput");
+        const text = input.value.trim();
+        if (!text) return;
+        quickNotes.unshift({
+          id: `note-${Date.now()}`,
+          text,
+          createdAt: new Date().toLocaleString("ru-RU", { day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" })
+        });
+        input.value = "";
+        renderQuickNotes();
+        saveState();
+        showNotice("Заметка сохранена.");
+      });
+
+      document.getElementById("quickNoteList")?.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-delete-note]");
+        if (!button) return;
+        const index = quickNotes.findIndex((note) => note.id === button.dataset.deleteNote);
+        if (index < 0) return;
+        quickNotes.splice(index, 1);
+        renderQuickNotes();
+        saveState();
+      });
 
       document.addEventListener("invalid", (event) => {
         const field = event.target;
