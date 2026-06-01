@@ -107,6 +107,15 @@
         display: none !important;
       }
 
+      .plan-only .nav-btn:not([data-route="week"]),
+      .plan-only .sidebar-card,
+      .plan-only .search,
+      .plan-only .top-actions,
+      .plan-only .quick-actions,
+      .plan-only #generateDayTasks {
+        display: none !important;
+      }
+
       .brand {
         display: flex;
         align-items: center;
@@ -1688,8 +1697,8 @@
       }
     </style>
   </head>
-  <body class="solo-mode">
-    <div class="app solo-mode">
+  <body class="solo-mode plan-only">
+    <div class="app solo-mode plan-only">
       <aside class="sidebar">
         <div class="brand">
           <div class="mark">F</div>
@@ -1701,7 +1710,7 @@
 
         <div class="nav-group">
           <p class="nav-label">Рабочее место</p>
-          <button class="nav-btn active" data-route="dashboard" data-title="Сегодня">
+          <button class="nav-btn" data-route="dashboard" data-title="Сегодня">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>
             Сегодня
           </button>
@@ -1717,7 +1726,7 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
             Прогресс
           </button>
-          <button class="nav-btn" data-route="week" data-title="План">
+          <button class="nav-btn active" data-route="week" data-title="План">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5V5a2 2 0 0 1 2-2h11"/><path d="M8 7h12v14H8z"/><path d="M12 11h4M12 15h4"/></svg>
             План
           </button>
@@ -1786,7 +1795,7 @@
         </header>
 
         <div class="content">
-          <section class="page active" id="dashboard">
+          <section class="page" id="dashboard">
             <div class="page-head">
               <div>
                 <p class="eyebrow">Сегодня</p>
@@ -1995,7 +2004,7 @@
             </div>
           </section>
 
-          <section class="page" id="week">
+          <section class="page active" id="week">
             <div class="page-head">
               <div><p class="eyebrow">Неделя</p><h1>План Евы на неделю</h1><p class="muted" style="margin-top: 8px">Заполняем неделю: понедельник-воскресенье. Из плана автоматически рождаются задачи дня.</p></div>
               <div style="display: flex; gap: 10px"><button class="btn secondary" id="copyPrevDay">Скопировать вчера</button><button class="btn secondary" id="insertTemplate">Вставить шаблон Евы</button><button class="btn" id="generateDayTasks">Создать задачи из плана</button></div>
@@ -2335,6 +2344,7 @@
       const routeTitle = document.querySelector(".topbar h2");
       const STORAGE_KEY = "family-os-eva-solo-v1";
       const SOLO_MODE = true;
+      const PLAN_ONLY_MODE = true;
       const ACTIVE_CHILDREN = ["Ева"];
 
       function loadSavedState() {
@@ -2350,8 +2360,8 @@
       let authProfile = SOLO_MODE ? { role: "solo", name: "Ева", familyName: "План Евы", inviteCode: "" } : (savedState.authProfile || null);
 
       function go(route) {
-        const publicRoutes = SOLO_MODE ? ["dashboard", "tasks", "children", "week", "reports"] : ["dashboard", "tasks", "children", "reports", "settings"];
-        if (!publicRoutes.includes(route)) route = "dashboard";
+        const publicRoutes = PLAN_ONLY_MODE ? ["week"] : (SOLO_MODE ? ["dashboard", "tasks", "children", "week", "reports"] : ["dashboard", "tasks", "children", "reports", "settings"]);
+        if (!publicRoutes.includes(route)) route = PLAN_ONLY_MODE ? "week" : "dashboard";
         if (authProfile?.role === "child" && ["children", "reports", "settings"].includes(route)) {
           route = "dashboard";
           showNotice("В детском режиме открыт только личный dashboard и свои задачи.");
@@ -2371,7 +2381,9 @@
         go(jump.dataset.routeJump);
       });
 
-      if (location.hash) {
+      if (PLAN_ONLY_MODE) {
+        go("week");
+      } else if (location.hash) {
         const id = location.hash.slice(1);
         if (document.getElementById(id)) go(id);
       }
