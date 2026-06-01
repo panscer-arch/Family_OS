@@ -3060,7 +3060,8 @@
       const monthNamesShort = ["янв", "фев", "мар", "апр", "мая", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"];
       const weekdayShort = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс"];
       const today = new Date();
-      let selectedDate = savedState.selectedDate ? new Date(savedState.selectedDate) : new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const evaPlanStartDate = new Date(2026, 4, 31);
+      let selectedDate = savedState.selectedDate ? new Date(savedState.selectedDate) : new Date(evaPlanStartDate);
       let calendarMonth = savedState.calendarMonth ? new Date(savedState.calendarMonth) : new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
       const planStore = savedState.planStore || {};
 
@@ -3219,7 +3220,7 @@
       }
 
       function renderWeekPlan() {
-        const weekStart = mondayOf(selectedDate);
+        const weekStart = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
         const weekEnd = addDays(weekStart, 6);
         document.getElementById("weekRangeTitle").textContent = `План с ${formatDate(weekStart)} по ${formatDate(weekEnd)}`;
         const weekGrid = document.getElementById("weekGrid");
