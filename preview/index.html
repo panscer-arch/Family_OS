@@ -107,7 +107,7 @@
         display: none !important;
       }
 
-      .plan-only .nav-btn:not([data-route="week"]):not([data-route="content"]),
+      .plan-only .nav-btn:not([data-route="week"]):not([data-route="content"]):not([data-route="storage"]),
       .plan-only .sidebar-card,
       .plan-only .search,
       .plan-only .top-actions,
@@ -1734,6 +1734,10 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3V9Z"/></svg>
             Контент
           </button>
+          <button class="nav-btn" data-route="storage" data-title="Кладовые">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2Z"/><path d="M7 6V4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/><path d="M3 12h18"/><path d="M9 12v2a3 3 0 0 0 6 0v-2"/></svg>
+            Кладовые
+          </button>
           <button class="nav-btn parent-only" data-route="plan" data-title="План дня" style="display:none">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
             Задачи дня
@@ -1921,41 +1925,6 @@
                 <div class="progress"><span data-child-progress="Ева" style="--value: 0%"></span></div>
               </article>
             </div>
-            <article class="card" id="storageCard" style="margin-top: 18px">
-              <div class="card-title"><div><h2>Кладовые</h2><p class="muted" style="margin-top: 6px">Три кладовые: что лежит, что продать, что отдать.</p></div><span class="pill blue" id="storageCount">0 вещей</span></div>
-              <div class="helper-panel" id="storageHelper">
-                <div class="card-title"><div><h3>Помощник по кладовым</h3><p class="muted" id="storageHelperText" style="margin-top: 6px">Начните с фото первой полки: подпишите вещь и выберите, оставить её, продать или отдать.</p></div><span class="pill" id="storageHelperStats">0 / 0 / 0</span></div>
-                <div class="helper-actions">
-                  <button class="btn secondary" type="button" data-storage-preset="unsorted">Разобрать фото</button>
-                  <button class="btn secondary" type="button" data-storage-preset="sell">Вещь на продажу</button>
-                  <button class="btn secondary" type="button" data-storage-preset="give">Вещь отдать</button>
-                  <button class="btn secondary" type="button" data-storage-preset="keep">Оставить дома</button>
-                </div>
-              </div>
-              <div class="segmented" id="storageRoomTabs">
-                <button class="segment-btn active" type="button" data-storage-room="Кладовая 1">Кладовая 1</button>
-                <button class="segment-btn" type="button" data-storage-room="Кладовая 2">Кладовая 2</button>
-                <button class="segment-btn" type="button" data-storage-room="Кладовая 3">Кладовая 3</button>
-              </div>
-              <div class="segmented" id="storageFilters">
-                <button class="segment-btn active" type="button" data-storage-filter="all">Все</button>
-                <button class="segment-btn" type="button" data-storage-filter="unsorted">Не разобрано</button>
-                <button class="segment-btn" type="button" data-storage-filter="keep">Оставить</button>
-                <button class="segment-btn" type="button" data-storage-filter="sell">Продать</button>
-                <button class="segment-btn" type="button" data-storage-filter="give">Отдать</button>
-              </div>
-              <form class="grid cols-4" id="storageForm">
-                <select id="storageRoomInput"><option>Кладовая 1</option><option>Кладовая 2</option><option>Кладовая 3</option></select>
-                <input class="field" id="storageItemInput" placeholder="Что на фото? Например: мяч" required />
-                <select id="storageStatusInput"><option value="unsorted">не разобрано</option><option value="keep">оставить</option><option value="sell">продать</option><option value="give">отдать</option></select>
-                <button class="btn" type="submit">Добавить вещь</button>
-                <input class="field" id="storagePlaceInput" placeholder="Место: полка, коробка, пакет" />
-                <input class="field" id="storagePriceInput" type="number" min="0" placeholder="Цена, если продать" />
-                <input class="field" id="storagePhotoInput" placeholder="Фото или ссылка" />
-                <input class="field" id="storageNoteInput" placeholder="Заметка" />
-              </form>
-              <div class="activity" id="storageInventory" style="margin-top: 16px"></div>
-            </article>
           </section>
 
           <section class="page" id="tasks">
@@ -2082,6 +2051,47 @@
             <article class="card" style="margin-top: 18px">
               <div class="card-title"><h2>Архив роликов</h2><span class="pill" id="contentArchiveCount">0</span></div>
               <div class="activity" id="contentArchive"></div>
+            </article>
+          </section>
+
+          <section class="page" id="storage">
+            <div class="page-head">
+              <div><p class="eyebrow">Storage</p><h1>Кладовые</h1><p class="muted" style="margin-top: 8px">Три кладовые для разбора вещей: что оставить, продать, отдать или ещё решить.</p></div>
+            </div>
+            <article class="card" id="storageCard">
+              <div class="card-title"><div><h2>Разбор вещей</h2><p class="muted" style="margin-top: 6px">Добавляй вещи по фото или вручную. Потом можно быстро понять, где что лежит.</p></div><span class="pill blue" id="storageCount">0 вещей</span></div>
+              <div class="helper-panel" id="storageHelper">
+                <div class="card-title"><div><h3>Помощник по кладовым</h3><p class="muted" id="storageHelperText" style="margin-top: 6px">Начните с фото первой полки: подпишите вещь и выберите, оставить её, продать или отдать.</p></div><span class="pill" id="storageHelperStats">0 / 0 / 0</span></div>
+                <div class="helper-actions">
+                  <button class="btn secondary" type="button" data-storage-preset="unsorted">Разобрать фото</button>
+                  <button class="btn secondary" type="button" data-storage-preset="sell">Вещь на продажу</button>
+                  <button class="btn secondary" type="button" data-storage-preset="give">Вещь отдать</button>
+                  <button class="btn secondary" type="button" data-storage-preset="keep">Оставить дома</button>
+                </div>
+              </div>
+              <div class="segmented" id="storageRoomTabs">
+                <button class="segment-btn active" type="button" data-storage-room="Кладовая 1">Кладовая 1</button>
+                <button class="segment-btn" type="button" data-storage-room="Кладовая 2">Кладовая 2</button>
+                <button class="segment-btn" type="button" data-storage-room="Кладовая 3">Кладовая 3</button>
+              </div>
+              <div class="segmented" id="storageFilters">
+                <button class="segment-btn active" type="button" data-storage-filter="all">Все</button>
+                <button class="segment-btn" type="button" data-storage-filter="unsorted">Не разобрано</button>
+                <button class="segment-btn" type="button" data-storage-filter="keep">Оставить</button>
+                <button class="segment-btn" type="button" data-storage-filter="sell">Продать</button>
+                <button class="segment-btn" type="button" data-storage-filter="give">Отдать</button>
+              </div>
+              <form class="grid cols-4" id="storageForm">
+                <select id="storageRoomInput"><option>Кладовая 1</option><option>Кладовая 2</option><option>Кладовая 3</option></select>
+                <input class="field" id="storageItemInput" placeholder="Что на фото? Например: мяч" required />
+                <select id="storageStatusInput"><option value="unsorted">не разобрано</option><option value="keep">оставить</option><option value="sell">продать</option><option value="give">отдать</option></select>
+                <button class="btn" type="submit">Добавить вещь</button>
+                <input class="field" id="storagePlaceInput" placeholder="Место: полка, коробка, пакет" />
+                <input class="field" id="storagePriceInput" type="number" min="0" placeholder="Цена, если продать" />
+                <input class="field" id="storagePhotoInput" placeholder="Фото или ссылка" />
+                <input class="field" id="storageNoteInput" placeholder="Заметка" />
+              </form>
+              <div class="activity" id="storageInventory" style="margin-top: 16px"></div>
             </article>
           </section>
 
@@ -2399,7 +2409,7 @@
       let authProfile = SOLO_MODE ? { role: "solo", name: "Ева", familyName: "План Евы", inviteCode: "" } : (savedState.authProfile || null);
 
       function go(route) {
-        const publicRoutes = PLAN_ONLY_MODE ? ["week", "content"] : (SOLO_MODE ? ["dashboard", "tasks", "children", "week", "reports"] : ["dashboard", "tasks", "children", "reports", "settings"]);
+        const publicRoutes = PLAN_ONLY_MODE ? ["week", "content", "storage"] : (SOLO_MODE ? ["dashboard", "tasks", "children", "week", "reports"] : ["dashboard", "tasks", "children", "reports", "settings"]);
         if (!publicRoutes.includes(route)) route = PLAN_ONLY_MODE ? "week" : "dashboard";
         if (authProfile?.role === "child" && ["children", "reports", "settings"].includes(route)) {
           route = "dashboard";
@@ -2410,6 +2420,7 @@
         const active = [...routes].find((button) => button.dataset.route === route);
         if (active) routeTitle.textContent = active.dataset.title;
         if (route === "content") renderContentWorkspace();
+        if (route === "storage") renderPantryItems();
         location.hash = route;
       }
 
