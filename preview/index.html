@@ -1133,49 +1133,12 @@
       }
 
       .week-item {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) auto;
-        align-items: start;
-        gap: 8px;
         border-radius: 12px;
         background: rgba(255, 255, 255, 0.055);
         padding: 10px;
         color: var(--soft);
         font-size: 13px;
         line-height: 1.35;
-      }
-
-      .week-item-text {
-        min-width: 0;
-      }
-
-      .week-item-actions {
-        display: flex;
-        gap: 6px;
-      }
-
-      .week-item-action {
-        width: 28px;
-        height: 28px;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        border-radius: 9px;
-        background: rgba(255, 255, 255, 0.055);
-        color: var(--soft);
-        display: grid;
-        place-items: center;
-        transition: 160ms ease;
-      }
-
-      .week-item-action:hover {
-        border-color: rgba(142, 230, 200, 0.32);
-        color: var(--text);
-        background: rgba(142, 230, 200, 0.08);
-      }
-
-      .week-item-action.delete:hover {
-        border-color: rgba(255, 143, 177, 0.36);
-        color: var(--rose);
-        background: rgba(255, 143, 177, 0.08);
       }
 
       .checklist {
@@ -2075,10 +2038,7 @@
                   <select id="weekItemOwner"><option>Ева</option></select>
                   <input class="field" id="weekItemTitle" placeholder="Добавить пункт в выбранный день" required />
                   <select id="weekItemTag"><option>режим</option><option>учёба</option><option>дом</option><option>кухня</option><option>комната</option><option>робот-пылесос</option><option>кошки</option><option>контент</option><option>еда</option><option>прогулка</option><option>спорт</option><option>сон</option><option>навык</option><option>библиотека</option></select>
-                  <div class="form-row">
-                    <button class="btn" id="weekItemSubmit" type="submit">Добавить в день</button>
-                    <button class="btn secondary" id="weekItemCancelEdit" type="button" style="display:none">Отмена</button>
-                  </div>
+                  <button class="btn" type="submit">Добавить в день</button>
                 </form>
               </article>
               <article class="card"><h2>Закреплено</h2><p class="muted" style="margin-top: 8px">Подъём, умывание, завтрак, чтение, прогулка, готовка, учёба и контент-задачи. Акробатика автоматически во вторник и четверг.</p><div class="activity" style="margin-top: 14px"><span class="pill">режим</span><span class="pill blue">акробатика</span><span class="pill peach">контент</span></div></article>
@@ -3116,7 +3076,6 @@
       let selectedDate = savedState.selectedDate ? new Date(savedState.selectedDate) : new Date(evaPlanStartDate);
       let calendarMonth = savedState.calendarMonth ? new Date(savedState.calendarMonth) : new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
       const planStore = savedState.planStore || {};
-      let editingPlanItem = null;
 
       function isoDate(date) {
         const year = date.getFullYear();
@@ -3272,28 +3231,6 @@
         document.getElementById("dailyDate").textContent = day.dataset.date;
       }
 
-      function resetPlanEditor() {
-        editingPlanItem = null;
-        document.getElementById("weekItemForm").reset();
-        document.getElementById("weekItemTime").value = "18:00";
-        document.getElementById("weekItemOwner").value = "Ева";
-        document.getElementById("weekItemTag").value = "режим";
-        document.getElementById("weekItemSubmit").textContent = "Добавить в день";
-        document.getElementById("weekItemCancelEdit").style.display = "none";
-      }
-
-      function fillPlanEditor(item, index, date) {
-        const parsed = parsePlanItem(item, "Ева");
-        editingPlanItem = { index, iso: isoDate(date) };
-        document.getElementById("weekItemTime").value = parsed.time || "18:00";
-        document.getElementById("weekItemOwner").value = "Ева";
-        document.getElementById("weekItemTitle").value = parsed.title;
-        document.getElementById("weekItemTag").value = [...document.getElementById("weekItemTag").options].some((option) => option.value === parsed.tag) ? parsed.tag : "режим";
-        document.getElementById("weekItemSubmit").textContent = "Сохранить";
-        document.getElementById("weekItemCancelEdit").style.display = "";
-        document.getElementById("weekItemTitle").focus();
-      }
-
       function renderWeekPlan() {
         const weekStart = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
         const weekEnd = addDays(weekStart, 6);
@@ -3311,39 +3248,14 @@
           day.dataset.date = formatDate(date);
           day.dataset.iso = key;
           day.dataset.child = plan.child;
-          day.innerHTML = `<h3>${weekdayShort[weekdayIndex]} ${date.getDate()}</h3><div class="week-items">${plan.items.map((item, itemIndex) => `<div class="week-item" data-plan-index="${itemIndex}"><span class="week-item-text">${escapeHtml(item)}</span><span class="week-item-actions"><button class="week-item-action" type="button" data-edit-plan-item="${itemIndex}" aria-label="Изменить пункт">Изм.</button><button class="week-item-action delete" type="button" data-delete-plan-item="${itemIndex}" aria-label="Удалить пункт">×</button></span></div>`).join("")}</div>`;
+          day.innerHTML = `<h3>${weekdayShort[weekdayIndex]} ${date.getDate()}</h3><div class="week-items">${plan.items.map((item) => `<div class="week-item">${escapeHtml(item)}</div>`).join("")}</div>`;
           day.addEventListener("click", () => {
             selectedDate = date;
             document.querySelectorAll(".week-day").forEach((item) => item.classList.remove("active"));
             day.classList.add("active");
             renderMonthCalendar();
             syncDayEditor();
-            resetPlanEditor();
             saveState();
-          });
-          day.querySelectorAll("[data-edit-plan-item]").forEach((button) => {
-            button.addEventListener("click", (event) => {
-              event.stopPropagation();
-              selectedDate = date;
-              document.querySelectorAll(".week-day").forEach((item) => item.classList.remove("active"));
-              day.classList.add("active");
-              renderMonthCalendar();
-              syncDayEditor();
-              fillPlanEditor(plan.items[Number(button.dataset.editPlanItem)], Number(button.dataset.editPlanItem), date);
-            });
-          });
-          day.querySelectorAll("[data-delete-plan-item]").forEach((button) => {
-            button.addEventListener("click", (event) => {
-              event.stopPropagation();
-              const itemIndex = Number(button.dataset.deletePlanItem);
-              const removed = plan.items[itemIndex];
-              plan.items.splice(itemIndex, 1);
-              if (editingPlanItem?.iso === key && editingPlanItem.index === itemIndex) resetPlanEditor();
-              renderWeekPlan();
-              renderMonthCalendar();
-              logActivity(`Из плана удалено: ${removed}`);
-              saveState();
-            });
           });
           weekGrid.appendChild(day);
         }
@@ -3372,20 +3284,15 @@
         const owner = document.getElementById("weekItemOwner").value;
         const tag = document.getElementById("weekItemTag").value;
         const plan = ensurePlan(selectedDate);
-        const nextItem = `${time} ${owner} · ${title} #${tag}`;
-        if (editingPlanItem && editingPlanItem.iso === isoDate(selectedDate)) {
-          plan.items[editingPlanItem.index] = nextItem;
-          logActivity(`План обновлён: ${owner} · ${title}`);
-        } else {
-          plan.items.push(nextItem);
-          logActivity(`В план добавлено: ${owner} · ${title}`);
-        }
-        resetPlanEditor();
-        renderWeekPlan();
+        plan.items.push(`${time} ${owner} · ${title} #${tag}`);
+        const item = document.createElement("div");
+        item.className = "week-item";
+        item.textContent = `${time} ${owner} · ${title} #${tag}`;
+        activeWeekDay().querySelector(".week-items").appendChild(item);
+        document.getElementById("weekItemTitle").value = "";
         renderMonthCalendar();
+        logActivity(`В план добавлено: ${owner} · ${title}`);
       });
-
-      document.getElementById("weekItemCancelEdit").addEventListener("click", resetPlanEditor);
 
       document.getElementById("copyPrevDay").addEventListener("click", () => {
         const source = ensurePlan(addDays(selectedDate, -1));
