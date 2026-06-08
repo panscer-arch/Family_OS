@@ -107,7 +107,7 @@
         display: none !important;
       }
 
-      .plan-only .nav-btn:not([data-route="week"]):not([data-route="content"]):not([data-route="storage"]):not([data-route="food"]),
+      .plan-only .nav-btn:not([data-route="week"]):not([data-route="content"]):not([data-route="food"]),
       .plan-only .sidebar-card,
       .plan-only .search,
       .plan-only .top-actions,
@@ -1734,10 +1734,6 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m10 9 5 3-5 3V9Z"/></svg>
             Контент
           </button>
-          <button class="nav-btn" data-route="storage" data-title="Кладовые">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 8a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2Z"/><path d="M7 6V4a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/><path d="M3 12h18"/><path d="M9 12v2a3 3 0 0 0 6 0v-2"/></svg>
-            Кладовые
-          </button>
           <button class="nav-btn" data-route="food" data-title="Еда">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 3v7a4 4 0 0 0 4 4v7"/><path d="M4 7h8"/><path d="M8 3v18"/><path d="M19 3v18"/><path d="M15 3h4a3 3 0 0 1 0 6h-4Z"/></svg>
             Еда
@@ -2069,47 +2065,6 @@
             <article class="card" style="margin-top: 18px">
               <div class="card-title"><h2>Архив роликов</h2><span class="pill" id="contentArchiveCount">0</span></div>
               <div class="activity" id="contentArchive"></div>
-            </article>
-          </section>
-
-          <section class="page" id="storage">
-            <div class="page-head">
-              <div><p class="eyebrow">Storage</p><h1>Кладовые</h1><p class="muted" style="margin-top: 8px">Три кладовые для разбора вещей: что оставить, продать, отдать или ещё решить.</p></div>
-            </div>
-            <article class="card" id="storageCard">
-              <div class="card-title"><div><h2>Разбор вещей</h2><p class="muted" style="margin-top: 6px">Добавляй вещи по фото или вручную. Потом можно быстро понять, где что лежит.</p></div><span class="pill blue" id="storageCount">0 вещей</span></div>
-              <div class="helper-panel" id="storageHelper">
-                <div class="card-title"><div><h3>Помощник по кладовым</h3><p class="muted" id="storageHelperText" style="margin-top: 6px">Начните с фото первой полки: подпишите вещь и выберите, оставить её, продать или отдать.</p></div><span class="pill" id="storageHelperStats">0 / 0 / 0</span></div>
-                <div class="helper-actions">
-                  <button class="btn secondary" type="button" data-storage-preset="unsorted">Разобрать фото</button>
-                  <button class="btn secondary" type="button" data-storage-preset="sell">Вещь на продажу</button>
-                  <button class="btn secondary" type="button" data-storage-preset="give">Вещь отдать</button>
-                  <button class="btn secondary" type="button" data-storage-preset="keep">Оставить дома</button>
-                </div>
-              </div>
-              <div class="segmented" id="storageRoomTabs">
-                <button class="segment-btn active" type="button" data-storage-room="Кладовая 1">Кладовая 1</button>
-                <button class="segment-btn" type="button" data-storage-room="Кладовая 2">Кладовая 2</button>
-                <button class="segment-btn" type="button" data-storage-room="Кладовая 3">Кладовая 3</button>
-              </div>
-              <div class="segmented" id="storageFilters">
-                <button class="segment-btn active" type="button" data-storage-filter="all">Все</button>
-                <button class="segment-btn" type="button" data-storage-filter="unsorted">Не разобрано</button>
-                <button class="segment-btn" type="button" data-storage-filter="keep">Оставить</button>
-                <button class="segment-btn" type="button" data-storage-filter="sell">Продать</button>
-                <button class="segment-btn" type="button" data-storage-filter="give">Отдать</button>
-              </div>
-              <form class="grid cols-4" id="storageForm">
-                <select id="storageRoomInput"><option>Кладовая 1</option><option>Кладовая 2</option><option>Кладовая 3</option></select>
-                <input class="field" id="storageItemInput" placeholder="Что на фото? Например: мяч" required />
-                <select id="storageStatusInput"><option value="unsorted">не разобрано</option><option value="keep">оставить</option><option value="sell">продать</option><option value="give">отдать</option></select>
-                <button class="btn" type="submit">Добавить вещь</button>
-                <input class="field" id="storagePlaceInput" placeholder="Место: полка, коробка, пакет" />
-                <input class="field" id="storagePriceInput" type="number" min="0" placeholder="Цена, если продать" />
-                <input class="field" id="storagePhotoInput" placeholder="Фото или ссылка" />
-                <input class="field" id="storageNoteInput" placeholder="Заметка" />
-              </form>
-              <div class="activity" id="storageInventory" style="margin-top: 16px"></div>
             </article>
           </section>
 
@@ -2462,7 +2417,7 @@
       let authProfile = SOLO_MODE ? { role: "solo", name: "Ева", familyName: "План Евы", inviteCode: "" } : (savedState.authProfile || null);
 
       function go(route) {
-        const publicRoutes = PLAN_ONLY_MODE ? ["week", "content", "storage", "food"] : (SOLO_MODE ? ["dashboard", "tasks", "children", "week", "reports"] : ["dashboard", "tasks", "children", "reports", "settings"]);
+        const publicRoutes = PLAN_ONLY_MODE ? ["week", "content", "food"] : (SOLO_MODE ? ["dashboard", "tasks", "children", "week", "reports"] : ["dashboard", "tasks", "children", "reports", "settings"]);
         if (!publicRoutes.includes(route)) route = PLAN_ONLY_MODE ? "week" : "dashboard";
         if (authProfile?.role === "child" && ["children", "reports", "settings"].includes(route)) {
           route = "dashboard";
@@ -2473,7 +2428,6 @@
         const active = [...routes].find((button) => button.dataset.route === route);
         if (active) routeTitle.textContent = active.dataset.title;
         if (route === "content") renderContentWorkspace();
-        if (route === "storage") renderPantryItems();
         if (route === "food") renderFoodMeals();
         location.hash = route;
       }
@@ -2509,14 +2463,11 @@
       const childStats = {
         "Ева": savedState.childStats?.["Ева"] || { streak: 0, level: 1, achievements: [] }
       };
-      const pantryItems = savedState.pantryItems || [];
       const contentWorkspace = savedState.contentWorkspace || { archive: [] };
       const foodMeals = savedState.foodMeals || [
         { id: "food-breakfast-default", title: "Омлет / яичница", type: "приготовить", time: "завтрак", note: "быстро и понятно", done: false },
         { id: "food-order-default", title: "Роллы / пицца / боул", type: "заказать", time: "обед", note: "когда нет сил готовить", done: false }
       ];
-      let selectedStorageRoom = savedState.selectedStorageRoom || "Кладовая 1";
-      let storageFilter = savedState.storageFilter || "all";
 
       function collectLaneHtml() {
         const lanes = {};
@@ -2534,11 +2485,8 @@
           checklistTasks,
           childPoints,
           childStats,
-          pantryItems,
           contentWorkspace,
           foodMeals,
-          selectedStorageRoom,
-          storageFilter,
           authProfile,
           onboarded: Boolean(authProfile),
           planStore: typeof planStore !== "undefined" ? planStore : savedState.planStore,
@@ -3721,97 +3669,6 @@
         if (empty) empty.style.display = count ? "none" : "grid";
       }
 
-      function storageStatusLabel(status) {
-        return {
-          unsorted: "не разобрано",
-          keep: "оставить",
-          sell: "продать",
-          give: "отдать"
-        }[status] || "оставить";
-      }
-
-      function storageStatusTone(status) {
-        return {
-          unsorted: "rose",
-          keep: "blue",
-          sell: "peach",
-          give: "mint"
-        }[status] || "blue";
-      }
-
-      function syncStorageControls() {
-        document.querySelectorAll("[data-storage-room]").forEach((button) => {
-          button.classList.toggle("active", button.dataset.storageRoom === selectedStorageRoom);
-        });
-        document.querySelectorAll("[data-storage-filter]").forEach((button) => {
-          button.classList.toggle("active", button.dataset.storageFilter === storageFilter);
-        });
-        const roomInput = document.getElementById("storageRoomInput");
-        if (roomInput) roomInput.value = selectedStorageRoom;
-      }
-
-      function updateStorageHelper() {
-        const text = document.getElementById("storageHelperText");
-        const stats = document.getElementById("storageHelperStats");
-        if (!text || !stats) return;
-        const totals = pantryItems.reduce((acc, item) => {
-          acc[item.status] = (acc[item.status] || 0) + 1;
-          return acc;
-        }, { unsorted: 0, keep: 0, sell: 0, give: 0 });
-        stats.textContent = `${totals.unsorted || 0} не разобрано · ${totals.keep || 0} оставить · ${totals.sell || 0} продать · ${totals.give || 0} отдать`;
-        if (!pantryItems.length) {
-          text.textContent = "Начните с фото первой полки: подпишите вещь и выберите, оставить её, продать или отдать.";
-          return;
-        }
-        if (totals.unsorted) {
-          text.textContent = `Есть ${totals.unsorted} вещ. без решения. Сначала разберите их: оставить, продать или отдать.`;
-          return;
-        }
-        if (!totals.sell && !totals.give) {
-          text.textContent = "Уже есть вещи. Теперь удобно разобрать: что точно не нужно, что можно продать, а что отдать.";
-          return;
-        }
-        if (totals.sell > totals.give) {
-          text.textContent = "Есть вещи на продажу. Следующий шаг: добавьте заметку про состояние и цену, чтобы не потерять мысль.";
-          return;
-        }
-        text.textContent = "Кладовые разбираются. Продолжайте добавлять вещи по фото: название, кладовая, решение и короткая заметка.";
-      }
-
-      function renderPantryItems() {
-        const inventory = document.getElementById("storageInventory");
-        const count = document.getElementById("storageCount");
-        if (!inventory) return;
-        inventory.innerHTML = "";
-        syncStorageControls();
-        const filteredItems = pantryItems.filter((item) => {
-          const roomOk = item.room === selectedStorageRoom;
-          const statusOk = storageFilter === "all" || item.status === storageFilter;
-          return roomOk && statusOk;
-        });
-        if (count) count.textContent = `${filteredItems.length} / ${pantryItems.length} вещей`;
-        updateStorageHelper();
-        if (!filteredItems.length) {
-          inventory.innerHTML = `<div class="onboarding-card"><h3>Здесь пока пусто</h3><p class="muted">Добавьте вещь в ${escapeHtml(selectedStorageRoom)} или переключите фильтр.</p></div>`;
-          return;
-        }
-        filteredItems.forEach((item) => {
-          const row = document.createElement("div");
-          row.className = "activity-item";
-          row.dataset.storageId = item.id;
-          const details = [
-            item.room,
-            item.place,
-            item.price ? `${item.price} ₽` : "",
-            item.photo ? "фото/ссылка есть" : "",
-            item.date,
-            item.note
-          ].filter(Boolean).join(" · ");
-          row.innerHTML = `<span class="mini-icon">${escapeHtml(item.room.replace("Кладовая ", "К"))}</span><div><h3>${escapeHtml(item.title)}</h3><p class="muted">${escapeHtml(details)}</p></div><span class="pill ${storageStatusTone(item.status)}">${escapeHtml(storageStatusLabel(item.status))}</span><button class="delete-message" type="button" data-delete-storage="${escapeHtml(item.id)}">Удалить</button>`;
-          inventory.appendChild(row);
-        });
-      }
-
       function addDeleteHandler(item) {
         const button = item.querySelector(".delete-message");
         if (!button) return;
@@ -3852,7 +3709,6 @@
         document.querySelectorAll(".task-card").forEach(bindTaskCard);
         document.querySelectorAll("#messages .activity-item").forEach(addDeleteHandler);
         updateMessageCount();
-        renderPantryItems();
         renderFoodMeals();
         updateLaneCounts();
         renderAuthProfile();
@@ -3875,86 +3731,6 @@
         updateMessageCount();
         input.value = "";
         logActivity(`Сообщение отправлено: ${to}`);
-        saveState();
-      });
-
-      document.getElementById("storageForm")?.addEventListener("submit", (event) => {
-        event.preventDefault();
-        const title = document.getElementById("storageItemInput").value.trim();
-        if (!title) return;
-          const item = {
-            id: `storage-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-            room: document.getElementById("storageRoomInput").value,
-            title,
-            status: document.getElementById("storageStatusInput").value,
-            place: document.getElementById("storagePlaceInput").value.trim(),
-            price: document.getElementById("storagePriceInput").value.trim(),
-            photo: document.getElementById("storagePhotoInput").value.trim(),
-            note: document.getElementById("storageNoteInput").value.trim(),
-            date: new Date().toLocaleDateString("ru-RU")
-          };
-        pantryItems.unshift(item);
-        document.getElementById("storageItemInput").value = "";
-        document.getElementById("storagePlaceInput").value = "";
-        document.getElementById("storagePriceInput").value = "";
-        document.getElementById("storagePhotoInput").value = "";
-        document.getElementById("storageNoteInput").value = "";
-        renderPantryItems();
-        logActivity(`Добавлена вещь в ${item.room}: ${item.title}`);
-        saveState();
-      });
-
-      document.querySelectorAll("[data-storage-preset]").forEach((button) => {
-        button.addEventListener("click", () => {
-          const status = button.dataset.storagePreset;
-          const titleInput = document.getElementById("storageItemInput");
-          const statusInput = document.getElementById("storageStatusInput");
-          const noteInput = document.getElementById("storageNoteInput");
-          if (!titleInput || !statusInput || !noteInput) return;
-          statusInput.value = status;
-          const templates = {
-            unsorted: { title: "Вещь с фото", note: "нужно решить: оставить, продать или отдать" },
-            keep: { title: "Вещь оставить", note: "где лежит, зачем нужна" },
-            sell: { title: "Вещь на продажу", note: "состояние, примерная цена, где продавать" },
-            give: { title: "Вещь отдать", note: "кому отдать или куда передать" }
-          };
-          titleInput.value = templates[status]?.title || "";
-          noteInput.value = templates[status]?.note || "";
-          titleInput.focus();
-          showNotice("Шаблон кладовой вставлен. Можно дописать название.");
-        });
-      });
-
-      document.querySelectorAll("[data-storage-room]").forEach((button) => {
-        button.addEventListener("click", () => {
-          selectedStorageRoom = button.dataset.storageRoom;
-          renderPantryItems();
-          saveState();
-        });
-      });
-
-      document.getElementById("storageRoomInput")?.addEventListener("change", (event) => {
-        selectedStorageRoom = event.target.value;
-        renderPantryItems();
-        saveState();
-      });
-
-      document.querySelectorAll("[data-storage-filter]").forEach((button) => {
-        button.addEventListener("click", () => {
-          storageFilter = button.dataset.storageFilter;
-          renderPantryItems();
-          saveState();
-        });
-      });
-
-      document.getElementById("storageInventory")?.addEventListener("click", (event) => {
-        const button = event.target.closest("[data-delete-storage]");
-        if (!button) return;
-        const index = pantryItems.findIndex((item) => item.id === button.dataset.deleteStorage);
-        if (index < 0) return;
-        const [removed] = pantryItems.splice(index, 1);
-        renderPantryItems();
-        logActivity(`Удалена вещь из кладовой: ${removed.title}`);
         saveState();
       });
 
