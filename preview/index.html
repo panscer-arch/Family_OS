@@ -2043,6 +2043,7 @@
                   <input class="field" id="contentDraftInput" placeholder="Ссылка на черновик" />
                   <input class="field" id="contentEditInput" placeholder="Ссылка на монтаж" />
                   <input class="field" id="contentPublishedInput" placeholder="Ссылка на опубликованный ролик" />
+                  <textarea class="field" id="contentScriptInput" placeholder="Сценарий ролика"></textarea>
                   <textarea class="field" id="contentResultInput" placeholder="Что сегодня сделано по ролику?"></textarea>
                   <button class="btn" type="submit">Сохранить ролик</button>
                 </form>
@@ -2052,6 +2053,19 @@
                 <div class="activity" id="currentContentCard"></div>
               </article>
             </div>
+            <article class="card" style="margin-top: 18px">
+              <div class="card-title"><div><h2>ИИ-сценарий</h2><p class="muted" style="margin-top: 6px">Быстро собрать хук, кадры, текст и финал для короткого ролика.</p></div><span class="pill blue">draft</span></div>
+              <div class="grid cols-3">
+                <input class="field" id="scriptIdeaInput" placeholder="Тема: о чём ролик?" />
+                <select id="scriptFormatInput">
+                  <option value="shorts">Shorts / Reels</option>
+                  <option value="tutorial">мини-урок</option>
+                  <option value="story">история</option>
+                </select>
+                <button class="btn" id="generateScriptButton" type="button">Сгенерировать сценарий</button>
+              </div>
+              <p class="muted" style="margin-top: 12px">Пока это встроенный шаблон-генератор. Потом можно подключить настоящий API.</p>
+            </article>
             <article class="card" style="margin-top: 18px">
               <div class="card-title"><h2>Архив роликов</h2><span class="pill" id="contentArchiveCount">0</span></div>
               <div class="activity" id="contentArchive"></div>
@@ -2891,6 +2905,39 @@
         return `<a class="pill blue" href="${escapeHtml(url)}" target="_blank" rel="noreferrer">${escapeHtml(label)}</a>`;
       }
 
+      function buildVideoScript(topic, format) {
+        const cleanTopic = topic || "идея ролика";
+        const formatLabel = {
+          shorts: "короткий вертикальный ролик",
+          tutorial: "мини-урок",
+          story: "история"
+        }[format] || "короткий ролик";
+        return [
+          `Тема: ${cleanTopic}`,
+          `Формат: ${formatLabel}`,
+          "",
+          "1. Хук 0-3 сек",
+          `Сказать: “Смотри, как я быстро показываю: ${cleanTopic}.”`,
+          "Кадр: крупный план, сразу действие, без долгого вступления.",
+          "",
+          "2. Главная часть 3-20 сек",
+          "- показать первый шаг;",
+          "- показать самый интересный момент;",
+          "- добавить короткую фразу, что именно происходит;",
+          "- не объяснять слишком долго, лучше показать руками/экраном.",
+          "",
+          "3. Финал 20-30 сек",
+          "Сказать: “Вот что получилось. Хочешь, покажу продолжение?”",
+          "Кадр: результат, готовая вещь, экран или эмоция.",
+          "",
+          "Что снять:",
+          "- начало процесса;",
+          "- 2-3 быстрых кадра по шагам;",
+          "- финальный результат;",
+          "- один красивый кадр для обложки."
+        ].join("\n");
+      }
+
       function renderContentWorkspace() {
         const statusBadge = document.getElementById("contentStatusBadge");
         const current = document.getElementById("currentContentCard");
@@ -2898,12 +2945,27 @@
         const archiveCount = document.getElementById("contentArchiveCount");
         if (!current || !archive) return;
         if (statusBadge) statusBadge.textContent = contentWorkspace.status || "идея";
+        const formMap = {
+          contentTitleInput: contentWorkspace.title || "",
+          contentTopicInput: contentWorkspace.topic || "",
+          contentStatusInput: contentWorkspace.status || "идея",
+          contentDraftInput: contentWorkspace.draftUrl || "",
+          contentEditInput: contentWorkspace.editUrl || "",
+          contentPublishedInput: contentWorkspace.publishedUrl || "",
+          contentScriptInput: contentWorkspace.script || "",
+          contentResultInput: contentWorkspace.result || ""
+        };
+        Object.entries(formMap).forEach(([id, value]) => {
+          const field = document.getElementById(id);
+          if (field && document.activeElement !== field) field.value = value;
+        });
         current.innerHTML = contentWorkspace.title ? `
           <div class="activity-item">
             <span class="mini-icon">▶</span>
             <div>
               <h3>${escapeHtml(contentWorkspace.title)}</h3>
               <p class="muted">${escapeHtml(contentWorkspace.topic || "тема не указана")} · ${escapeHtml(contentWorkspace.status || "идея")}</p>
+              ${contentWorkspace.script ? `<p class="muted" style="margin-top: 8px; white-space: pre-line">${escapeHtml(contentWorkspace.script)}</p>` : ""}
               ${contentWorkspace.result ? `<p class="muted" style="margin-top: 8px">${escapeHtml(contentWorkspace.result)}</p>` : ""}
               <div class="task-actions">${contentLink("черновик", contentWorkspace.draftUrl)}${contentLink("монтаж", contentWorkspace.editUrl)}${contentLink("публикация", contentWorkspace.publishedUrl)}</div>
             </div>
@@ -2918,7 +2980,7 @@
         items.forEach((item) => {
           const row = document.createElement("div");
           row.className = "activity-item";
-          row.innerHTML = `<span class="mini-icon">✓</span><div><h3>${escapeHtml(item.title)}</h3><p class="muted">${escapeHtml(item.date)} · ${escapeHtml(item.topic || "без темы")}</p><div class="task-actions">${contentLink("ссылка", item.publishedUrl)}</div></div>`;
+          row.innerHTML = `<span class="mini-icon">✓</span><div><h3>${escapeHtml(item.title)}</h3><p class="muted">${escapeHtml(item.date)} · ${escapeHtml(item.topic || "без темы")}${item.script ? " · сценарий есть" : ""}</p><div class="task-actions">${contentLink("ссылка", item.publishedUrl)}</div></div>`;
           archive.appendChild(row);
         });
       }
@@ -2931,10 +2993,34 @@
         contentWorkspace.draftUrl = document.getElementById("contentDraftInput").value.trim();
         contentWorkspace.editUrl = document.getElementById("contentEditInput").value.trim();
         contentWorkspace.publishedUrl = document.getElementById("contentPublishedInput").value.trim();
+        contentWorkspace.script = document.getElementById("contentScriptInput").value.trim();
         contentWorkspace.result = document.getElementById("contentResultInput").value.trim();
         renderContentWorkspace();
         saveState();
         showNotice("Ролик сохранён.");
+      });
+
+      document.getElementById("generateScriptButton")?.addEventListener("click", () => {
+        const titleInput = document.getElementById("contentTitleInput");
+        const topicInput = document.getElementById("contentTopicInput");
+        const scriptInput = document.getElementById("contentScriptInput");
+        const statusInput = document.getElementById("contentStatusInput");
+        const idea = document.getElementById("scriptIdeaInput").value.trim() || topicInput.value.trim() || titleInput.value.trim();
+        if (!idea) {
+          showNotice("Напишите тему ролика.");
+          return;
+        }
+        if (!titleInput.value.trim()) titleInput.value = idea;
+        if (!topicInput.value.trim()) topicInput.value = idea;
+        scriptInput.value = buildVideoScript(idea, document.getElementById("scriptFormatInput").value);
+        statusInput.value = "сценарий";
+        contentWorkspace.title = titleInput.value.trim();
+        contentWorkspace.topic = topicInput.value.trim();
+        contentWorkspace.status = "сценарий";
+        contentWorkspace.script = scriptInput.value.trim();
+        renderContentWorkspace();
+        saveState();
+        showNotice("Сценарий сгенерирован.");
       });
 
       document.getElementById("archiveContentVideo")?.addEventListener("click", () => {
@@ -2946,10 +3032,11 @@
         contentWorkspace.archive.unshift({
           title: contentWorkspace.title,
           topic: contentWorkspace.topic || "",
+          script: contentWorkspace.script || "",
           publishedUrl: contentWorkspace.publishedUrl || "",
           date: new Date().toLocaleDateString("ru-RU")
         });
-        ["title", "topic", "draftUrl", "editUrl", "publishedUrl", "result"].forEach((key) => { contentWorkspace[key] = ""; });
+        ["title", "topic", "draftUrl", "editUrl", "publishedUrl", "script", "result"].forEach((key) => { contentWorkspace[key] = ""; });
         contentWorkspace.status = "идея";
         document.getElementById("contentForm")?.reset();
         renderContentWorkspace();
