@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>post_001_c7demo001</title>
+  <style>
+      :root {
+        --bg: #f7f1e8;
+        --panel: rgba(255, 252, 247, 0.88);
+        --ink: #1e1a17;
+        --accent: #c65d2e;
+        --accent-2: #2660a4;
+        --line: rgba(30, 26, 23, 0.12);
+        --muted: #6b635d;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Georgia, "Times New Roman", serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top left, rgba(198, 93, 46, 0.16), transparent 28%),
+          radial-gradient(circle at top right, rgba(38, 96, 164, 0.16), transparent 26%),
+          linear-gradient(180deg, #fbf6ef 0%, var(--bg) 100%);
+      }
+      a { color: inherit; }
+      .dashboard, .post-page {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 20px 64px;
+      }
+      .hero {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        padding: 28px;
+        box-shadow: 0 12px 40px rgba(30, 26, 23, 0.08);
+      }
+      .hero h1 {
+        margin: 8px 0 12px;
+        font-size: clamp(2.4rem, 4vw, 4.2rem);
+        line-height: 0.95;
+      }
+      .hero p {
+        max-width: 760px;
+        font-size: 1.05rem;
+      }
+      .eyebrow, .confidence, .muted, .url {
+        color: var(--muted);
+      }
+      .stats, .groups, .cards, .grid {
+        display: grid;
+        gap: 16px;
+      }
+      .stats {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        margin: 20px 0 28px;
+      }
+      .groups {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        margin-bottom: 28px;
+      }
+      .cards {
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      }
+      .grid {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        margin: 24px 0;
+      }
+      .panel, .card, .stat {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: 0 10px 30px rgba(30, 26, 23, 0.06);
+      }
+      .stat strong {
+        display: block;
+        font-size: 2rem;
+        margin-top: 8px;
+      }
+      .card-meta, .filters {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .filters {
+        margin: 18px 0 24px;
+      }
+      .filters input, .filters select {
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        padding: 10px 14px;
+        background: rgba(255,255,255,0.8);
+        min-width: 180px;
+      }
+      .pill, .tool-badge, .value-badge, .tag-badge {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        padding: 7px 12px;
+        margin: 4px 6px 0 0;
+        font-size: 0.92rem;
+      }
+      .pill, .tag-badge { background: rgba(30, 26, 23, 0.07); }
+      .tool-badge { background: rgba(198, 93, 46, 0.14); color: #8f3710; }
+      .value-badge { background: rgba(38, 96, 164, 0.14); color: #17467b; }
+      .back-link {
+        display: inline-block;
+        margin-bottom: 16px;
+      }
+      pre {
+        white-space: pre-wrap;
+        font-family: "SFMono-Regular", Consolas, monospace;
+        line-height: 1.5;
+      }
+      @media (max-width: 720px) {
+        .dashboard, .post-page { padding: 20px 14px 40px; }
+        .hero { padding: 20px; }
+      }
+    </style>
+</head>
+<body>
+  <main class="post-page">
+    <a class="back-link" href="../index.html">Back to dashboard</a>
+    <section class="hero">
+      <p class="eyebrow">reel · confidence 0.95</p>
+      <h1>post_001_c7demo001</h1>
+      <p class="url"><a href="https://www.instagram.com/reel/C7demo001/">https://www.instagram.com/reel/C7demo001/</a></p>
+      <p>Claude Code workflow for automating repetitive marketing tasks with OpenAI and n8n.</p>
+    </section>
+    <section class="grid">
+      <article class="panel">
+        <h2>Tools</h2>
+        <div class="badge-row"><span class="tool-badge">Claude Code</span><span class="tool-badge">OpenAI</span><span class="tool-badge">n8n</span></div>
+      </article>
+      <article class="panel">
+        <h2>Value Type</h2>
+        <div class="badge-row"><span class="value-badge">automation</span><span class="value-badge">workflow</span><span class="value-badge">content</span></div>
+      </article>
+      <article class="panel">
+        <h2>Tags</h2>
+        <div class="badge-row"><span class="tag-badge">Claude Code</span><span class="tag-badge">OpenAI</span><span class="tag-badge">n8n</span><span class="tag-badge">automation</span><span class="tag-badge">workflow</span><span class="tag-badge">content</span><span class="tag-badge">claude</span><span class="tag-badge">code</span><span class="tag-badge">automating</span><span class="tag-badge">repetitive</span></div>
+      </article>
+      <article class="panel">
+        <h2>Takeaways</h2>
+        <ul><li>Mentioned tools: Claude Code, OpenAI, n8n.</li><li>Main value signals: automation, workflow, content.</li><li>Claude Code workflow for automating repetitive marketing tasks with OpenAI and n8n.</li></ul>
+      </article>
+    </section>
+    <section class="panel">
+      <h2>Raw Text</h2>
+      <pre>Claude Code workflow for automating repetitive marketing tasks with OpenAI and n8n.</pre>
+    </section>
+  </main>
+</body>
+</html>

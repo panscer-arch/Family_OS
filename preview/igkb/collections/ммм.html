@@ -1,0 +1,3412 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ммм</title>
+  <style>
+      :root {
+        --bg-1: #08111f;
+        --bg-2: #111f3c;
+        --bg-3: #1d1147;
+        --panel: rgba(11, 18, 34, 0.86);
+        --panel-soft: rgba(14, 24, 46, 0.76);
+        --ink: #f5f7ff;
+        --muted: #a7b2d6;
+        --line: rgba(255, 255, 255, 0.08);
+        --orange: #ff7a18;
+        --pink: #ff3d81;
+        --cyan: #38d6ff;
+        --yellow: #ffd36e;
+        --shadow: 0 18px 60px rgba(0, 0, 0, 0.28);
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        color: var(--ink);
+        font-family: "SF Pro Display", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+        background:
+          radial-gradient(circle at 12% 18%, rgba(255, 122, 24, 0.26), transparent 22%),
+          radial-gradient(circle at 88% 10%, rgba(56, 214, 255, 0.24), transparent 20%),
+          linear-gradient(140deg, var(--bg-1) 0%, var(--bg-2) 52%, var(--bg-3) 100%);
+        min-height: 100vh;
+      }
+      a { color: inherit; text-decoration: none; }
+      .dashboard, .post-page {
+        max-width: 1320px;
+        margin: 0 auto;
+        padding: 28px 20px 72px;
+      }
+      .hero {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)), var(--panel-soft);
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        padding: 30px;
+        box-shadow: var(--shadow);
+        margin-bottom: 22px;
+      }
+      .hero::before,
+      .hero::after {
+        content: "";
+        position: absolute;
+        inset: auto;
+        border-radius: 999px;
+        pointer-events: none;
+        filter: blur(2px);
+      }
+      .hero::before {
+        top: -42px;
+        right: -28px;
+        width: 220px;
+        height: 220px;
+        background: radial-gradient(circle, rgba(255, 61, 129, 0.24), rgba(255, 61, 129, 0.02) 62%, transparent 70%);
+      }
+      .hero::after {
+        left: -40px;
+        bottom: -60px;
+        width: 260px;
+        height: 260px;
+        background: radial-gradient(circle, rgba(56, 214, 255, 0.18), rgba(255, 122, 24, 0.04) 58%, transparent 72%);
+      }
+      .hero-art {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 18px;
+      }
+      .hero-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 13px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.1);
+        color: #fff0e2;
+        font-size: 0.92rem;
+      }
+      .ig-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, var(--orange), var(--pink), var(--cyan));
+        box-shadow: 0 0 18px rgba(255, 93, 127, 0.55);
+      }
+      .hero h1 {
+        margin: 8px 0 10px;
+        font-size: clamp(2.2rem, 4vw, 4.6rem);
+        line-height: 0.95;
+        letter-spacing: -0.04em;
+        max-width: 980px;
+      }
+      .eyebrow, .hero-meta, .meta-line, .filters-summary, .muted, .back-link {
+        color: var(--muted);
+      }
+      .stats, .groups, .cards, .grid, .quick-answer {
+        display: grid;
+        gap: 16px;
+      }
+      .stats {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        margin: 0 0 22px;
+      }
+      .groups {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      }
+      .compact-groups {
+        margin-bottom: 18px;
+      }
+      .cards {
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      }
+      .grid, .quick-answer {
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        margin-bottom: 18px;
+      }
+      .panel, .card, .stat {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        padding: 20px;
+        box-shadow: var(--shadow);
+      }
+      .card {
+        position: relative;
+        overflow: hidden;
+        transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+      }
+      .card::before {
+        content: "";
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 4px;
+        background: linear-gradient(180deg, var(--orange), var(--pink), var(--cyan));
+        opacity: 0.9;
+      }
+      .card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(255, 211, 110, 0.22);
+        box-shadow: 0 22px 64px rgba(0, 0, 0, 0.34);
+      }
+      .panel h2, .card h3 {
+        margin-top: 0;
+      }
+      .stat strong {
+        display: block;
+        margin-top: 10px;
+        font-size: 2.3rem;
+        letter-spacing: -0.04em;
+      }
+      .command-panel {
+        margin: 0 0 24px;
+        padding: 20px;
+        border-radius: 28px;
+        background:
+          linear-gradient(135deg, rgba(255,122,24,0.18), rgba(255,61,129,0.10) 42%, rgba(56,214,255,0.12) 100%),
+          rgba(8, 14, 28, 0.9);
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(18px);
+      }
+      .command-copy {
+        margin-bottom: 18px;
+      }
+      .command-kicker {
+        margin: 0 0 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        font-size: 0.8rem;
+        color: #ffd7b8;
+      }
+      .command-copy h2 {
+        margin: 0 0 10px;
+        font-size: clamp(1.5rem, 2.4vw, 2.6rem);
+        line-height: 1;
+        letter-spacing: -0.04em;
+      }
+      .filter-grid {
+        display: grid;
+        gap: 14px;
+      }
+      .filter-main {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: 1.6fr 1fr 1fr auto;
+      }
+      .filter-field label {
+        display: block;
+        margin: 0 0 7px;
+        font-size: 0.86rem;
+        color: #cfd7f5;
+      }
+      .filter-field input, .filter-field select {
+        width: 100%;
+        border-radius: 14px;
+        border: 1px solid rgba(255,255,255,0.14);
+        padding: 14px 16px;
+        background: rgba(8, 14, 28, 0.84);
+        color: var(--ink);
+        outline: none;
+        font-size: 0.98rem;
+      }
+      .filter-field input:focus, .filter-field select:focus {
+        border-color: rgba(56,214,255,0.7);
+        box-shadow: 0 0 0 4px rgba(56,214,255,0.12);
+      }
+      .filter-actions {
+        display: flex;
+        align-items: end;
+      }
+      .reset-button {
+        width: 100%;
+        border: 0;
+        border-radius: 14px;
+        padding: 14px 16px;
+        font-weight: 700;
+        cursor: pointer;
+        color: #08111f;
+        background: linear-gradient(135deg, #fff2d6, #ffd399);
+      }
+      .filters-summary {
+        margin: 12px 0 0;
+      }
+      .quick-picks {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 2px 0 18px;
+      }
+      .quick-pick {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 999px;
+        background: rgba(255,255,255,0.08);
+        color: var(--ink);
+        padding: 10px 14px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .quick-pick:hover,
+      .quick-pick.is-active {
+        background: linear-gradient(135deg, rgba(255,122,24,0.24), rgba(255,61,129,0.22));
+        border-color: rgba(255, 211, 110, 0.38);
+      }
+      .badge-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        padding: 7px 11px;
+        font-size: 0.86rem;
+        border: 1px solid rgba(255,255,255,0.07);
+      }
+      .badge-posttype, .badge-muted {
+        background: rgba(255,255,255,0.08);
+      }
+      .badge-value {
+        background: linear-gradient(135deg, rgba(255,122,24,0.22), rgba(255,61,129,0.18));
+      }
+      .badge-theme {
+        background: rgba(56,214,255,0.14);
+        color: #c9f5ff;
+      }
+      .badge-collection {
+        background: rgba(255,255,255,0.07);
+      }
+      .card-top {
+        display: flex;
+        gap: 12px;
+        align-items: start;
+        justify-content: space-between;
+      }
+      .card-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .card-open-hint {
+        flex: 0 0 auto;
+        color: #ffd8bf;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      .card-blurb {
+        color: #ffe8d6;
+        font-size: 0.98rem;
+      }
+      .card h3 {
+        margin: 14px 0 8px;
+        font-size: 1.16rem;
+        line-height: 1.15;
+      }
+      .card p {
+        margin: 8px 0;
+      }
+      .useful-panel {
+        margin-top: 14px;
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.08);
+        background: rgba(255,255,255,0.04);
+        overflow: hidden;
+      }
+      .useful-panel summary {
+        cursor: pointer;
+        list-style: none;
+        padding: 12px 14px;
+        font-weight: 700;
+        color: #fff2d6;
+      }
+      .useful-panel summary::-webkit-details-marker {
+        display: none;
+      }
+      .useful-body {
+        padding: 0 14px 14px;
+      }
+      .useful-body ul {
+        margin: 10px 0 0;
+        padding-left: 18px;
+      }
+      .useful-body li {
+        margin: 0 0 8px;
+      }
+      .resource-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+      }
+      .resource-link,
+      .resource-empty {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 10px;
+        border-radius: 999px;
+        background: rgba(56,214,255,0.12);
+        border: 1px solid rgba(56,214,255,0.16);
+        color: #cbf5ff;
+        font-size: 0.86rem;
+      }
+      .resource-empty {
+        background: rgba(255,255,255,0.06);
+        border-color: rgba(255,255,255,0.08);
+        color: #d6defb;
+      }
+      .card-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 14px;
+      }
+      .action-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 104px;
+        padding: 10px 14px;
+        border-radius: 12px;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.08);
+        font-weight: 700;
+      }
+      .action-primary {
+        background: linear-gradient(135deg, #ff8d32, #ff5d7f);
+        color: white;
+        border: 0;
+        box-shadow: 0 10px 28px rgba(255, 93, 127, 0.28);
+      }
+      .action-secondary {
+        color: var(--ink);
+      }
+      .raw-block {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        padding: 18px 20px;
+        box-shadow: var(--shadow);
+      }
+      .raw-block summary {
+        cursor: pointer;
+        font-weight: 700;
+      }
+      pre {
+        white-space: pre-wrap;
+        font-family: "SFMono-Regular", Consolas, monospace;
+        color: #dfe7ff;
+      }
+      @media (max-width: 900px) {
+        .filter-main {
+          grid-template-columns: 1fr 1fr;
+        }
+        .filter-actions {
+          grid-column: span 2;
+        }
+      }
+      @media (max-width: 720px) {
+        .dashboard, .post-page { padding: 18px 14px 36px; }
+        .hero, .command-panel, .panel, .card, .stat, .raw-block { border-radius: 20px; }
+        .stats, .groups, .cards, .grid, .quick-answer, .filter-main {
+          grid-template-columns: 1fr;
+        }
+        .filter-actions {
+          grid-column: auto;
+        }
+      }
+    </style>
+</head>
+<body>
+  <main class="post-page">
+    <a class="back-link" href="../index.html">← Назад к дашборду</a>
+    <section class="hero">
+      <p class="eyebrow">Страница коллекции</p>
+      <h1>Ммм</h1>
+      <p>Здесь 106 сохранённых постов. Ниже можно быстро посмотреть, что из этого реально стоит открыть.</p>
+    </section>
+    <section class="groups compact-groups">
+      <article class="panel">
+        <h2>Чаще всего здесь встречается</h2>
+        <p><strong><a href="themes/ai-creators.html">ИИ</a></strong><span>8</span></p><p><strong><a href="themes/design-visual.html">Дизайн</a></strong><span>8</span></p><p><strong><a href="themes/content-media.html">Контент</a></strong><span>3</span></p><p><strong><a href="themes/marketing-growth.html">Маркетинг</a></strong><span>2</span></p><p><strong><a href="themes/self-reference.html">Личное</a></strong><span>1</span></p>
+      </article>
+    </section>
+    <section class="cards">
+      
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_316_dsigqkmjsns.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/kirill-leeks.html">@kirill.leeks</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @kirill.leeks часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DSIGqKmjSNS/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DSIGqKmjSNS/">Скопировать</button>
+        <a class="action-button" href="../posts/post_316_dsigqkmjsns.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_434_dqiz8b6kixp.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/skr-dn.html">@skr_dn</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @skr_dn часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DQiz8b6kixP/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DQiz8b6kixP/">Скопировать</button>
+        <a class="action-button" href="../posts/post_434_dqiz8b6kixp.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_457_dqfodwiilv2.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/dar-kostya.html">@dar_kostya</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @dar_kostya часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DQFOdwIiLv2/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DQFOdwIiLv2/">Скопировать</button>
+        <a class="action-button" href="../posts/post_457_dqfodwiilv2.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_469_dokgtyoav-s.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/planpanamera.html">@planpanamera__</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @planpanamera__ часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DOkGtyoAv-S/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DOkGtyoAv-S/">Скопировать</button>
+        <a class="action-button" href="../posts/post_469_dokgtyoav-s.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_491_dpg9h72iub5.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/isocialyou.html">@isocialyou</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @isocialyou часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DPg9H72iuB5/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DPg9H72iuB5/">Скопировать</button>
+        <a class="action-button" href="../posts/post_491_dpg9h72iub5.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_523_do8dn2jk2mw.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/vlad-iss-love.html">@vlad_iss_love</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @vlad_iss_love часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DO8DN2jk2mW/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DO8DN2jk2mW/">Скопировать</button>
+        <a class="action-button" href="../posts/post_523_do8dn2jk2mw.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_525_dpyssavikj6.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/podosinnikov-vladimir.html">@podosinnikov_vladimir</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @podosinnikov_vladimir часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DPYssAViKJ6/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DPYssAViKJ6/">Скопировать</button>
+        <a class="action-button" href="../posts/post_525_dpyssavikj6.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_527_dpprmkpdeo8.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/stepik-sokolov.html">@stepik.sokolov</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @stepik.sokolov часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DPPrmKpDEO8/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DPPrmKpDEO8/">Скопировать</button>
+        <a class="action-button" href="../posts/post_527_dpprmkpdeo8.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">личное</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_528_dpa6mnzjkph.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/skr-dn.html">@skr_dn</a></p>
+      <p class="card-blurb">Личное и то, что хочется сохранить себе.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><a class="badge badge-collection" href="../collections/я.html">Я</a><a class="badge badge-theme" href="../themes/self-reference.html">Личное</a></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @skr_dn часто полезный, к нему можно вернуться ещё.</li><li>Это скорее что-то личное, к чему можно вернуться позже.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DPa6mNZjKph/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DPa6mNZjKph/">Скопировать</button>
+        <a class="action-button" href="../posts/post_528_dpa6mnzjkph.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">ai-инструменты</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_544_dn0ue6uwjit.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/tainstvennaya-molniya.html">@tainstvennaya.molniya</a></p>
+      <p class="card-blurb">ИИ, полезные фишки и инструменты.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><a class="badge badge-theme" href="../themes/ai-creators.html">ИИ</a></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Тут может быть новая AI-фича, полезный сервис или сценарий применения.</li><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Здесь может быть полезный AI-инструмент или новая AI-фишка.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DN0Ue6Uwjit/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DN0Ue6Uwjit/">Скопировать</button>
+        <a class="action-button" href="../posts/post_544_dn0ue6uwjit.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_564_doll8u2ilc-.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/kirillpeskov.html">@kirillpeskov</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @kirillpeskov часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DOlL8u2iLC-/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DOlL8u2iLC-/">Скопировать</button>
+        <a class="action-button" href="../posts/post_564_doll8u2ilc-.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_565_dnxco44ua96.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/ureka-antonn.html">@ureka.antonn</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @ureka.antonn часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DNxco44UA96/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DNxco44UA96/">Скопировать</button>
+        <a class="action-button" href="../posts/post_565_dnxco44ua96.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">ai-инструменты</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_566_dol4gncjmnw.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/aironzak.html">@aironzak</a></p>
+      <p class="card-blurb">ИИ, полезные фишки и инструменты.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><a class="badge badge-theme" href="../themes/ai-creators.html">ИИ</a></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Тут может быть новая AI-фича, полезный сервис или сценарий применения.</li><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Здесь может быть полезный AI-инструмент или новая AI-фишка.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DOL4gNcjmNW/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DOL4gNcjmNW/">Скопировать</button>
+        <a class="action-button" href="../posts/post_566_dol4gncjmnw.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_567_doiwq6iag2c.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/aleksei-hunt.html">@aleksei_hunt</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @aleksei_hunt часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DOIwq6IAG2c/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DOIwq6IAG2c/">Скопировать</button>
+        <a class="action-button" href="../posts/post_567_doiwq6iag2c.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_572_doeggqnkjnn.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/harsh-times.html">@harsh.times</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @harsh.times часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DOeGGqnkjnn/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DOeGGqnkjnn/">Скопировать</button>
+        <a class="action-button" href="../posts/post_572_doeggqnkjnn.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_577_dj9z19va7bs.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/nadia-stavaridis.html">@nadia_stavaridis</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @nadia_stavaridis часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DJ9Z19vA7Bs/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DJ9Z19vA7Bs/">Скопировать</button>
+        <a class="action-button" href="../posts/post_577_dj9z19va7bs.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_580_dhqxle9ozbs.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/leyli-yalunina.html">@leyli_yalunina</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @leyli_yalunina часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DHqxlE9Ozbs/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DHqxlE9Ozbs/">Скопировать</button>
+        <a class="action-button" href="../posts/post_580_dhqxle9ozbs.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">дизайн и креатив</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_581_doaeyf8dfyn.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/kub-studio.html">@kub_studio</a></p>
+      <p class="card-blurb">Дизайн, визуал и насмотренность.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><a class="badge badge-theme" href="../themes/design-visual.html">Дизайн</a></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Тут может быть стиль, композиция или визуальный ход, который стоит сохранить.</li><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Здесь может быть полезный визуальный приём, стиль или референс.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DOaeyf8DFYn/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DOaeyf8DFYn/">Скопировать</button>
+        <a class="action-button" href="../posts/post_581_doaeyf8dfyn.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_582_dnlcvcam4bb.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/tariel-abjalbekov.html">@tariel_abjalbekov</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @tariel_abjalbekov часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DNlcVcAM4bb/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DNlcVcAM4bb/">Скопировать</button>
+        <a class="action-button" href="../posts/post_582_dnlcvcam4bb.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">контент и медиа</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_589_dlso-nxnnis.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/directoreels.html">@directoreels</a></p>
+      <p class="card-blurb">Контент, идеи и приёмы.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><a class="badge badge-theme" href="../themes/content-media.html">Контент</a></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Тут может быть удачный формат ролика или идея для подачи.</li><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Здесь может быть полезный формат ролика, подачи или монтажа.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DLsO-nxNnIS/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DLsO-nxNnIS/">Скопировать</button>
+        <a class="action-button" href="../posts/post_589_dlso-nxnnis.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_593_diwblx0ktkh.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/duty-boy-stylish.html">@duty_boy_stylish</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @duty_boy_stylish часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DIwbLX0KTkH/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DIwbLX0KTkH/">Скопировать</button>
+        <a class="action-button" href="../posts/post_593_diwblx0ktkh.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_618_dm5aslwtowp.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/akyliicase.html">@akyliicase</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @akyliicase часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DM5aSlWtowp/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DM5aSlWtowp/">Скопировать</button>
+        <a class="action-button" href="../posts/post_618_dm5aslwtowp.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">дизайн и креатив</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_632_dnvhg2v2npc.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/artem-hisa.html">@artem.hisa</a></p>
+      <p class="card-blurb">Дизайн, визуал и насмотренность.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><a class="badge badge-theme" href="../themes/design-visual.html">Дизайн</a></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Тут может быть стиль, композиция или визуальный ход, который стоит сохранить.</li><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Здесь может быть полезный визуальный приём, стиль или референс.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DNvhG2v2NPc/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DNvhG2v2NPc/">Скопировать</button>
+        <a class="action-button" href="../posts/post_632_dnvhg2v2npc.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_643_dm4ujtlt6h3.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/popppppp201.html">@popppppp201</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @popppppp201 часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DM4UJtLT6h3/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DM4UJtLT6h3/">Скопировать</button>
+        <a class="action-button" href="../posts/post_643_dm4ujtlt6h3.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_644_dnasjkhorvs.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/bezikovkirilll.html">@bezikovkirilll</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @bezikovkirilll часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DNAsjkHoRVs/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DNAsjkHoRVs/">Скопировать</button>
+        <a class="action-button" href="../posts/post_644_dnasjkhorvs.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">контент и медиа</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_648_dngjawbto2r.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/directoreels.html">@directoreels</a></p>
+      <p class="card-blurb">Контент, идеи и приёмы.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><a class="badge badge-theme" href="../themes/content-media.html">Контент</a></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Тут может быть удачный формат ролика или идея для подачи.</li><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Здесь может быть полезный формат ролика, подачи или монтажа.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DNgJAWbto2R/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DNgJAWbto2R/">Скопировать</button>
+        <a class="action-button" href="../posts/post_648_dngjawbto2r.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_649_c3lg2h1xjil.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/antonvipo1.html">@antonvipo1</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @antonvipo1 часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/C3lG2h1xjiL/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/C3lG2h1xjiL/">Скопировать</button>
+        <a class="action-button" href="../posts/post_649_c3lg2h1xjil.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_661_dnbvqfyo061.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/rasulowv.html">@rasulowv</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @rasulowv часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DNBVQfYo061/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DNBVQfYo061/">Скопировать</button>
+        <a class="action-button" href="../posts/post_661_dnbvqfyo061.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_671_dhtetdwm2ke.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/lana64dmitrievska.html">@lana64dmitrievska</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @lana64dmitrievska часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DHTeTDWM2kE/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DHTeTDWM2kE/">Скопировать</button>
+        <a class="action-button" href="../posts/post_671_dhtetdwm2ke.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_675_dnlcycapl4i.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/bazamavrodi.html">@bazamavrodi</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @bazamavrodi часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DNLcYCapl4i/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DNLcYCapl4i/">Скопировать</button>
+        <a class="action-button" href="../posts/post_675_dnlcycapl4i.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_684_dlpzedfiahg.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/boykiyitsme.html">@boykiyitsme</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @boykiyitsme часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DLpZEdFiahG/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DLpZEdFiahG/">Скопировать</button>
+        <a class="action-button" href="../posts/post_684_dlpzedfiahg.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_685_dmjgzdcoyjq.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/rasulowv.html">@rasulowv</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @rasulowv часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DMjGZdCoYjq/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DMjGZdCoYjq/">Скопировать</button>
+        <a class="action-button" href="../posts/post_685_dmjgzdcoyjq.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_711_dmkftpdq4np.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/nick-vels.html">@nick_vels</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @nick_vels часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DMKftpDq4Np/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DMKftpDq4Np/">Скопировать</button>
+        <a class="action-button" href="../posts/post_711_dmkftpdq4np.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_717_dl5ip17s3mh.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/demesick.html">@demesick</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @demesick часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DL5IP17s3Mh/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DL5IP17s3Mh/">Скопировать</button>
+        <a class="action-button" href="../posts/post_717_dl5ip17s3mh.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">ai-инструменты</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_719_dlxgufgiksw.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/fink-gpt.html">@fink_gpt</a></p>
+      <p class="card-blurb">ИИ, полезные фишки и инструменты.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><a class="badge badge-theme" href="../themes/ai-creators.html">ИИ</a></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Тут может быть новая AI-фича, полезный сервис или сценарий применения.</li><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Здесь может быть полезный AI-инструмент или новая AI-фишка.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DLxgUFGIksw/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DLxgUFGIksw/">Скопировать</button>
+        <a class="action-button" href="../posts/post_719_dlxgufgiksw.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_720_dlr-02pia0g.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/ilkhom-nazarov.html">@ilkhom__nazarov</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @ilkhom__nazarov часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DLr-02Pia0g/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DLr-02Pia0g/">Скопировать</button>
+        <a class="action-button" href="../posts/post_720_dlr-02pia0g.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">дизайн и креатив</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_727_dlpw_awtaj8.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/kub-studio.html">@kub_studio</a></p>
+      <p class="card-blurb">Дизайн, визуал и насмотренность.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><a class="badge badge-theme" href="../themes/design-visual.html">Дизайн</a></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Тут может быть стиль, композиция или визуальный ход, который стоит сохранить.</li><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Здесь может быть полезный визуальный приём, стиль или референс.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DLpw_aWtAJ8/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DLpw_aWtAJ8/">Скопировать</button>
+        <a class="action-button" href="../posts/post_727_dlpw_awtaj8.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_728_dlo9fhimizp.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/teyhan-koldoshov.html">@teyhan.koldoshov</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @teyhan.koldoshov часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DLo9FHiMIzP/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DLo9FHiMIzP/">Скопировать</button>
+        <a class="action-button" href="../posts/post_728_dlo9fhimizp.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_729_dlys3fssb75.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/k-real-petrov.html">@k.real_petrov</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @k.real_petrov часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DLYS3FSsb75/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DLYS3FSsb75/">Скопировать</button>
+        <a class="action-button" href="../posts/post_729_dlys3fssb75.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_736_dlh_ly6imsf.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/russgamzatov.html">@russgamzatov</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @russgamzatov часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DLh_LY6IMsF/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DLh_LY6IMsF/">Скопировать</button>
+        <a class="action-button" href="../posts/post_736_dlh_ly6imsf.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_737_dlgxenrppr7.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/prostoy-sanya.html">@prostoy.sanya</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @prostoy.sanya часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DLgXenrPpR7/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DLgXenrPpR7/">Скопировать</button>
+        <a class="action-button" href="../posts/post_737_dlgxenrppr7.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_740_dldrqt9ng08.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/sadekovvv.html">@sadekovvv</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @sadekovvv часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DLdRQT9NG08/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DLdRQT9NG08/">Скопировать</button>
+        <a class="action-button" href="../posts/post_740_dldrqt9ng08.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">ai-инструменты</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_741_dlfysb5ie9p.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/maximmath-ai.html">@maximmath.ai</a></p>
+      <p class="card-blurb">ИИ, полезные фишки и инструменты.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><a class="badge badge-theme" href="../themes/ai-creators.html">ИИ</a></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Тут может быть новая AI-фича, полезный сервис или сценарий применения.</li><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Здесь может быть полезный AI-инструмент или новая AI-фишка.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DLfYsb5IE9p/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DLfYsb5IE9p/">Скопировать</button>
+        <a class="action-button" href="../posts/post_741_dlfysb5ie9p.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">дизайн и креатив</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_742_dlaebiyntlw.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/kub-studio.html">@kub_studio</a></p>
+      <p class="card-blurb">Дизайн, визуал и насмотренность.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><a class="badge badge-theme" href="../themes/design-visual.html">Дизайн</a></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Тут может быть стиль, композиция или визуальный ход, который стоит сохранить.</li><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Здесь может быть полезный визуальный приём, стиль или референс.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DLaEbiYNTlW/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DLaEbiYNTlW/">Скопировать</button>
+        <a class="action-button" href="../posts/post_742_dlaebiyntlw.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_746_dlccugjo-2c.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/kommunist-tv.html">@kommunist.tv</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @kommunist.tv часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DLCcugJo-2C/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DLCcugJo-2C/">Скопировать</button>
+        <a class="action-button" href="../posts/post_746_dlccugjo-2c.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Пост</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_749_dle7qjco2sl.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/neurust.html">@neurust</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @neurust часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/p/DLE7QJco2Sl/">Пост</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/p/DLE7QJco2Sl/">Скопировать</button>
+        <a class="action-button" href="../posts/post_749_dle7qjco2sl.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_752_dlpvp4qxzu_.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/kossolapov-igor.html">@kossolapov_igor</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @kossolapov_igor часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DLPvP4Qxzu_/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DLPvP4Qxzu_/">Скопировать</button>
+        <a class="action-button" href="../posts/post_752_dlpvp4qxzu_.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">ai-инструменты</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_753_dlqnnm9m01v.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/aironzak.html">@aironzak</a></p>
+      <p class="card-blurb">ИИ, полезные фишки и инструменты.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><a class="badge badge-theme" href="../themes/ai-creators.html">ИИ</a></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Тут может быть новая AI-фича, полезный сервис или сценарий применения.</li><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Здесь может быть полезный AI-инструмент или новая AI-фишка.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DLQNNM9M01v/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DLQNNM9M01v/">Скопировать</button>
+        <a class="action-button" href="../posts/post_753_dlqnnm9m01v.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">дизайн и креатив</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_754_dlphq3zo7sb.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/artur-frame.html">@artur_frame</a></p>
+      <p class="card-blurb">Дизайн, визуал и насмотренность.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><a class="badge badge-theme" href="../themes/design-visual.html">Дизайн</a></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Тут может быть стиль, композиция или визуальный ход, который стоит сохранить.</li><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Здесь может быть полезный визуальный приём, стиль или референс.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DLPHQ3Zo7SB/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DLPHQ3Zo7SB/">Скопировать</button>
+        <a class="action-button" href="../posts/post_754_dlphq3zo7sb.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_758_di6wjnomhnf.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/tunefullymusic.html">@tunefullymusic</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @tunefullymusic часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DI6WjnOMhNf/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DI6WjnOMhNf/">Скопировать</button>
+        <a class="action-button" href="../posts/post_758_di6wjnomhnf.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_763_dlhqd3rc4su.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/igorzuevichm.html">@igorzuevichm</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @igorzuevichm часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DLHqd3rC4su/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DLHqd3rC4su/">Скопировать</button>
+        <a class="action-button" href="../posts/post_763_dlhqd3rc4su.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_764_dlfoaqppmty.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/fadi-maaz.html">@fadi_maaz</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @fadi_maaz часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DLFOAqPPMty/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DLFOAqPPMty/">Скопировать</button>
+        <a class="action-button" href="../posts/post_764_dlfoaqppmty.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_767_dldiiettdmh.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/sadekovvv.html">@sadekovvv</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @sadekovvv часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DLDiiettDmh/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DLDiiettDmh/">Скопировать</button>
+        <a class="action-button" href="../posts/post_767_dldiiettdmh.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_768_dle9gsxnglx.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/bogatushin-ru.html">@bogatushin_ru</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @bogatushin_ru часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DLE9gsXNGLX/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DLE9gsXNGLX/">Скопировать</button>
+        <a class="action-button" href="../posts/post_768_dle9gsxnglx.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_769_dlf9_fwk6zz.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/nick-vels.html">@nick_vels</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @nick_vels часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DLF9_fWK6Zz/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DLF9_fWK6Zz/">Скопировать</button>
+        <a class="action-button" href="../posts/post_769_dlf9_fwk6zz.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_770_cpbboyrtdss.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/3motats.html">@3motats</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @3motats часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/CpBBoYrtdss/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/CpBBoYrtdss/">Скопировать</button>
+        <a class="action-button" href="../posts/post_770_cpbboyrtdss.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_772_dlfxbpnodr_.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/potapovfx.html">@potapovfx</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @potapovfx часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DLFXbpNoDR_/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DLFXbpNoDR_/">Скопировать</button>
+        <a class="action-button" href="../posts/post_772_dlfxbpnodr_.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_773_dk__r_stbrd.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/ultradent72.html">@ultradent72</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @ultradent72 часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DK__r_StbrD/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DK__r_StbrD/">Скопировать</button>
+        <a class="action-button" href="../posts/post_773_dk__r_stbrd.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_774_dk_ziz_ngft.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/ilia-twins.html">@ilia_twins</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @ilia_twins часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DK_zIz_NgfT/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DK_zIz_NgfT/">Скопировать</button>
+        <a class="action-button" href="../posts/post_774_dk_ziz_ngft.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_776_dla7s2ouzy8.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/align-go.html">@align.go</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @align.go часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DLA7S2OuzY8/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DLA7S2OuzY8/">Скопировать</button>
+        <a class="action-button" href="../posts/post_776_dla7s2ouzy8.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_778_dlagr0jbag_.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/lenivins.html">@lenivins</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @lenivins часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DLAgr0jBAG_/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DLAgr0jBAG_/">Скопировать</button>
+        <a class="action-button" href="../posts/post_778_dlagr0jbag_.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">ai-инструменты</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_780_dlczeorn5cd.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/burmistrov-ai.html">@burmistrov_ai</a></p>
+      <p class="card-blurb">ИИ, полезные фишки и инструменты.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><a class="badge badge-theme" href="../themes/ai-creators.html">ИИ</a></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Тут может быть новая AI-фича, полезный сервис или сценарий применения.</li><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Здесь может быть полезный AI-инструмент или новая AI-фишка.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DLCzEORN5Cd/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DLCzEORN5Cd/">Скопировать</button>
+        <a class="action-button" href="../posts/post_780_dlczeorn5cd.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_781_dk_kp7nthii.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/igorzuevichm.html">@igorzuevichm</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @igorzuevichm часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DK_kp7ntHII/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DK_kp7ntHII/">Скопировать</button>
+        <a class="action-button" href="../posts/post_781_dk_kp7nthii.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">контент и медиа</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_782_dgitdx-ketj.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/starikov-prod.html">@starikov_prod</a></p>
+      <p class="card-blurb">Контент, идеи и приёмы.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><a class="badge badge-theme" href="../themes/content-media.html">Контент</a></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Тут может быть удачный формат ролика или идея для подачи.</li><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Здесь может быть полезный формат ролика, подачи или монтажа.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DGitDX-KetJ/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DGitDX-KetJ/">Скопировать</button>
+        <a class="action-button" href="../posts/post_782_dgitdx-ketj.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_784_dkb6wezsrwb.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/temus-necrut.html">@temus.necrut</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @temus.necrut часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DKb6WezsrWB/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DKb6WezsrWB/">Скопировать</button>
+        <a class="action-button" href="../posts/post_784_dkb6wezsrwb.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">маркетинг</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_785_dk9rvllolrt.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/andxox-marketing.html">@andxox_marketing</a></p>
+      <p class="card-blurb">Маркетинг, рост и продвижение.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><a class="badge badge-theme" href="../themes/marketing-growth.html">Маркетинг</a></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Здесь может быть сильная идея для оффера, подачи или роста.</li><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Здесь может быть полезная маркетинговая идея или способ подачи.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DK9RvLLoLrT/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DK9RvLLoLrT/">Скопировать</button>
+        <a class="action-button" href="../posts/post_785_dk9rvllolrt.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_787_dk7sxkltjsi.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/sadekovvv.html">@sadekovvv</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @sadekovvv часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DK7sXKLtjsI/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DK7sXKLtjsI/">Скопировать</button>
+        <a class="action-button" href="../posts/post_787_dk7sxkltjsi.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_789_dk4pfuimzya.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/ilya-konevsci.html">@ilya_konevsci</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @ilya_konevsci часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DK4PfUiMZYa/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DK4PfUiMZYa/">Скопировать</button>
+        <a class="action-button" href="../posts/post_789_dk4pfuimzya.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_792_dkzqd4roxpv.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/valery-glushkov.html">@valery.glushkov</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @valery.glushkov часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DKzQD4roXpV/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DKzQD4roXpV/">Скопировать</button>
+        <a class="action-button" href="../posts/post_792_dkzqd4roxpv.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_793_dku1exknn0g.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/sadekovvv.html">@sadekovvv</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @sadekovvv часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DKu1exkNn0g/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DKu1exkNn0g/">Скопировать</button>
+        <a class="action-button" href="../posts/post_793_dku1exknn0g.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_795_dhl-s0-nmpi.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/grigoriy-lomakin.html">@grigoriy_lomakin</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @grigoriy_lomakin часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DHL-S0-NmpI/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DHL-S0-NmpI/">Скопировать</button>
+        <a class="action-button" href="../posts/post_795_dhl-s0-nmpi.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_796_dkl5yufmlwz.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/lebed-88.html">@lebed_88</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @lebed_88 часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DKl5yuFMLwz/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DKl5yuFMLwz/">Скопировать</button>
+        <a class="action-button" href="../posts/post_796_dkl5yufmlwz.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">дизайн и креатив</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_798_dif8aalomkv.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/artemkey-new.html">@artemkey_new</a></p>
+      <p class="card-blurb">Дизайн, визуал и насмотренность.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><a class="badge badge-theme" href="../themes/design-visual.html">Дизайн</a></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Тут может быть стиль, композиция или визуальный ход, который стоит сохранить.</li><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Здесь может быть полезный визуальный приём, стиль или референс.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DIF8AaLomKv/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DIF8AaLomKv/">Скопировать</button>
+        <a class="action-button" href="../posts/post_798_dif8aalomkv.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">ai-инструменты</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_801_dktobklnvc5.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/rudenko-aivideo.html">@rudenko.aivideo</a></p>
+      <p class="card-blurb">ИИ, полезные фишки и инструменты.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><a class="badge badge-theme" href="../themes/ai-creators.html">ИИ</a></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Тут может быть новая AI-фича, полезный сервис или сценарий применения.</li><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Здесь может быть полезный AI-инструмент или новая AI-фишка.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DKtoBKlNVc5/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DKtoBKlNVc5/">Скопировать</button>
+        <a class="action-button" href="../posts/post_801_dktobklnvc5.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_810_dkgi9sdod42.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/vavoytenko.html">@vavoytenko</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @vavoytenko часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DKgi9SdoD42/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DKgi9SdoD42/">Скопировать</button>
+        <a class="action-button" href="../posts/post_810_dkgi9sdod42.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_812_diprrwsiqf7.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/shviesos-karys.html">@shviesos_karys</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @shviesos_karys часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DIpRRwSIQF7/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DIpRRwSIQF7/">Скопировать</button>
+        <a class="action-button" href="../posts/post_812_diprrwsiqf7.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_813_dktrm2-atru.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/aleksandrburdashev.html">@aleksandrburdashev</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @aleksandrburdashev часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DKTrM2-AtrU/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DKTrM2-AtrU/">Скопировать</button>
+        <a class="action-button" href="../posts/post_813_dktrm2-atru.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_815_c2gdz4worgr.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/bor-is-love.html">@bor.is.love</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @bor.is.love часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/C2gDz4WoRgR/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/C2gDz4WoRgR/">Скопировать</button>
+        <a class="action-button" href="../posts/post_815_c2gdz4worgr.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Пост</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_816_dkma5myttje.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/nick-vels.html">@nick_vels</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @nick_vels часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/p/DKmA5myttJE/">Пост</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/p/DKmA5myttJE/">Скопировать</button>
+        <a class="action-button" href="../posts/post_816_dkma5myttje.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_817_dg68ly2ig84.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/evgeniyyglushenko.html">@evgeniyyglushenko</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @evgeniyyglushenko часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DG68Ly2IG84/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DG68Ly2IG84/">Скопировать</button>
+        <a class="action-button" href="../posts/post_817_dg68ly2ig84.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_818_dkjp1getfap.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/kossolapov-igor.html">@kossolapov_igor</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @kossolapov_igor часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DKjp1getFAP/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DKjp1getFAP/">Скопировать</button>
+        <a class="action-button" href="../posts/post_818_dkjp1getfap.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_819_djoccz8snti.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/maakooveev.html">@maakooveev</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @maakooveev часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DJoCcZ8sNTI/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DJoCcZ8sNTI/">Скопировать</button>
+        <a class="action-button" href="../posts/post_819_djoccz8snti.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_820_dkksiomi2yr.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/ann-belskikh.html">@ann.belskikh</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @ann.belskikh часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DKkSIOMI2yR/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DKkSIOMI2yR/">Скопировать</button>
+        <a class="action-button" href="../posts/post_820_dkksiomi2yr.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_821_dkjaxakteaa.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/bogatushin-ru.html">@bogatushin_ru</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @bogatushin_ru часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DKjaxakteaA/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DKjaxakteaA/">Скопировать</button>
+        <a class="action-button" href="../posts/post_821_dkjaxakteaa.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_822_df3o7z1iiuw.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/vibetext-exe.html">@vibetext.exe</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @vibetext.exe часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DF3O7Z1Iiuw/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DF3O7Z1Iiuw/">Скопировать</button>
+        <a class="action-button" href="../posts/post_822_df3o7z1iiuw.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_823_dkkfyynociw.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/potapovfx.html">@potapovfx</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @potapovfx часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DKkfYyNoCiW/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DKkfYyNoCiW/">Скопировать</button>
+        <a class="action-button" href="../posts/post_823_dkkfyynociw.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_824_dkko0lzme_1.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/nick-vels.html">@nick_vels</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @nick_vels часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DKkO0lZME_1/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DKkO0lZME_1/">Скопировать</button>
+        <a class="action-button" href="../posts/post_824_dkko0lzme_1.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">маркетинг</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_825_dkjlbl5sf2a.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/andxox-marketing.html">@andxox_marketing</a></p>
+      <p class="card-blurb">Маркетинг, рост и продвижение.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><a class="badge badge-theme" href="../themes/marketing-growth.html">Маркетинг</a></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Здесь может быть сильная идея для оффера, подачи или роста.</li><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Здесь может быть полезная маркетинговая идея или способ подачи.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DKjlBl5sF2A/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DKjlBl5sF2A/">Скопировать</button>
+        <a class="action-button" href="../posts/post_825_dkjlbl5sf2a.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_826_dkflmi8oxno.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/olga-vasiltsova.html">@olga_vasiltsova</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @olga_vasiltsova часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DKfLMi8oxnO/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DKfLMi8oxnO/">Скопировать</button>
+        <a class="action-button" href="../posts/post_826_dkflmi8oxno.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_827_dkkaq3dmdjj.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/nick-vels.html">@nick_vels</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @nick_vels часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DKkAq3DMdjJ/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DKkAq3DMdjJ/">Скопировать</button>
+        <a class="action-button" href="../posts/post_827_dkkaq3dmdjj.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_842_diqu1ufcbl6.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/petukhovmv.html">@petukhovmv</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @petukhovmv часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DIqU1ufCBl6/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DIqU1ufCBl6/">Скопировать</button>
+        <a class="action-button" href="../posts/post_842_diqu1ufcbl6.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">дизайн и креатив</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_845_dglsfhcrncu.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/kub-studio.html">@kub_studio</a></p>
+      <p class="card-blurb">Дизайн, визуал и насмотренность.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><a class="badge badge-theme" href="../themes/design-visual.html">Дизайн</a></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Тут может быть стиль, композиция или визуальный ход, который стоит сохранить.</li><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Здесь может быть полезный визуальный приём, стиль или референс.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DGlSFHcRNCu/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DGlSFHcRNCu/">Скопировать</button>
+        <a class="action-button" href="../posts/post_845_dglsfhcrncu.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_848_diem9khns2f.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/tim-prok.html">@tim.prok</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @tim.prok часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DIEM9kHNs2F/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DIEM9kHNs2F/">Скопировать</button>
+        <a class="action-button" href="../posts/post_848_diem9khns2f.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_861_dkuaqbdttwj.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/igorzuevichm.html">@igorzuevichm</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @igorzuevichm часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DKUAQbdttWj/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DKUAQbdttWj/">Скопировать</button>
+        <a class="action-button" href="../posts/post_861_dkuaqbdttwj.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">ai-инструменты</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_865_dj897buphak.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/alanxgpt.html">@alanxgpt</a></p>
+      <p class="card-blurb">ИИ, полезные фишки и инструменты.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><a class="badge badge-theme" href="../themes/ai-creators.html">ИИ</a></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Тут может быть новая AI-фича, полезный сервис или сценарий применения.</li><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Здесь может быть полезный AI-инструмент или новая AI-фишка.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DJ897BupHAK/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DJ897BupHAK/">Скопировать</button>
+        <a class="action-button" href="../posts/post_865_dj897buphak.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_868_dkov7ffslpe.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/kondrashov.html">@kondrashov</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @kondrashov часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DKOv7FFsLPE/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DKOv7FFsLPE/">Скопировать</button>
+        <a class="action-button" href="../posts/post_868_dkov7ffslpe.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_903_djezmitcbhd.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/petukhovmv.html">@petukhovmv</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @petukhovmv часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DJeZmItCbhD/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DJeZmItCbhD/">Скопировать</button>
+        <a class="action-button" href="../posts/post_903_djezmitcbhd.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_906_di_npngc7vh.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/sev-sidoro.html">@sev.sidoro</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @sev.sidoro часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DI_npngC7vh/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DI_npngC7vh/">Скопировать</button>
+        <a class="action-button" href="../posts/post_906_di_npngc7vh.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_958_dieso_bib5a.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/motiv-lave.html">@motiv_lave</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @motiv_lave часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DIeSO_bIB5A/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DIeSO_bIB5A/">Скопировать</button>
+        <a class="action-button" href="../posts/post_958_dieso_bib5a.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_968_dhbqghetd7b.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/thesashache.html">@thesashache</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @thesashache часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DHBQgHEtD7b/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DHBQgHEtD7b/">Скопировать</button>
+        <a class="action-button" href="../posts/post_968_dhbqghetd7b.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_1108_dgltnf4tk0_.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/kurchanov-evgeny.html">@kurchanov_evgeny</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @kurchanov_evgeny часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DGLtNf4tK0_/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DGLtNf4tK0_/">Скопировать</button>
+        <a class="action-button" href="../posts/post_1108_dgltnf4tk0_.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Пост</span>
+          <span class="badge badge-value">дизайн и креатив</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_1109_b5h8cdof5lf.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/photo-facts.html">@_photo_facts_</a></p>
+      <p class="card-blurb">Дизайн, визуал и насмотренность.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><a class="badge badge-theme" href="../themes/design-visual.html">Дизайн</a></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Тут может быть стиль, композиция или визуальный ход, который стоит сохранить.</li><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Здесь может быть полезный визуальный приём, стиль или референс.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/p/B5h8cdoF5Lf/">Пост</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/p/B5h8cdoF5Lf/">Скопировать</button>
+        <a class="action-button" href="../posts/post_1109_b5h8cdof5lf.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_1129_dfno3mqs4ae.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/vavoytenko.html">@vavoytenko</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @vavoytenko часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DFNO3Mqs4aE/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DFNO3Mqs4aE/">Скопировать</button>
+        <a class="action-button" href="../posts/post_1129_dfno3mqs4ae.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_1146_c_6hndpiytk.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/parodistiy.html">@parodistiy_</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @parodistiy_ часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/C_6HNDpIYtK/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/C_6HNDpIYtK/">Скопировать</button>
+        <a class="action-button" href="../posts/post_1146_c_6hndpiytk.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_1171_de0dxats21n.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/efimov-eva.html">@efimov_eva</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @efimov_eva часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DE0DxAts21N/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DE0DxAts21N/">Скопировать</button>
+        <a class="action-button" href="../posts/post_1171_de0dxats21n.html">Карточка</a>
+      </div>
+    </article>
+    
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Рилс</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_1240_dc52zz0tq34.html">Ммм</a></h3>
+      <p class="meta-line"><a href="../authors/aleksandr-g-snopkov.html">@aleksandr_g_snopkov</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/ммм.html">Ммм</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Ммм».</li><li>Если автор @aleksandr_g_snopkov часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/reel/DC52ZZ0tQ34/">Рилс</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/reel/DC52ZZ0tQ34/">Скопировать</button>
+        <a class="action-button" href="../posts/post_1240_dc52zz0tq34.html">Карточка</a>
+      </div>
+    </article>
+    
+    </section>
+  </main>
+</body>
+</html>

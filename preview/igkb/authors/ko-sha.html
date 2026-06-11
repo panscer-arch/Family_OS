@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>@ko_sha</title>
+  <style>
+      :root {
+        --bg-1: #08111f;
+        --bg-2: #111f3c;
+        --bg-3: #1d1147;
+        --panel: rgba(11, 18, 34, 0.86);
+        --panel-soft: rgba(14, 24, 46, 0.76);
+        --ink: #f5f7ff;
+        --muted: #a7b2d6;
+        --line: rgba(255, 255, 255, 0.08);
+        --orange: #ff7a18;
+        --pink: #ff3d81;
+        --cyan: #38d6ff;
+        --yellow: #ffd36e;
+        --shadow: 0 18px 60px rgba(0, 0, 0, 0.28);
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        color: var(--ink);
+        font-family: "SF Pro Display", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+        background:
+          radial-gradient(circle at 12% 18%, rgba(255, 122, 24, 0.26), transparent 22%),
+          radial-gradient(circle at 88% 10%, rgba(56, 214, 255, 0.24), transparent 20%),
+          linear-gradient(140deg, var(--bg-1) 0%, var(--bg-2) 52%, var(--bg-3) 100%);
+        min-height: 100vh;
+      }
+      a { color: inherit; text-decoration: none; }
+      .dashboard, .post-page {
+        max-width: 1320px;
+        margin: 0 auto;
+        padding: 28px 20px 72px;
+      }
+      .hero {
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)), var(--panel-soft);
+        border: 1px solid var(--line);
+        border-radius: 28px;
+        padding: 30px;
+        box-shadow: var(--shadow);
+        margin-bottom: 22px;
+      }
+      .hero::before,
+      .hero::after {
+        content: "";
+        position: absolute;
+        inset: auto;
+        border-radius: 999px;
+        pointer-events: none;
+        filter: blur(2px);
+      }
+      .hero::before {
+        top: -42px;
+        right: -28px;
+        width: 220px;
+        height: 220px;
+        background: radial-gradient(circle, rgba(255, 61, 129, 0.24), rgba(255, 61, 129, 0.02) 62%, transparent 70%);
+      }
+      .hero::after {
+        left: -40px;
+        bottom: -60px;
+        width: 260px;
+        height: 260px;
+        background: radial-gradient(circle, rgba(56, 214, 255, 0.18), rgba(255, 122, 24, 0.04) 58%, transparent 72%);
+      }
+      .hero-art {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 18px;
+      }
+      .hero-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 9px 13px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.1);
+        color: #fff0e2;
+        font-size: 0.92rem;
+      }
+      .ig-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, var(--orange), var(--pink), var(--cyan));
+        box-shadow: 0 0 18px rgba(255, 93, 127, 0.55);
+      }
+      .hero h1 {
+        margin: 8px 0 10px;
+        font-size: clamp(2.2rem, 4vw, 4.6rem);
+        line-height: 0.95;
+        letter-spacing: -0.04em;
+        max-width: 980px;
+      }
+      .eyebrow, .hero-meta, .meta-line, .filters-summary, .muted, .back-link {
+        color: var(--muted);
+      }
+      .stats, .groups, .cards, .grid, .quick-answer {
+        display: grid;
+        gap: 16px;
+      }
+      .stats {
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        margin: 0 0 22px;
+      }
+      .groups {
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      }
+      .compact-groups {
+        margin-bottom: 18px;
+      }
+      .cards {
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      }
+      .grid, .quick-answer {
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        margin-bottom: 18px;
+      }
+      .panel, .card, .stat {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        padding: 20px;
+        box-shadow: var(--shadow);
+      }
+      .card {
+        position: relative;
+        overflow: hidden;
+        transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+      }
+      .card::before {
+        content: "";
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 4px;
+        background: linear-gradient(180deg, var(--orange), var(--pink), var(--cyan));
+        opacity: 0.9;
+      }
+      .card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(255, 211, 110, 0.22);
+        box-shadow: 0 22px 64px rgba(0, 0, 0, 0.34);
+      }
+      .panel h2, .card h3 {
+        margin-top: 0;
+      }
+      .stat strong {
+        display: block;
+        margin-top: 10px;
+        font-size: 2.3rem;
+        letter-spacing: -0.04em;
+      }
+      .command-panel {
+        margin: 0 0 24px;
+        padding: 20px;
+        border-radius: 28px;
+        background:
+          linear-gradient(135deg, rgba(255,122,24,0.18), rgba(255,61,129,0.10) 42%, rgba(56,214,255,0.12) 100%),
+          rgba(8, 14, 28, 0.9);
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(18px);
+      }
+      .command-copy {
+        margin-bottom: 18px;
+      }
+      .command-kicker {
+        margin: 0 0 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        font-size: 0.8rem;
+        color: #ffd7b8;
+      }
+      .command-copy h2 {
+        margin: 0 0 10px;
+        font-size: clamp(1.5rem, 2.4vw, 2.6rem);
+        line-height: 1;
+        letter-spacing: -0.04em;
+      }
+      .filter-grid {
+        display: grid;
+        gap: 14px;
+      }
+      .filter-main {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: 1.6fr 1fr 1fr auto;
+      }
+      .filter-field label {
+        display: block;
+        margin: 0 0 7px;
+        font-size: 0.86rem;
+        color: #cfd7f5;
+      }
+      .filter-field input, .filter-field select {
+        width: 100%;
+        border-radius: 14px;
+        border: 1px solid rgba(255,255,255,0.14);
+        padding: 14px 16px;
+        background: rgba(8, 14, 28, 0.84);
+        color: var(--ink);
+        outline: none;
+        font-size: 0.98rem;
+      }
+      .filter-field input:focus, .filter-field select:focus {
+        border-color: rgba(56,214,255,0.7);
+        box-shadow: 0 0 0 4px rgba(56,214,255,0.12);
+      }
+      .filter-actions {
+        display: flex;
+        align-items: end;
+      }
+      .reset-button {
+        width: 100%;
+        border: 0;
+        border-radius: 14px;
+        padding: 14px 16px;
+        font-weight: 700;
+        cursor: pointer;
+        color: #08111f;
+        background: linear-gradient(135deg, #fff2d6, #ffd399);
+      }
+      .filters-summary {
+        margin: 12px 0 0;
+      }
+      .quick-picks {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 2px 0 18px;
+      }
+      .quick-pick {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 999px;
+        background: rgba(255,255,255,0.08);
+        color: var(--ink);
+        padding: 10px 14px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      .quick-pick:hover,
+      .quick-pick.is-active {
+        background: linear-gradient(135deg, rgba(255,122,24,0.24), rgba(255,61,129,0.22));
+        border-color: rgba(255, 211, 110, 0.38);
+      }
+      .badge-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        border-radius: 999px;
+        padding: 7px 11px;
+        font-size: 0.86rem;
+        border: 1px solid rgba(255,255,255,0.07);
+      }
+      .badge-posttype, .badge-muted {
+        background: rgba(255,255,255,0.08);
+      }
+      .badge-value {
+        background: linear-gradient(135deg, rgba(255,122,24,0.22), rgba(255,61,129,0.18));
+      }
+      .badge-theme {
+        background: rgba(56,214,255,0.14);
+        color: #c9f5ff;
+      }
+      .badge-collection {
+        background: rgba(255,255,255,0.07);
+      }
+      .card-top {
+        display: flex;
+        gap: 12px;
+        align-items: start;
+        justify-content: space-between;
+      }
+      .card-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .card-open-hint {
+        flex: 0 0 auto;
+        color: #ffd8bf;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+      .card-blurb {
+        color: #ffe8d6;
+        font-size: 0.98rem;
+      }
+      .card h3 {
+        margin: 14px 0 8px;
+        font-size: 1.16rem;
+        line-height: 1.15;
+      }
+      .card p {
+        margin: 8px 0;
+      }
+      .useful-panel {
+        margin-top: 14px;
+        border-radius: 16px;
+        border: 1px solid rgba(255,255,255,0.08);
+        background: rgba(255,255,255,0.04);
+        overflow: hidden;
+      }
+      .useful-panel summary {
+        cursor: pointer;
+        list-style: none;
+        padding: 12px 14px;
+        font-weight: 700;
+        color: #fff2d6;
+      }
+      .useful-panel summary::-webkit-details-marker {
+        display: none;
+      }
+      .useful-body {
+        padding: 0 14px 14px;
+      }
+      .useful-body ul {
+        margin: 10px 0 0;
+        padding-left: 18px;
+      }
+      .useful-body li {
+        margin: 0 0 8px;
+      }
+      .resource-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+      }
+      .resource-link,
+      .resource-empty {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 10px;
+        border-radius: 999px;
+        background: rgba(56,214,255,0.12);
+        border: 1px solid rgba(56,214,255,0.16);
+        color: #cbf5ff;
+        font-size: 0.86rem;
+      }
+      .resource-empty {
+        background: rgba(255,255,255,0.06);
+        border-color: rgba(255,255,255,0.08);
+        color: #d6defb;
+      }
+      .card-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 14px;
+      }
+      .action-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 104px;
+        padding: 10px 14px;
+        border-radius: 12px;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.08);
+        font-weight: 700;
+      }
+      .action-primary {
+        background: linear-gradient(135deg, #ff8d32, #ff5d7f);
+        color: white;
+        border: 0;
+        box-shadow: 0 10px 28px rgba(255, 93, 127, 0.28);
+      }
+      .action-secondary {
+        color: var(--ink);
+      }
+      .raw-block {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 22px;
+        padding: 18px 20px;
+        box-shadow: var(--shadow);
+      }
+      .raw-block summary {
+        cursor: pointer;
+        font-weight: 700;
+      }
+      pre {
+        white-space: pre-wrap;
+        font-family: "SFMono-Regular", Consolas, monospace;
+        color: #dfe7ff;
+      }
+      @media (max-width: 900px) {
+        .filter-main {
+          grid-template-columns: 1fr 1fr;
+        }
+        .filter-actions {
+          grid-column: span 2;
+        }
+      }
+      @media (max-width: 720px) {
+        .dashboard, .post-page { padding: 18px 14px 36px; }
+        .hero, .command-panel, .panel, .card, .stat, .raw-block { border-radius: 20px; }
+        .stats, .groups, .cards, .grid, .quick-answer, .filter-main {
+          grid-template-columns: 1fr;
+        }
+        .filter-actions {
+          grid-column: auto;
+        }
+      }
+    </style>
+</head>
+<body>
+  <main class="post-page">
+    <a class="back-link" href="../index.html">← Назад к дашборду</a>
+    <section class="hero">
+      <p class="eyebrow">Страница автора</p>
+      <h1>@ko_sha</h1>
+      <p>Здесь 1 сохранённых постов. Ниже можно быстро посмотреть, что из этого реально стоит открыть.</p>
+    </section>
+    <section class="groups compact-groups">
+      <article class="panel">
+        <h2>Чаще всего здесь встречается</h2>
+        <p class='muted'>Темы пока не выделены.</p>
+      </article>
+    </section>
+    <section class="cards">
+      
+    <article class="card">
+      <div class="card-top">
+        <div class="card-badges">
+          <span class="badge badge-posttype">Пост</span>
+          <span class="badge badge-value">полезная заметка</span>
+        </div>
+        <span class="card-open-hint">Instagram</span>
+      </div>
+      <h3><a href="../posts/post_1398_dabgfkry94c.html">Идея</a></h3>
+      <p class="meta-line"><a href="../authors/ko-sha.html">@ko_sha</a></p>
+      <p class="card-blurb">Полезная идея, к которой можно быстро вернуться.</p>
+      <div class="badge-row"><a class="badge badge-collection" href="../collections/идея.html">Идея</a><span class="badge badge-muted">без темы</span></div>
+      
+      <details class="useful-panel">
+        <summary>Полезное</summary>
+        <div class="useful-body">
+          <ul><li>Похоже, это сохранено как идея для коллекции «Идея».</li><li>Если автор @ko_sha часто полезный, к нему можно вернуться ещё.</li></ul>
+          <div class="resource-links"><span class="resource-empty">Пока ссылки из ролика не извлечены.</span></div>
+        </div>
+      </details>
+    
+      <div class="card-actions">
+        <a class="action-button action-primary" href="https://www.instagram.com/p/DAbgfKRy94c/">Пост</a>
+        <button class="action-button action-secondary copy-link-button" type="button" data-url="https://www.instagram.com/p/DAbgfKRy94c/">Скопировать</button>
+        <a class="action-button" href="../posts/post_1398_dabgfkry94c.html">Карточка</a>
+      </div>
+    </article>
+    
+    </section>
+  </main>
+</body>
+</html>
