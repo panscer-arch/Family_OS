@@ -1612,22 +1612,6 @@
         background: #202528;
       }
 
-      .mac-dots {
-        display: flex;
-        gap: 9px;
-        padding: 2px 2px 16px;
-      }
-
-      .mac-dot {
-        width: 13px;
-        height: 13px;
-        border-radius: 99px;
-      }
-
-      .mac-dot.red { background: #ff5f57; }
-      .mac-dot.yellow { background: #febc2e; }
-      .mac-dot.green { background: #28c840; }
-
       .things-nav,
       .things-project-list {
         display: grid;
@@ -1686,7 +1670,7 @@
       .things-project-form {
         margin-top: auto;
         display: grid;
-        grid-template-columns: 1fr 40px;
+        grid-template-columns: 1fr auto;
         gap: 8px;
       }
 
@@ -1700,7 +1684,7 @@
 
       .things-project-form .btn {
         min-height: 40px;
-        padding: 0;
+        padding: 0 12px;
       }
 
       .things-main {
@@ -2406,21 +2390,18 @@
           <section class="page" id="notes">
             <div class="things-app">
               <aside class="things-sidebar">
-                <div class="mac-dots" aria-hidden="true"><span class="mac-dot red"></span><span class="mac-dot yellow"></span><span class="mac-dot green"></span></div>
                 <div class="things-nav" id="notesSidebar">
                   <button class="things-nav-row active" type="button" data-note-view="inbox"><span class="things-icon">▣</span><span>Входящие</span><span class="things-count" data-note-count="inbox">0</span></button>
                   <button class="things-nav-row" type="button" data-note-view="today"><span class="things-icon" style="color:#ffdd4a">★</span><span>Сегодня</span><span class="things-count" data-note-count="today">0</span></button>
                   <button class="things-nav-row" type="button" data-note-view="plans"><span class="things-icon" style="color:#ff5f7e">▦</span><span>Планы</span><span class="things-count" data-note-count="plans">0</span></button>
-                  <button class="things-nav-row" type="button" data-note-view="anytime"><span class="things-icon" style="color:#79d1cc">▤</span><span>В любое время</span><span class="things-count" data-note-count="anytime">0</span></button>
-                  <button class="things-nav-row" type="button" data-note-view="someday"><span class="things-icon" style="color:#f0df9a">▱</span><span>Когда-нибудь</span><span class="things-count" data-note-count="someday">0</span></button>
                   <button class="things-nav-row" type="button" data-note-view="journal"><span class="things-icon" style="color:#6bdc70">☑</span><span>Журнал</span><span class="things-count" data-note-count="journal">0</span></button>
                   <button class="things-nav-row" type="button" data-note-view="trash"><span class="things-icon" style="color:#d9dde0">▥</span><span>Корзина</span><span class="things-count" data-note-count="trash">0</span></button>
                 </div>
                 <div class="things-section-title">Проекты <span id="notesProjectCount">0</span></div>
                 <div class="things-project-list" id="notesProjects"></div>
                 <form class="things-project-form" id="noteProjectForm">
-                  <input class="field" id="noteProjectInput" placeholder="Новый проект" required />
-                  <button class="btn secondary" type="submit">+</button>
+                  <input class="field" id="noteProjectInput" placeholder="Название проекта" required />
+                  <button class="btn secondary" type="submit">Создать</button>
                 </form>
               </aside>
               <main class="things-main">
@@ -2436,8 +2417,6 @@
                     <option value="inbox">Входящие</option>
                     <option value="today">Сегодня</option>
                     <option value="plans">Планы</option>
-                    <option value="anytime">В любое время</option>
-                    <option value="someday">Когда-нибудь</option>
                   </select>
                   <select id="noteProjectSelect"><option value="">Без проекта</option></select>
                   <button class="btn" type="submit">Добавить</button>
@@ -3535,8 +3514,6 @@
         { id: "inbox", title: "Входящие", icon: "▣", hint: "быстро записать и потом разобрать" },
         { id: "today", title: "Сегодня", icon: "★", hint: "только то, что важно сделать сегодня" },
         { id: "plans", title: "Планы", icon: "▦", hint: "запланированные дела и идеи" },
-        { id: "anytime", title: "В любое время", icon: "▤", hint: "можно сделать без точной даты" },
-        { id: "someday", title: "Когда-нибудь", icon: "▱", hint: "идеи на потом" },
         { id: "journal", title: "Журнал", icon: "☑", hint: "готовое и закрытое" },
         { id: "trash", title: "Корзина", icon: "⌫", hint: "удалённое, но ещё можно вернуть" }
       ];
@@ -3545,6 +3522,7 @@
 
       function normalizeNote(note) {
         if (!note.list) note.list = note.status === "done" ? "journal" : (note.status || "inbox");
+        if (["anytime", "someday"].includes(note.list)) note.list = "plans";
         if (typeof note.done !== "boolean") note.done = note.status === "done";
         if (typeof note.deleted !== "boolean") note.deleted = false;
         if (!("projectId" in note)) note.projectId = "";
@@ -3646,7 +3624,7 @@
             ? `<button class="btn secondary" type="button" data-note-restore="${escapeHtml(note.id)}">Вернуть</button><button class="delete-message" type="button" data-note-destroy="${escapeHtml(note.id)}">Удалить навсегда</button>`
             : note.done
               ? `<button class="btn secondary" type="button" data-note-list="inbox" data-note-id="${escapeHtml(note.id)}">Вернуть во входящие</button><button class="delete-message" type="button" data-note-delete="${escapeHtml(note.id)}">В корзину</button>`
-              : `<button class="btn secondary" type="button" data-note-complete="${escapeHtml(note.id)}">Готово</button><button class="btn secondary" type="button" data-note-list="today" data-note-id="${escapeHtml(note.id)}">Сегодня</button><button class="btn secondary" type="button" data-note-list="someday" data-note-id="${escapeHtml(note.id)}">Когда-нибудь</button><button class="delete-message" type="button" data-note-delete="${escapeHtml(note.id)}">В корзину</button>`;
+              : `<button class="btn secondary" type="button" data-note-complete="${escapeHtml(note.id)}">Готово</button><button class="btn secondary" type="button" data-note-list="today" data-note-id="${escapeHtml(note.id)}">Сегодня</button><button class="btn secondary" type="button" data-note-list="plans" data-note-id="${escapeHtml(note.id)}">В планы</button><button class="delete-message" type="button" data-note-delete="${escapeHtml(note.id)}">В корзину</button>`;
           row.innerHTML = `<button class="things-check ${note.done ? "done" : ""}" type="button" data-note-complete="${escapeHtml(note.id)}">${note.done ? "✓" : ""}</button><div><h3>${escapeHtml(note.title)}</h3><p class="muted">${escapeHtml(note.text || "")}${project ? ` · ${escapeHtml(project.title)}` : ""}${note.createdAt ? ` · ${escapeHtml(note.createdAt)}` : ""}</p></div><div class="action-row">${actions}</div>`;
           list.appendChild(row);
         });
