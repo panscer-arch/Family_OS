@@ -2099,6 +2099,13 @@
               <p class="muted" style="margin-top: 12px">Пока это встроенный шаблон-генератор. Потом можно подключить настоящий API.</p>
             </article>
             <article class="card" style="margin-top: 18px">
+              <div class="card-title">
+                <div><h2>Идеи на месяц</h2><p class="muted" style="margin-top: 6px">30 тем: каждый день можно взять одну и сразу сделать из неё ролик.</p></div>
+                <span class="pill peach" id="monthIdeasCount">30 идей</span>
+              </div>
+              <div class="activity" id="monthContentIdeas"></div>
+            </article>
+            <article class="card" style="margin-top: 18px">
               <div class="card-title"><h2>Архив роликов</h2><span class="pill" id="contentArchiveCount">0</span></div>
               <div class="activity" id="contentArchive"></div>
             </article>
@@ -2946,12 +2953,71 @@
         ].join("\n");
       }
 
+      function defaultMonthVideoIdeas() {
+        return [
+          ["День 1", "Как я планирую свой день", "план, утро, рабочее место"],
+          ["День 2", "Что я делаю утром, чтобы не тупить", "подъём, завтрак, настрой"],
+          ["День 3", "Разбираю одну маленькую зону в комнате", "до/после, порядок"],
+          ["День 4", "Мой GPT + вайбкодинг день", "экран, процесс, результат"],
+          ["День 5", "Как я придумываю идею для ролика", "замысел, сценарий, кадры"],
+          ["День 6", "Что я ем на завтрак, когда лень думать", "еда, быстро, уютно"],
+          ["День 7", "Неделя: что получилось и что не получилось", "итоги, честно, планы"],
+          ["День 8", "Мини-челлендж: 30 минут без отвлечений", "таймер, фокус, результат"],
+          ["День 9", "Как я снимаю ролик с нуля", "сценарий, съёмка, монтаж"],
+          ["День 10", "Моя любимая штука в комнате", "история предмета, почему нравится"],
+          ["День 11", "До/после: рабочий стол", "разбор, порядок, красота"],
+          ["День 12", "Что я читаю и зачем", "книга, мысль, вывод"],
+          ["День 13", "Один навык, который я хочу прокачать", "обучение, попытка, вывод"],
+          ["День 14", "Мой день без хаоса", "план, чек-лист, спокойствие"],
+          ["День 15", "Как я выбираю, что снять сегодня", "идеи, выбор, сценарий"],
+          ["День 16", "Показываю процесс монтажа", "нарезка, музыка, субтитры"],
+          ["День 17", "Ошибка дня и чему она научила", "честно, короткий вывод"],
+          ["День 18", "Что заказать или приготовить на обед", "еда, выбор, настроение"],
+          ["День 19", "Одна полезная привычка на день", "маленький шаг, повтор"],
+          ["День 20", "Как я делаю обложку для видео", "кадр, текст, эмоция"],
+          ["День 21", "Три вещи, которые сделали день лучше", "итоги, настроение"],
+          ["День 22", "Пробую новый формат ролика", "эксперимент, результат"],
+          ["День 23", "Как я убираю вещи без паники", "сортировка, порядок"],
+          ["День 24", "Мой мини-проект в кодинге", "идея, код, что получилось"],
+          ["День 25", "Что я делаю, когда не хочется ничего", "мягкий старт, маленькая задача"],
+          ["День 26", "Снимаю ролик за 20 минут", "таймер, процесс, результат"],
+          ["День 27", "Мой вечерний ритуал", "книга, отдых, сон"],
+          ["День 28", "Самая полезная находка недели", "вещь, сервис, мысль"],
+          ["День 29", "Что я хочу улучшить в следующем месяце", "планы, рост"],
+          ["День 30", "Итоги месяца в 30 секундах", "лучшие моменты, вывод"]
+        ].map(([day, title, note], index) => ({ id: `month-video-${index + 1}`, day, title, note, done: false }));
+      }
+
+      function ensureMonthVideoIdeas() {
+        if (!Array.isArray(contentWorkspace.monthIdeas) || !contentWorkspace.monthIdeas.length) {
+          contentWorkspace.monthIdeas = defaultMonthVideoIdeas();
+        }
+        return contentWorkspace.monthIdeas;
+      }
+
+      function renderMonthVideoIdeas() {
+        const list = document.getElementById("monthContentIdeas");
+        const count = document.getElementById("monthIdeasCount");
+        if (!list) return;
+        const ideas = ensureMonthVideoIdeas();
+        const done = ideas.filter((idea) => idea.done).length;
+        if (count) count.textContent = `${done} / ${ideas.length} снято`;
+        list.innerHTML = "";
+        ideas.forEach((idea) => {
+          const row = document.createElement("div");
+          row.className = `activity-item ${idea.done ? "status-done" : ""}`;
+          row.innerHTML = `<span class="mini-icon">${idea.done ? "✓" : escapeHtml(String(idea.day).replace("День ", ""))}</span><div><h3>${escapeHtml(idea.title)}</h3><p class="muted">${escapeHtml(idea.day)} · ${escapeHtml(idea.note)}</p></div><button class="btn secondary" type="button" data-use-month-idea="${escapeHtml(idea.id)}">Взять</button><button class="delete-message" type="button" data-done-month-idea="${escapeHtml(idea.id)}">${idea.done ? "Вернуть" : "Снято"}</button>`;
+          list.appendChild(row);
+        });
+      }
+
       function renderContentWorkspace() {
         const statusBadge = document.getElementById("contentStatusBadge");
         const current = document.getElementById("currentContentCard");
         const archive = document.getElementById("contentArchive");
         const archiveCount = document.getElementById("contentArchiveCount");
         if (!current || !archive) return;
+        ensureMonthVideoIdeas();
         if (statusBadge) statusBadge.textContent = contentWorkspace.status || "идея";
         const formMap = {
           contentTitleInput: contentWorkspace.title || "",
@@ -2983,6 +3049,7 @@
         if (archiveCount) archiveCount.textContent = String(items.length);
         if (!items.length) {
           archive.innerHTML = `<div class="onboarding-card"><h3>Архив пуст</h3><p class="muted">Когда ролик готов, отправьте его в архив.</p></div>`;
+          renderMonthVideoIdeas();
           return;
         }
         items.forEach((item) => {
@@ -2991,6 +3058,7 @@
           row.innerHTML = `<span class="mini-icon">✓</span><div><h3>${escapeHtml(item.title)}</h3><p class="muted">${escapeHtml(item.date)} · ${escapeHtml(item.topic || "без темы")}${item.script ? " · сценарий есть" : ""}</p><div class="task-actions">${contentLink("ссылка", item.publishedUrl)}</div></div>`;
           archive.appendChild(row);
         });
+        renderMonthVideoIdeas();
       }
 
       document.getElementById("contentForm")?.addEventListener("submit", (event) => {
@@ -3029,6 +3097,32 @@
         renderContentWorkspace();
         saveState();
         showNotice("Сценарий сгенерирован.");
+      });
+
+      document.getElementById("monthContentIdeas")?.addEventListener("click", (event) => {
+        const useButton = event.target.closest("[data-use-month-idea]");
+        const doneButton = event.target.closest("[data-done-month-idea]");
+        const ideas = ensureMonthVideoIdeas();
+        if (useButton) {
+          const idea = ideas.find((item) => item.id === useButton.dataset.useMonthIdea);
+          if (!idea) return;
+          contentWorkspace.title = idea.title;
+          contentWorkspace.topic = idea.note;
+          contentWorkspace.status = "идея";
+          const scriptIdea = document.getElementById("scriptIdeaInput");
+          if (scriptIdea) scriptIdea.value = idea.title;
+          renderContentWorkspace();
+          saveState();
+          showNotice("Идея добавлена в текущий ролик.");
+          return;
+        }
+        if (doneButton) {
+          const idea = ideas.find((item) => item.id === doneButton.dataset.doneMonthIdea);
+          if (!idea) return;
+          idea.done = !idea.done;
+          renderMonthVideoIdeas();
+          saveState();
+        }
       });
 
       document.getElementById("archiveContentVideo")?.addEventListener("click", () => {
