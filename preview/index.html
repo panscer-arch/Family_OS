@@ -1622,7 +1622,7 @@
         width: 100%;
         min-height: 34px;
         display: grid;
-        grid-template-columns: 24px 1fr auto;
+        grid-template-columns: 24px 1fr auto auto;
         align-items: center;
         gap: 10px;
         border: 0;
@@ -1634,6 +1634,28 @@
         font-weight: 760;
         text-align: left;
         cursor: pointer;
+      }
+
+      .things-project-delete {
+        width: 24px;
+        height: 24px;
+        display: grid;
+        place-items: center;
+        border: 0;
+        border-radius: 7px;
+        background: transparent;
+        color: rgba(244, 247, 249, 0.34);
+        opacity: 0;
+        transition: 160ms ease;
+      }
+
+      .things-nav-row:hover .things-project-delete {
+        opacity: 1;
+      }
+
+      .things-project-delete:hover {
+        background: rgba(255, 95, 87, 0.14);
+        color: #ff8d86;
       }
 
       .things-nav-row:hover {
@@ -3589,11 +3611,12 @@
             projectsList.innerHTML = `<div class="muted" style="padding: 8px; font-size: 14px">Проектов пока нет</div>`;
           } else {
             noteProjects.forEach((project) => {
-              const row = document.createElement("button");
+              const row = document.createElement("div");
               row.className = `things-nav-row${activeNotesView === `project:${project.id}` ? " active" : ""}`;
-              row.type = "button";
+              row.role = "button";
+              row.tabIndex = 0;
               row.dataset.noteProject = project.id;
-              row.innerHTML = `<span class="things-icon" style="color:#98a1aa">□</span><span>${escapeHtml(project.title)}</span><span class="things-count">${noteCount(`project:${project.id}`)}</span>`;
+              row.innerHTML = `<span class="things-icon" style="color:#98a1aa">□</span><span>${escapeHtml(project.title)}</span><span class="things-count">${noteCount(`project:${project.id}`)}</span><button class="things-project-delete" type="button" data-delete-project="${escapeHtml(project.id)}" aria-label="Удалить проект ${escapeHtml(project.title)}">×</button>`;
               projectsList.appendChild(row);
             });
           }
@@ -3663,9 +3686,39 @@
       });
 
       document.getElementById("notesProjects")?.addEventListener("click", (event) => {
+        const deleteButton = event.target.closest("[data-delete-project]");
+        if (deleteButton) {
+          const projectId = deleteButton.dataset.deleteProject;
+          const project = noteProjects.find((item) => item.id === projectId);
+          if (!project) return;
+          if (!window.confirm(`Удалить проект «${project.title}»? Заметки из проекта переедут во Входящие.`)) return;
+          notesItems.forEach((note) => {
+            if (note.projectId === projectId) {
+              note.projectId = "";
+              note.list = "inbox";
+            }
+          });
+          const index = noteProjects.findIndex((item) => item.id === projectId);
+          if (index >= 0) noteProjects.splice(index, 1);
+          if (activeNotesView === `project:${projectId}`) activeNotesView = "inbox";
+          renderNotes();
+          saveState();
+          showNotice("Проект удалён, записи перенесены во Входящие.");
+          return;
+        }
         const button = event.target.closest("[data-note-project]");
         if (!button) return;
         activeNotesView = `project:${button.dataset.noteProject}`;
+        renderNotes();
+        saveState();
+      });
+
+      document.getElementById("notesProjects")?.addEventListener("keydown", (event) => {
+        if (!["Enter", " "].includes(event.key)) return;
+        const row = event.target.closest("[data-note-project]");
+        if (!row) return;
+        event.preventDefault();
+        activeNotesView = `project:${row.dataset.noteProject}`;
         renderNotes();
         saveState();
       });
