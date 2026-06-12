@@ -873,6 +873,13 @@
         color: var(--blue);
       }
 
+      .action-row {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 8px;
+      }
+
       .children-grid {
         grid-template-columns: repeat(3, minmax(0, 1fr));
       }
@@ -1516,7 +1523,8 @@
       @media (max-width: 820px) {
         .auth-shell,
         .auth-role-grid,
-        .form-row {
+        .form-row,
+        .notes-workspace {
           grid-template-columns: 1fr;
         }
 
@@ -1552,6 +1560,25 @@
         align-items: center;
         justify-content: space-between;
         gap: 18px;
+      }
+
+      .note-list-row {
+        width: 100%;
+        border-radius: 14px;
+        color: var(--soft);
+        cursor: pointer;
+        text-align: left;
+      }
+
+      .note-list-row.active {
+        border-color: rgba(143, 199, 255, 0.28);
+        background: rgba(143, 199, 255, 0.12);
+        color: white;
+      }
+
+      .notes-workspace {
+        grid-template-columns: minmax(220px, 300px) minmax(0, 1fr);
+        align-items: start;
       }
 
       .toggle {
@@ -2152,33 +2179,45 @@
 
           <section class="page" id="notes">
             <div class="page-head">
-              <div><p class="eyebrow">Notes</p><h1>Заметки</h1><p class="muted" style="margin-top: 8px">Лёгкое место для мыслей, дел и идей: быстро записать, разобрать сегодня или отложить.</p></div>
+              <div><p class="eyebrow">Things</p><h1>Заметки</h1><p class="muted" style="margin-top: 8px">Входящие, журнал, корзина и проекты. Быстро записать мысль и потом разложить.</p></div>
             </div>
-            <div class="grid cols-2">
+            <div class="grid notes-workspace">
               <article class="card">
-                <div class="card-title"><div><h2>Быстрая запись</h2><p class="muted" style="margin-top: 6px">Как inbox: записала мысль, потом решила, куда её.</p></div><span class="pill blue" id="notesCount">0</span></div>
-                <form class="grid" id="noteForm" style="margin-top: 14px">
-                  <input class="field" id="noteTitleInput" placeholder="Что записать?" required />
-                  <textarea class="field" id="noteTextInput" placeholder="Детали, ссылка, мысль или маленький план"></textarea>
-                  <div class="form-row">
-                    <select id="noteStatusInput">
-                      <option value="inbox">входящие</option>
-                      <option value="today">сегодня</option>
-                      <option value="someday">потом</option>
-                    </select>
-                    <input class="field" id="noteTagInput" placeholder="Тег: ролик, еда, план" />
-                  </div>
-                  <button class="btn" type="submit">Добавить заметку</button>
+                <div class="card-title"><h2>Списки</h2><span class="pill blue" id="notesTotalCount">0</span></div>
+                <div class="activity" id="notesSidebar">
+                  <button class="settings-row note-list-row active" type="button" data-note-view="inbox"><span>▣ Входящие</span><span class="pill" data-note-count="inbox">0</span></button>
+                  <button class="settings-row note-list-row" type="button" data-note-view="today"><span>★ Сегодня</span><span class="pill" data-note-count="today">0</span></button>
+                  <button class="settings-row note-list-row" type="button" data-note-view="plans"><span>▦ Планы</span><span class="pill" data-note-count="plans">0</span></button>
+                  <button class="settings-row note-list-row" type="button" data-note-view="anytime"><span>▤ В любое время</span><span class="pill" data-note-count="anytime">0</span></button>
+                  <button class="settings-row note-list-row" type="button" data-note-view="someday"><span>▱ Когда-нибудь</span><span class="pill" data-note-count="someday">0</span></button>
+                  <button class="settings-row note-list-row" type="button" data-note-view="journal"><span>☑ Журнал</span><span class="pill" data-note-count="journal">0</span></button>
+                  <button class="settings-row note-list-row" type="button" data-note-view="trash"><span>🗑 Корзина</span><span class="pill" data-note-count="trash">0</span></button>
+                </div>
+                <div class="card-title" style="margin-top: 18px"><h2>Проекты</h2><span class="pill peach" id="notesProjectCount">0</span></div>
+                <div class="activity" id="notesProjects"></div>
+                <form class="grid" id="noteProjectForm" style="margin-top: 14px">
+                  <input class="field" id="noteProjectInput" placeholder="Новый проект" required />
+                  <button class="btn secondary" type="submit">Создать проект</button>
                 </form>
               </article>
               <article class="card">
-                <div class="card-title"><h2>Список</h2><span class="pill peach" id="notesViewCount">0</span></div>
-                <div class="segmented" id="noteFilters" style="margin-top: 0">
-                  <button class="segment-btn active" type="button" data-note-filter="inbox">Входящие</button>
-                  <button class="segment-btn" type="button" data-note-filter="today">Сегодня</button>
-                  <button class="segment-btn" type="button" data-note-filter="someday">Потом</button>
-                  <button class="segment-btn" type="button" data-note-filter="done">Готово</button>
-                </div>
+                <div class="card-title"><h2 id="notesViewTitle">Входящие</h2><span class="pill peach" id="notesViewCount">0</span></div>
+                <form class="grid" id="noteForm" style="margin: 10px 0 16px">
+                  <input class="field" id="noteTitleInput" placeholder="Новая запись" required />
+                  <div class="form-row">
+                    <select id="noteDestinationInput">
+                      <option value="inbox">Входящие</option>
+                      <option value="today">Сегодня</option>
+                      <option value="plans">Планы</option>
+                      <option value="anytime">В любое время</option>
+                      <option value="someday">Когда-нибудь</option>
+                    </select>
+                    <select id="noteProjectSelect"><option value="">Без проекта</option></select>
+                  </div>
+                  <textarea class="field" id="noteTextInput" placeholder="Заметка, ссылка, мысль или детали"></textarea>
+                  <button class="btn" type="submit">Добавить</button>
+                </form>
+                <button class="btn secondary" id="emptyTrashButton" type="button" style="display:none; margin-bottom: 14px">Очистить корзину</button>
                 <div class="activity" id="notesList" style="margin-top: 14px"></div>
               </article>
             </div>
@@ -2575,10 +2614,14 @@
         { id: "food-order-default", title: "Роллы / пицца / боул", type: "заказать", time: "обед", note: "когда нет сил готовить", done: false }
       ];
       const notesItems = savedState.notesItems || [
-        { id: "note-default-1", title: "Идея для ролика", text: "Записать короткую мысль и потом перенести в Контент.", status: "inbox", tag: "контент", createdAt: new Date().toLocaleDateString("ru-RU") },
-        { id: "note-default-2", title: "Что сделать сегодня", text: "Выбрать одну маленькую вещь и довести до конца.", status: "today", tag: "день", createdAt: new Date().toLocaleDateString("ru-RU") }
+        { id: "note-default-1", title: "Идея для ролика", text: "Записать короткую мысль и потом перенести в Контент.", list: "inbox", projectId: "", done: false, deleted: false, createdAt: new Date().toLocaleDateString("ru-RU") },
+        { id: "note-default-2", title: "Что сделать сегодня", text: "Выбрать одну маленькую вещь и довести до конца.", list: "today", projectId: "", done: false, deleted: false, createdAt: new Date().toLocaleDateString("ru-RU") }
       ];
-      let notesFilter = savedState.notesFilter || "inbox";
+      const noteProjects = savedState.noteProjects || [
+        { id: "project-content", title: "Контент", createdAt: new Date().toLocaleDateString("ru-RU") },
+        { id: "project-life", title: "Быт", createdAt: new Date().toLocaleDateString("ru-RU") }
+      ];
+      let activeNotesView = savedState.activeNotesView || savedState.notesFilter || "inbox";
 
       function collectLaneHtml() {
         const lanes = {};
@@ -2599,7 +2642,8 @@
           contentWorkspace,
           foodMeals,
           notesItems,
-          notesFilter,
+          noteProjects,
+          activeNotesView,
           authProfile,
           onboarded: Boolean(authProfile),
           planStore: typeof planStore !== "undefined" ? planStore : savedState.planStore,
@@ -3263,44 +3307,118 @@
         }
       });
 
-      function noteStatusLabel(status) {
-        return {
-          inbox: "входящие",
-          today: "сегодня",
-          someday: "потом",
-          done: "готово"
-        }[status] || "входящие";
+      const noteViews = [
+        { id: "inbox", title: "Входящие", icon: "▣", hint: "быстро записать и потом разобрать" },
+        { id: "today", title: "Сегодня", icon: "★", hint: "только то, что важно сделать сегодня" },
+        { id: "plans", title: "Планы", icon: "▦", hint: "запланированные дела и идеи" },
+        { id: "anytime", title: "В любое время", icon: "▤", hint: "можно сделать без точной даты" },
+        { id: "someday", title: "Когда-нибудь", icon: "▱", hint: "идеи на потом" },
+        { id: "journal", title: "Журнал", icon: "☑", hint: "готовое и закрытое" },
+        { id: "trash", title: "Корзина", icon: "⌫", hint: "удалённое, но ещё можно вернуть" }
+      ];
+
+      const noteViewMap = Object.fromEntries(noteViews.map((view) => [view.id, view]));
+
+      function normalizeNote(note) {
+        if (!note.list) note.list = note.status === "done" ? "journal" : (note.status || "inbox");
+        if (typeof note.done !== "boolean") note.done = note.status === "done";
+        if (typeof note.deleted !== "boolean") note.deleted = false;
+        if (!("projectId" in note)) note.projectId = "";
+        return note;
       }
 
-      function noteStatusTone(status) {
-        return {
-          inbox: "blue",
-          today: "peach",
-          someday: "rose",
-          done: "mint"
-        }[status] || "blue";
+      function noteCount(viewId) {
+        return notesItems.filter((note) => noteMatchesView(normalizeNote(note), viewId)).length;
+      }
+
+      function noteMatchesView(note, viewId) {
+        if (viewId.startsWith("project:")) {
+          return !note.deleted && !note.done && note.projectId === viewId.replace("project:", "");
+        }
+        if (viewId === "trash") return note.deleted;
+        if (viewId === "journal") return !note.deleted && note.done;
+        return !note.deleted && !note.done && note.list === viewId && !note.projectId;
+      }
+
+      function noteViewTitle(viewId) {
+        if (viewId.startsWith("project:")) {
+          return noteProjects.find((project) => project.id === viewId.replace("project:", ""))?.title || "Проект";
+        }
+        return noteViewMap[viewId]?.title || "Входящие";
+      }
+
+      function renderNoteDestinations() {
+        const destination = document.getElementById("noteDestinationInput");
+        const projectSelect = document.getElementById("noteProjectSelect");
+        if (destination) {
+          destination.innerHTML = noteViews
+            .filter((view) => !["journal", "trash"].includes(view.id))
+            .map((view) => `<option value="${escapeHtml(view.id)}">${escapeHtml(view.title)}</option>`)
+            .join("");
+        }
+        if (projectSelect) {
+          projectSelect.innerHTML = `<option value="">Без проекта</option>${noteProjects.map((project) => `<option value="${escapeHtml(project.id)}">${escapeHtml(project.title)}</option>`).join("")}`;
+        }
       }
 
       function renderNotes() {
         const list = document.getElementById("notesList");
-        const total = document.getElementById("notesCount");
+        const total = document.getElementById("notesTotalCount");
         const viewCount = document.getElementById("notesViewCount");
+        const title = document.getElementById("notesViewTitle");
+        const projectsList = document.getElementById("notesProjects");
+        const projectCount = document.getElementById("notesProjectCount");
+        const emptyTrashButton = document.getElementById("emptyTrashButton");
         if (!list) return;
-        document.querySelectorAll("[data-note-filter]").forEach((button) => {
-          button.classList.toggle("active", button.dataset.noteFilter === notesFilter);
+        notesItems.forEach(normalizeNote);
+        renderNoteDestinations();
+
+        noteViews.forEach((view) => {
+          const button = document.querySelector(`[data-note-view="${view.id}"]`);
+          const count = document.querySelector(`[data-note-count="${view.id}"]`);
+          button?.classList.toggle("active", activeNotesView === view.id);
+          if (count) count.textContent = noteCount(view.id);
         });
-        const filtered = notesItems.filter((note) => note.status === notesFilter);
-        if (total) total.textContent = `${notesItems.length} всего`;
-        if (viewCount) viewCount.textContent = `${filtered.length} ${noteStatusLabel(notesFilter)}`;
+
+        if (projectsList) {
+          projectsList.innerHTML = "";
+          if (!noteProjects.length) {
+            projectsList.innerHTML = `<div class="onboarding-card"><h3>Проектов пока нет</h3><p class="muted">Создайте проект для контента, быта или большой идеи.</p></div>`;
+          } else {
+            noteProjects.forEach((project) => {
+              const row = document.createElement("button");
+              row.className = `settings-row note-list-row${activeNotesView === `project:${project.id}` ? " active" : ""}`;
+              row.type = "button";
+              row.dataset.noteProject = project.id;
+              row.innerHTML = `<span>□ ${escapeHtml(project.title)}</span><span class="pill">${noteCount(`project:${project.id}`)}</span>`;
+              projectsList.appendChild(row);
+            });
+          }
+        }
+
+        const currentItems = notesItems.filter((note) => noteMatchesView(normalizeNote(note), activeNotesView));
+        if (total) total.textContent = `${notesItems.filter((note) => !normalizeNote(note).deleted).length}`;
+        if (projectCount) projectCount.textContent = noteProjects.length;
+        if (viewCount) viewCount.textContent = currentItems.length;
+        if (title) title.textContent = noteViewTitle(activeNotesView);
+        if (emptyTrashButton) emptyTrashButton.style.display = activeNotesView === "trash" && currentItems.length ? "inline-flex" : "none";
+
         list.innerHTML = "";
-        if (!filtered.length) {
-          list.innerHTML = `<div class="onboarding-card"><h3>Здесь пока пусто</h3><p class="muted">Добавьте заметку или переключите список.</p></div>`;
+        if (!currentItems.length) {
+          const hint = activeNotesView.startsWith("project:") ? "Добавьте первую задачу в этот проект." : (noteViewMap[activeNotesView]?.hint || "Добавьте первую запись.");
+          list.innerHTML = `<div class="onboarding-card"><h3>Пока пусто</h3><p class="muted">${escapeHtml(hint)}</p></div>`;
           return;
         }
-        filtered.forEach((note) => {
+        currentItems.forEach((note) => {
+          const project = note.projectId ? noteProjects.find((item) => item.id === note.projectId) : null;
           const row = document.createElement("div");
-          row.className = `activity-item status-${noteStatusTone(note.status)}`;
-          row.innerHTML = `<span class="mini-icon">${note.status === "done" ? "✓" : "•"}</span><div><h3>${escapeHtml(note.title)}</h3><p class="muted">${escapeHtml(note.text || "без деталей")} · ${escapeHtml(note.tag || "без тега")} · ${escapeHtml(note.createdAt || "")}</p></div><span class="pill ${noteStatusTone(note.status)}">${escapeHtml(noteStatusLabel(note.status))}</span><button class="btn secondary" type="button" data-note-status="today" data-note-id="${escapeHtml(note.id)}">Сегодня</button><button class="btn secondary" type="button" data-note-status="someday" data-note-id="${escapeHtml(note.id)}">Потом</button><button class="btn secondary" type="button" data-note-status="done" data-note-id="${escapeHtml(note.id)}">Готово</button><button class="delete-message" type="button" data-delete-note="${escapeHtml(note.id)}">Удалить</button>`;
+          row.className = `activity-item status-${note.done ? "mint" : "blue"}`;
+          const actions = note.deleted
+            ? `<button class="btn secondary" type="button" data-note-restore="${escapeHtml(note.id)}">Вернуть</button><button class="delete-message" type="button" data-note-destroy="${escapeHtml(note.id)}">Удалить навсегда</button>`
+            : note.done
+              ? `<button class="btn secondary" type="button" data-note-list="inbox" data-note-id="${escapeHtml(note.id)}">Вернуть во входящие</button><button class="delete-message" type="button" data-note-delete="${escapeHtml(note.id)}">В корзину</button>`
+              : `<button class="btn secondary" type="button" data-note-complete="${escapeHtml(note.id)}">Готово</button><button class="btn secondary" type="button" data-note-list="today" data-note-id="${escapeHtml(note.id)}">Сегодня</button><button class="btn secondary" type="button" data-note-list="someday" data-note-id="${escapeHtml(note.id)}">Когда-нибудь</button><button class="delete-message" type="button" data-note-delete="${escapeHtml(note.id)}">В корзину</button>`;
+          row.innerHTML = `<span class="mini-icon">${note.done ? "✓" : "•"}</span><div><h3>${escapeHtml(note.title)}</h3><p class="muted">${escapeHtml(note.text || "без деталей")}${project ? ` · ${escapeHtml(project.title)}` : ""} · ${escapeHtml(note.createdAt || "")}</p></div><div class="action-row">${actions}</div>`;
           list.appendChild(row);
         });
       }
@@ -3309,49 +3427,110 @@
         event.preventDefault();
         const title = document.getElementById("noteTitleInput").value.trim();
         if (!title) return;
+        const selectedProject = document.getElementById("noteProjectSelect")?.value || "";
+        const selectedList = document.getElementById("noteDestinationInput")?.value || "inbox";
         notesItems.unshift({
           id: `note-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
           title,
           text: document.getElementById("noteTextInput").value.trim(),
-          status: document.getElementById("noteStatusInput").value,
-          tag: document.getElementById("noteTagInput").value.trim(),
+          list: selectedProject ? "inbox" : selectedList,
+          projectId: selectedProject,
+          done: false,
+          deleted: false,
           createdAt: new Date().toLocaleDateString("ru-RU")
         });
-        notesFilter = document.getElementById("noteStatusInput").value;
+        activeNotesView = selectedProject ? `project:${selectedProject}` : selectedList;
         document.getElementById("noteTitleInput").value = "";
         document.getElementById("noteTextInput").value = "";
-        document.getElementById("noteTagInput").value = "";
         renderNotes();
         saveState();
-        showNotice("Заметка добавлена.");
+        showNotice("Запись добавлена.");
       });
 
-      document.getElementById("noteFilters")?.addEventListener("click", (event) => {
-        const button = event.target.closest("[data-note-filter]");
+      document.getElementById("notesSidebar")?.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-note-view]");
         if (!button) return;
-        notesFilter = button.dataset.noteFilter;
+        activeNotesView = button.dataset.noteView;
         renderNotes();
         saveState();
+      });
+
+      document.getElementById("notesProjects")?.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-note-project]");
+        if (!button) return;
+        activeNotesView = `project:${button.dataset.noteProject}`;
+        renderNotes();
+        saveState();
+      });
+
+      document.getElementById("noteProjectForm")?.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const input = document.getElementById("noteProjectInput");
+        const title = input.value.trim();
+        if (!title) return;
+        const project = { id: `project-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, title, createdAt: new Date().toLocaleDateString("ru-RU") };
+        noteProjects.unshift(project);
+        activeNotesView = `project:${project.id}`;
+        input.value = "";
+        renderNotes();
+        saveState();
+        showNotice("Проект создан.");
       });
 
       document.getElementById("notesList")?.addEventListener("click", (event) => {
-        const statusButton = event.target.closest("[data-note-status]");
-        const deleteButton = event.target.closest("[data-delete-note]");
-        if (statusButton) {
-          const note = notesItems.find((item) => item.id === statusButton.dataset.noteId);
+        const complete = event.target.closest("[data-note-complete]");
+        const move = event.target.closest("[data-note-list]");
+        const remove = event.target.closest("[data-note-delete]");
+        const restore = event.target.closest("[data-note-restore]");
+        const destroy = event.target.closest("[data-note-destroy]");
+        if (complete) {
+          const note = notesItems.find((item) => item.id === complete.dataset.noteComplete);
           if (!note) return;
-          note.status = statusButton.dataset.noteStatus;
+          note.done = true;
+          note.deleted = false;
+          note.projectId = "";
+          activeNotesView = "journal";
+        }
+        if (move) {
+          const note = notesItems.find((item) => item.id === move.dataset.noteId);
+          if (!note) return;
+          note.list = move.dataset.noteList;
+          note.done = false;
+          note.deleted = false;
+          note.projectId = "";
+          activeNotesView = note.list;
+        }
+        if (remove) {
+          const note = notesItems.find((item) => item.id === remove.dataset.noteDelete);
+          if (!note) return;
+          note.deleted = true;
+          note.done = false;
+        }
+        if (restore) {
+          const note = notesItems.find((item) => item.id === restore.dataset.noteRestore);
+          if (!note) return;
+          note.deleted = false;
+          note.done = false;
+          note.list = "inbox";
+          activeNotesView = "inbox";
+        }
+        if (destroy) {
+          const index = notesItems.findIndex((item) => item.id === destroy.dataset.noteDestroy);
+          if (index >= 0) notesItems.splice(index, 1);
+        }
+        if (complete || move || remove || restore || destroy) {
           renderNotes();
           saveState();
-          return;
         }
-        if (deleteButton) {
-          const index = notesItems.findIndex((item) => item.id === deleteButton.dataset.deleteNote);
-          if (index < 0) return;
-          notesItems.splice(index, 1);
-          renderNotes();
-          saveState();
+      });
+
+      document.getElementById("emptyTrashButton")?.addEventListener("click", () => {
+        for (let i = notesItems.length - 1; i >= 0; i -= 1) {
+          if (normalizeNote(notesItems[i]).deleted) notesItems.splice(i, 1);
         }
+        renderNotes();
+        saveState();
+        showNotice("Корзина очищена.");
       });
 
       document.addEventListener("invalid", (event) => {
