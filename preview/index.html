@@ -107,7 +107,7 @@
         display: none !important;
       }
 
-      .plan-only .nav-btn:not([data-route="week"]):not([data-route="content"]):not([data-route="food"]):not([data-route="saved"]),
+      .plan-only .nav-btn:not([data-route="week"]):not([data-route="content"]):not([data-route="food"]):not([data-route="notes"]):not([data-route="saved"]),
       .plan-only .sidebar-card,
       .plan-only .search,
       .plan-only .top-actions,
@@ -1774,6 +1774,10 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 3v7a4 4 0 0 0 4 4v7"/><path d="M4 7h8"/><path d="M8 3v18"/><path d="M19 3v18"/><path d="M15 3h4a3 3 0 0 1 0 6h-4Z"/></svg>
             Еда
           </button>
+          <button class="nav-btn" data-route="notes" data-title="Заметки">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M8 8h8"/><path d="M8 12h6"/><path d="M8 16h4"/></svg>
+            Заметки
+          </button>
           <button class="nav-btn parent-only" data-route="plan" data-title="План дня" style="display:none">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
             Задачи дня
@@ -2146,6 +2150,40 @@
             </div>
           </section>
 
+          <section class="page" id="notes">
+            <div class="page-head">
+              <div><p class="eyebrow">Notes</p><h1>Заметки</h1><p class="muted" style="margin-top: 8px">Лёгкое место для мыслей, дел и идей: быстро записать, разобрать сегодня или отложить.</p></div>
+            </div>
+            <div class="grid cols-2">
+              <article class="card">
+                <div class="card-title"><div><h2>Быстрая запись</h2><p class="muted" style="margin-top: 6px">Как inbox: записала мысль, потом решила, куда её.</p></div><span class="pill blue" id="notesCount">0</span></div>
+                <form class="grid" id="noteForm" style="margin-top: 14px">
+                  <input class="field" id="noteTitleInput" placeholder="Что записать?" required />
+                  <textarea class="field" id="noteTextInput" placeholder="Детали, ссылка, мысль или маленький план"></textarea>
+                  <div class="form-row">
+                    <select id="noteStatusInput">
+                      <option value="inbox">входящие</option>
+                      <option value="today">сегодня</option>
+                      <option value="someday">потом</option>
+                    </select>
+                    <input class="field" id="noteTagInput" placeholder="Тег: ролик, еда, план" />
+                  </div>
+                  <button class="btn" type="submit">Добавить заметку</button>
+                </form>
+              </article>
+              <article class="card">
+                <div class="card-title"><h2>Список</h2><span class="pill peach" id="notesViewCount">0</span></div>
+                <div class="segmented" id="noteFilters" style="margin-top: 0">
+                  <button class="segment-btn active" type="button" data-note-filter="inbox">Входящие</button>
+                  <button class="segment-btn" type="button" data-note-filter="today">Сегодня</button>
+                  <button class="segment-btn" type="button" data-note-filter="someday">Потом</button>
+                  <button class="segment-btn" type="button" data-note-filter="done">Готово</button>
+                </div>
+                <div class="activity" id="notesList" style="margin-top: 14px"></div>
+              </article>
+            </div>
+          </section>
+
           <section class="page" id="plan">
             <div class="page-head">
               <div><p class="eyebrow">День</p><h1>Задачи дня</h1><p class="muted" style="margin-top: 8px">Этот экран заполняется автоматически из недельного плана и выполненных задач.</p></div>
@@ -2479,7 +2517,7 @@
       let authProfile = SOLO_MODE ? { role: "solo", name: "Ева", familyName: "План Евы", inviteCode: "" } : (savedState.authProfile || null);
 
       function go(route) {
-        const publicRoutes = PLAN_ONLY_MODE ? ["week", "content", "food", "saved"] : (SOLO_MODE ? ["dashboard", "tasks", "children", "week", "reports", "saved"] : ["dashboard", "tasks", "children", "reports", "settings", "saved"]);
+        const publicRoutes = PLAN_ONLY_MODE ? ["week", "content", "food", "notes", "saved"] : (SOLO_MODE ? ["dashboard", "tasks", "children", "week", "reports", "notes", "saved"] : ["dashboard", "tasks", "children", "reports", "settings", "notes", "saved"]);
         if (!publicRoutes.includes(route)) route = PLAN_ONLY_MODE ? "week" : "dashboard";
         if (authProfile?.role === "child" && ["children", "reports", "settings"].includes(route)) {
           route = "dashboard";
@@ -2491,6 +2529,7 @@
         if (active) routeTitle.textContent = active.dataset.title;
         if (route === "content") renderContentWorkspace();
         if (route === "food") renderFoodMeals();
+        if (route === "notes") renderNotes();
         location.hash = route;
       }
 
@@ -2535,6 +2574,11 @@
         { id: "food-breakfast-default", title: "Омлет / яичница", type: "приготовить", time: "завтрак", note: "быстро и понятно", done: false },
         { id: "food-order-default", title: "Роллы / пицца / боул", type: "заказать", time: "обед", note: "когда нет сил готовить", done: false }
       ];
+      const notesItems = savedState.notesItems || [
+        { id: "note-default-1", title: "Идея для ролика", text: "Записать короткую мысль и потом перенести в Контент.", status: "inbox", tag: "контент", createdAt: new Date().toLocaleDateString("ru-RU") },
+        { id: "note-default-2", title: "Что сделать сегодня", text: "Выбрать одну маленькую вещь и довести до конца.", status: "today", tag: "день", createdAt: new Date().toLocaleDateString("ru-RU") }
+      ];
+      let notesFilter = savedState.notesFilter || "inbox";
 
       function collectLaneHtml() {
         const lanes = {};
@@ -2554,6 +2598,8 @@
           childStats,
           contentWorkspace,
           foodMeals,
+          notesItems,
+          notesFilter,
           authProfile,
           onboarded: Boolean(authProfile),
           planStore: typeof planStore !== "undefined" ? planStore : savedState.planStore,
@@ -3217,6 +3263,97 @@
         }
       });
 
+      function noteStatusLabel(status) {
+        return {
+          inbox: "входящие",
+          today: "сегодня",
+          someday: "потом",
+          done: "готово"
+        }[status] || "входящие";
+      }
+
+      function noteStatusTone(status) {
+        return {
+          inbox: "blue",
+          today: "peach",
+          someday: "rose",
+          done: "mint"
+        }[status] || "blue";
+      }
+
+      function renderNotes() {
+        const list = document.getElementById("notesList");
+        const total = document.getElementById("notesCount");
+        const viewCount = document.getElementById("notesViewCount");
+        if (!list) return;
+        document.querySelectorAll("[data-note-filter]").forEach((button) => {
+          button.classList.toggle("active", button.dataset.noteFilter === notesFilter);
+        });
+        const filtered = notesItems.filter((note) => note.status === notesFilter);
+        if (total) total.textContent = `${notesItems.length} всего`;
+        if (viewCount) viewCount.textContent = `${filtered.length} ${noteStatusLabel(notesFilter)}`;
+        list.innerHTML = "";
+        if (!filtered.length) {
+          list.innerHTML = `<div class="onboarding-card"><h3>Здесь пока пусто</h3><p class="muted">Добавьте заметку или переключите список.</p></div>`;
+          return;
+        }
+        filtered.forEach((note) => {
+          const row = document.createElement("div");
+          row.className = `activity-item status-${noteStatusTone(note.status)}`;
+          row.innerHTML = `<span class="mini-icon">${note.status === "done" ? "✓" : "•"}</span><div><h3>${escapeHtml(note.title)}</h3><p class="muted">${escapeHtml(note.text || "без деталей")} · ${escapeHtml(note.tag || "без тега")} · ${escapeHtml(note.createdAt || "")}</p></div><span class="pill ${noteStatusTone(note.status)}">${escapeHtml(noteStatusLabel(note.status))}</span><button class="btn secondary" type="button" data-note-status="today" data-note-id="${escapeHtml(note.id)}">Сегодня</button><button class="btn secondary" type="button" data-note-status="someday" data-note-id="${escapeHtml(note.id)}">Потом</button><button class="btn secondary" type="button" data-note-status="done" data-note-id="${escapeHtml(note.id)}">Готово</button><button class="delete-message" type="button" data-delete-note="${escapeHtml(note.id)}">Удалить</button>`;
+          list.appendChild(row);
+        });
+      }
+
+      document.getElementById("noteForm")?.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const title = document.getElementById("noteTitleInput").value.trim();
+        if (!title) return;
+        notesItems.unshift({
+          id: `note-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+          title,
+          text: document.getElementById("noteTextInput").value.trim(),
+          status: document.getElementById("noteStatusInput").value,
+          tag: document.getElementById("noteTagInput").value.trim(),
+          createdAt: new Date().toLocaleDateString("ru-RU")
+        });
+        notesFilter = document.getElementById("noteStatusInput").value;
+        document.getElementById("noteTitleInput").value = "";
+        document.getElementById("noteTextInput").value = "";
+        document.getElementById("noteTagInput").value = "";
+        renderNotes();
+        saveState();
+        showNotice("Заметка добавлена.");
+      });
+
+      document.getElementById("noteFilters")?.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-note-filter]");
+        if (!button) return;
+        notesFilter = button.dataset.noteFilter;
+        renderNotes();
+        saveState();
+      });
+
+      document.getElementById("notesList")?.addEventListener("click", (event) => {
+        const statusButton = event.target.closest("[data-note-status]");
+        const deleteButton = event.target.closest("[data-delete-note]");
+        if (statusButton) {
+          const note = notesItems.find((item) => item.id === statusButton.dataset.noteId);
+          if (!note) return;
+          note.status = statusButton.dataset.noteStatus;
+          renderNotes();
+          saveState();
+          return;
+        }
+        if (deleteButton) {
+          const index = notesItems.findIndex((item) => item.id === deleteButton.dataset.deleteNote);
+          if (index < 0) return;
+          notesItems.splice(index, 1);
+          renderNotes();
+          saveState();
+        }
+      });
+
       document.addEventListener("invalid", (event) => {
         const field = event.target;
         if (!(field instanceof HTMLInputElement || field instanceof HTMLTextAreaElement || field instanceof HTMLSelectElement)) return;
@@ -3864,6 +4001,7 @@
         document.querySelectorAll("#messages .activity-item").forEach(addDeleteHandler);
         updateMessageCount();
         renderFoodMeals();
+        renderNotes();
         updateLaneCounts();
         renderAuthProfile();
         updateReports();
