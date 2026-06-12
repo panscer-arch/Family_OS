@@ -1148,6 +1148,74 @@
         line-height: 1.35;
       }
 
+      .day-summary {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+
+      .summary-tile {
+        border: 1px solid rgba(255, 255, 255, 0.075);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.045);
+        padding: 14px;
+      }
+
+      .summary-tile strong {
+        display: block;
+        margin-top: 6px;
+        color: white;
+        font-size: 20px;
+      }
+
+      .content-pipeline {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .pipeline-step {
+        min-height: 82px;
+        border: 1px solid rgba(255, 255, 255, 0.075);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.045);
+        padding: 13px;
+        transition: 180ms ease;
+      }
+
+      .pipeline-step.active {
+        border-color: rgba(142, 230, 200, 0.42);
+        background: rgba(142, 230, 200, 0.1);
+      }
+
+      .pipeline-step.done {
+        border-color: rgba(119, 221, 151, 0.26);
+        background: rgba(119, 221, 151, 0.08);
+      }
+
+      .pipeline-step span {
+        display: inline-grid;
+        place-items: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--mint);
+        font-weight: 850;
+      }
+
+      .pipeline-step h3 {
+        margin-top: 10px;
+        font-size: 14px;
+      }
+
+      .quick-preset-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+      }
+
       .checklist {
         display: grid;
         gap: 10px;
@@ -1524,6 +1592,9 @@
         .auth-shell,
         .auth-role-grid,
         .form-row,
+        .day-summary,
+        .content-pipeline,
+        .quick-preset-grid,
         .notes-workspace,
         .things-app,
         .things-bottom-composer {
@@ -2302,6 +2373,12 @@
               <div class="card-title"><h2 id="weekRangeTitle">Неделя</h2><span class="pill blue">Ева</span></div>
               <div class="week-grid" id="weekGrid"></div>
             </div>
+            <div class="day-summary" id="selectedDaySummary">
+              <div class="summary-tile"><p class="muted">Пунктов в дне</p><strong id="summaryTotalItems">0</strong></div>
+              <div class="summary-tile"><p class="muted">Контент</p><strong id="summaryContentItems">0</strong></div>
+              <div class="summary-tile"><p class="muted">Дом / быт</p><strong id="summaryHomeItems">0</strong></div>
+              <div class="summary-tile"><p class="muted">Еда / режим</p><strong id="summaryRoutineItems">0</strong></div>
+            </div>
             <div class="grid cols-3">
               <article class="card">
                 <div class="card-title"><h2 id="dayEditorTitle">Пн 18 · Ева</h2><span class="pill" id="dayEditorDate">18 мая</span></div>
@@ -2322,9 +2399,19 @@
             <div class="page-head">
               <div><p class="eyebrow">Content</p><h1>Контент</h1><p class="muted" style="margin-top: 8px">Отдельное место для роликов Евы: идея, сценарий, съёмка, монтаж и ссылка на результат.</p></div>
             </div>
+            <article class="card" style="margin-bottom: 18px">
+              <div class="card-title"><h2>Воронка ролика</h2><span class="pill blue" id="contentPipelineLabel">идея</span></div>
+              <div class="content-pipeline" id="contentPipeline"></div>
+            </article>
             <div class="grid cols-2">
               <article class="card">
                 <div class="card-title"><h2>Текущий ролик</h2><span class="pill blue" id="contentStatusBadge">идея</span></div>
+                <div class="quick-preset-grid" style="margin-bottom: 14px">
+                  <button class="btn secondary" type="button" data-content-status="идея">Идея</button>
+                  <button class="btn secondary" type="button" data-content-status="сценарий">Сценарий</button>
+                  <button class="btn secondary" type="button" data-content-status="монтаж">Монтаж</button>
+                  <button class="btn secondary" type="button" data-content-status="опубликовано">Выложено</button>
+                </div>
                 <form class="grid" id="contentForm">
                   <input class="field" id="contentTitleInput" placeholder="Название ролика" required />
                   <input class="field" id="contentTopicInput" placeholder="Тема / о чём ролик" />
@@ -2377,6 +2464,12 @@
           <section class="page" id="food">
             <div class="page-head">
               <div><p class="eyebrow">Food</p><h1>Еда</h1><p class="muted" style="margin-top: 8px">Идеи блюд: что приготовить дома или что заказать, когда не хочется придумывать с нуля.</p></div>
+            </div>
+            <div class="day-summary" style="margin-bottom: 18px">
+              <div class="summary-tile"><p class="muted">Всего идей</p><strong id="foodTotalSummary">0</strong></div>
+              <div class="summary-tile"><p class="muted">Выбрано</p><strong id="foodSelectedSummary">0</strong></div>
+              <div class="summary-tile"><p class="muted">Готовить</p><strong id="foodCookSummary">0</strong></div>
+              <div class="summary-tile"><p class="muted">Заказать</p><strong id="foodOrderSummary">0</strong></div>
             </div>
             <div class="grid cols-2">
               <article class="card">
@@ -3230,6 +3323,11 @@
         setTimeout(() => notice.remove(), 2200);
       }
 
+      function setText(id, value) {
+        const node = document.getElementById(id);
+        if (node) node.textContent = value;
+      }
+
       function contentLink(label, url) {
         if (!url) return "";
         return `<a class="pill blue" href="${escapeHtml(url)}" target="_blank" rel="noreferrer">${escapeHtml(label)}</a>`;
@@ -3266,6 +3364,26 @@
           "- финальный результат;",
           "- один красивый кадр для обложки."
         ].join("\n");
+      }
+
+      const contentStatuses = ["идея", "сценарий", "снято", "монтаж", "опубликовано"];
+
+      function renderContentPipeline() {
+        const pipeline = document.getElementById("contentPipeline");
+        const label = document.getElementById("contentPipelineLabel");
+        if (!pipeline) return;
+        const activeStatus = contentWorkspace.status || "идея";
+        const activeIndex = Math.max(0, contentStatuses.indexOf(activeStatus));
+        if (label) label.textContent = activeStatus;
+        pipeline.innerHTML = "";
+        contentStatuses.forEach((status, index) => {
+          const step = document.createElement("button");
+          step.type = "button";
+          step.className = `pipeline-step${index < activeIndex ? " done" : ""}${index === activeIndex ? " active" : ""}`;
+          step.dataset.contentStep = status;
+          step.innerHTML = `<span>${index < activeIndex ? "✓" : index + 1}</span><h3>${escapeHtml(status)}</h3><p class="muted" style="margin-top: 5px">${index < activeIndex ? "готово" : index === activeIndex ? "сейчас" : "дальше"}</p>`;
+          pipeline.appendChild(step);
+        });
       }
 
       function defaultMonthVideoIdeas() {
@@ -3334,6 +3452,7 @@
         if (!current || !archive) return;
         ensureMonthVideoIdeas();
         if (statusBadge) statusBadge.textContent = contentWorkspace.status || "идея";
+        renderContentPipeline();
         const formMap = {
           contentTitleInput: contentWorkspace.title || "",
           contentTopicInput: contentWorkspace.topic || "",
@@ -3375,6 +3494,26 @@
         });
         renderMonthVideoIdeas();
       }
+
+      document.getElementById("contentPipeline")?.addEventListener("click", (event) => {
+        const step = event.target.closest("[data-content-step]");
+        if (!step) return;
+        contentWorkspace.status = step.dataset.contentStep;
+        const statusInput = document.getElementById("contentStatusInput");
+        if (statusInput) statusInput.value = contentWorkspace.status;
+        renderContentWorkspace();
+        saveState();
+      });
+
+      document.querySelectorAll("[data-content-status]").forEach((button) => {
+        button.addEventListener("click", () => {
+          contentWorkspace.status = button.dataset.contentStatus;
+          const statusInput = document.getElementById("contentStatusInput");
+          if (statusInput) statusInput.value = contentWorkspace.status;
+          renderContentWorkspace();
+          saveState();
+        });
+      });
 
       document.getElementById("contentForm")?.addEventListener("submit", (event) => {
         event.preventDefault();
@@ -3468,8 +3607,14 @@
         if (!list) return;
         list.innerHTML = "";
         const doneCount = foodMeals.filter((meal) => meal.done).length;
+        const cookCount = foodMeals.filter((meal) => meal.type === "приготовить").length;
+        const orderCount = foodMeals.filter((meal) => meal.type === "заказать").length;
         if (count) count.textContent = `${foodMeals.length} идей`;
         if (ready) ready.textContent = `${doneCount} выбрано`;
+        setText("foodTotalSummary", foodMeals.length);
+        setText("foodSelectedSummary", doneCount);
+        setText("foodCookSummary", cookCount);
+        setText("foodOrderSummary", orderCount);
         if (!foodMeals.length) {
           list.innerHTML = `<div class="onboarding-card"><h3>Идей еды пока нет</h3><p class="muted">Добавьте блюдо, доставку или быстрый перекус.</p></div>`;
           return;
@@ -4234,6 +4379,17 @@
         document.getElementById("dayEditorTitle").textContent = `${day.querySelector("h3").textContent} · ${day.dataset.child}`;
         document.getElementById("dayEditorDate").textContent = day.dataset.date;
         document.getElementById("dailyDate").textContent = day.dataset.date;
+        updateSelectedDaySummary();
+      }
+
+      function updateSelectedDaySummary() {
+        const plan = ensurePlan(selectedDate);
+        const items = plan.items || [];
+        const hasAny = (words) => items.filter((item) => words.some((word) => item.toLowerCase().includes(word))).length;
+        setText("summaryTotalItems", items.length);
+        setText("summaryContentItems", hasAny(["#контент", "ролик", "монтаж", "канал"]));
+        setText("summaryHomeItems", hasAny(["#дом", "#комната", "#кухня", "пылесос", "робот", "кош"]));
+        setText("summaryRoutineItems", hasAny(["#еда", "#режим", "#сон", "завтрак", "обед", "подъём"]));
       }
 
       function renderWeekPlan() {
@@ -4296,6 +4452,7 @@
         activeWeekDay().querySelector(".week-items").appendChild(item);
         document.getElementById("weekItemTitle").value = "";
         renderMonthCalendar();
+        updateSelectedDaySummary();
         logActivity(`В план добавлено: ${owner} · ${title}`);
       });
 
