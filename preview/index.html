@@ -1215,6 +1215,80 @@
         line-height: 1.45;
       }
 
+      .content-board {
+        display: grid;
+        gap: 18px;
+      }
+
+      .content-table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      .content-table th,
+      .content-table td {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.075);
+        padding: 12px 10px;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      .content-table th {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 820;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .content-table td {
+        color: var(--soft);
+      }
+
+      .content-kanban {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(180px, 1fr));
+        gap: 12px;
+        overflow-x: auto;
+        padding-bottom: 4px;
+      }
+
+      .content-column {
+        min-height: 260px;
+        border: 1px solid rgba(255, 255, 255, 0.075);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.035);
+        padding: 12px;
+      }
+
+      .content-column.drag-over {
+        border-color: rgba(142, 230, 200, 0.44);
+        background: rgba(142, 230, 200, 0.08);
+      }
+
+      .content-card {
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.055);
+        padding: 12px;
+        color: var(--soft);
+        cursor: grab;
+      }
+
+      .content-card + .content-card {
+        margin-top: 8px;
+      }
+
+      .content-card:active {
+        cursor: grabbing;
+      }
+
+      .hook-list,
+      .project-list {
+        display: grid;
+        gap: 10px;
+      }
+
       .quick-preset-grid {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -2401,26 +2475,12 @@
 
           <section class="page" id="content">
             <div class="page-head">
-              <div><p class="eyebrow">Content</p><h1>Контент</h1><p class="muted" style="margin-top: 8px">Стратегия, первая неделя, идеи роликов и метрики для YouTube, Instagram и Telegram.</p></div>
+              <div><p class="eyebrow">Content</p><h1>Контент</h1><p class="muted" style="margin-top: 8px">Что снимать, что уже снято, что публиковать дальше и что реально заходит.</p></div>
             </div>
-            <article class="card" style="margin-bottom: 18px">
-              <div class="card-title"><h2>Контент-стратегия</h2><span class="pill blue">основа</span></div>
-              <div class="grid cols-2" style="margin-top: 14px">
-                <div>
-                  <p class="muted">Главная идея</p>
-                  <h3 style="margin-top: 8px">Мне скоро 13 лет. Я создаю сайты, приложения и проекты с помощью ИИ и показываю весь путь от идеи до результата простыми словами.</h3>
-                </div>
-                <div>
-                  <p class="muted">Целевая аудитория</p>
-                  <ul class="content-static-list">
-                    <li>Подростки 10-18 лет</li>
-                    <li>Новички в Vibe Coding</li>
-                    <li>Родители, интересующиеся ИИ</li>
-                    <li>Люди, которые хотят создавать проекты без глубоких знаний программирования</li>
-                  </ul>
-                </div>
-              </div>
-              <p class="muted" style="margin-top: 18px">Контентные направления</p>
+            <div class="content-board">
+            <article class="card">
+              <div class="card-title"><h2>Главная идея</h2><span class="pill blue">основа</span></div>
+              <h3 style="margin-top: 8px">Мне скоро 13 лет. Я создаю сайты, приложения и проекты с помощью ИИ и показываю весь путь от идеи до результата простыми словами.</h3>
               <ul class="content-static-list">
                 <li>Мой путь в Vibe Coding</li>
                 <li>Создание реальных проектов</li>
@@ -2431,90 +2491,60 @@
               </ul>
             </article>
 
-            <article class="card" style="margin-bottom: 18px">
-              <div class="card-title"><h2>План на первую неделю</h2><span class="pill peach">7 дней</span></div>
-              <div class="content-week-list">
-                <div class="content-week-day">
-                  <span class="pill blue">Понедельник</span>
-                  <ul>
-                    <li>Создать Instagram</li>
-                    <li>Создать Telegram</li>
-                    <li>Оформить профили</li>
-                    <li>Снять видео: "Почему я меняю контент"</li>
-                  </ul>
-                </div>
-                <div class="content-week-day">
-                  <span class="pill blue">Вторник</span>
-                  <ul>
-                    <li>Видео: "Мне скоро 13 лет и я создаю проекты с ИИ"</li>
-                    <li>Подготовить идеи для следующих роликов</li>
-                  </ul>
-                </div>
-                <div class="content-week-day">
-                  <span class="pill blue">Среда</span>
-                  <ul><li>Видео: "Показываю проект, над которым сейчас работаю"</li></ul>
-                </div>
-                <div class="content-week-day">
-                  <span class="pill blue">Четверг</span>
-                  <ul><li>Видео: "Первая серьёзная ошибка и как я её исправила"</li></ul>
-                </div>
-                <div class="content-week-day">
-                  <span class="pill blue">Пятница</span>
-                  <ul><li>Видео: "Что умеет ChatGPT при создании сайтов"</li></ul>
-                </div>
-                <div class="content-week-day">
-                  <span class="pill blue">Суббота</span>
-                  <ul><li>Видео: "Что получилось сделать за неделю"</li></ul>
-                </div>
-                <div class="content-week-day">
-                  <span class="pill blue">Воскресенье</span>
-                  <ul><li>Видео: "Итоги недели и планы дальше"</li></ul>
-                </div>
+            <article class="card">
+              <div class="card-title"><h2>Банк идей</h2><span class="pill peach" id="contentIdeasCount">0</span></div>
+              <form class="grid cols-4" id="contentIdeaForm" style="margin-bottom: 14px">
+                <input class="field" id="contentIdeaTitle" placeholder="Название идеи" required />
+                <select id="contentIdeaCategory"><option>Vibe Coding</option><option>Проект</option><option>Ошибка</option><option>ChatGPT</option><option>Челлендж</option><option>Закулисье</option></select>
+                <select id="contentIdeaPriority"><option>высокий</option><option>средний</option><option>низкий</option></select>
+                <button class="btn" type="submit">Добавить идею</button>
+              </form>
+              <div style="overflow-x:auto">
+                <table class="content-table">
+                  <thead><tr><th>Название идеи</th><th>Категория</th><th>Приоритет</th><th>Статус</th><th></th></tr></thead>
+                  <tbody id="contentIdeasTable"></tbody>
+                </table>
               </div>
             </article>
 
             <div class="grid cols-2">
               <article class="card">
-                <div class="card-title"><h2>Шаблон ролика</h2><span class="pill">структура</span></div>
-                <ul class="content-static-list">
-                  <li>Хук: 1-3 секунды</li>
-                  <li>Проблема</li>
-                  <li>Процесс</li>
-                  <li>Результат</li>
-                  <li>Призыв подписаться</li>
-                </ul>
+                <div class="card-title"><h2>Банк хуков</h2><span class="pill blue" id="contentHooksCount">0</span></div>
+                <form class="form-row" id="contentHookForm" style="margin-bottom: 14px">
+                  <input class="field" id="contentHookText" placeholder="Первая фраза ролика" required />
+                  <button class="btn" type="submit">Добавить хук</button>
+                </form>
+                <div class="hook-list" id="contentHooksList"></div>
               </article>
               <article class="card">
-                <div class="card-title"><h2>Метрики</h2><span class="pill">прогресс</span></div>
-                <p class="muted">Отслеживать</p>
-                <ul class="content-static-list">
-                  <li>Количество роликов</li>
-                  <li>Просмотры</li>
-                  <li>Лайки</li>
-                  <li>Комментарии</li>
-                  <li>Подписчики YouTube</li>
-                  <li>Подписчики Instagram</li>
-                  <li>Подписчики Telegram</li>
-                </ul>
-                <p class="muted" style="margin-top: 14px">Показывать прогресс по неделе и месяцу.</p>
+                <div class="card-title"><h2>Проекты для контента</h2><span class="pill" id="contentProjectsCount">0</span></div>
+                <div class="project-list" id="contentProjectsList"></div>
               </article>
             </div>
 
-            <article class="card" style="margin-top: 18px">
-              <div class="card-title"><h2>Идеи для роликов</h2><span class="pill peach">10 идей</span></div>
-              <ul class="content-static-list">
-                <li>Создаю сайт за 1 день</li>
-                <li>Создаю игру без знания кода</li>
-                <li>Проверяю идеи подписчиков</li>
-                <li>5 ошибок новичков</li>
-                <li>Что умеет ChatGPT в 2026 году</li>
-                <li>Создаю семейную CRM</li>
-                <li>Создаю приложение с нуля</li>
-                <li>Мой день в Vibe Coding</li>
-                <li>Сколько проектов можно сделать за месяц</li>
-                <li>Самый странный запрос для ИИ</li>
-              </ul>
+            <article class="card">
+              <div class="card-title"><h2>Контент-конвейер</h2><span class="pill blue">drag & drop</span></div>
+              <div class="content-kanban" id="contentKanban"></div>
             </article>
+
+            <article class="card">
+              <div class="card-title"><h2>Лучшие ролики</h2><span class="pill peach" id="bestVideosCount">0</span></div>
+              <form class="grid cols-4" id="bestVideoForm" style="margin-bottom: 14px">
+                <input class="field" id="bestVideoTitle" placeholder="Название" required />
+                <input class="field" id="bestVideoViews" type="number" min="0" placeholder="Просмотры" />
+                <input class="field" id="bestVideoLikes" type="number" min="0" placeholder="Лайки" />
+                <button class="btn" type="submit">Добавить</button>
+                <input class="field" id="bestVideoComments" type="number" min="0" placeholder="Комментарии" />
+                <input class="field" id="bestVideoReason" style="grid-column: span 3" placeholder="Почему сработало" />
+              </form>
+              <div style="overflow-x:auto">
+                <table class="content-table">
+                  <thead><tr><th>Название</th><th>Просмотры</th><th>Лайки</th><th>Комментарии</th><th>Почему сработало</th><th></th></tr></thead>
+                  <tbody id="bestVideosTable"></tbody>
+                </table>
+              </div>
+            </article>
+            </div>
           </section>
 
           <section class="page" id="food">
@@ -2982,7 +3012,42 @@
       const childStats = {
         "Ева": savedState.childStats?.["Ева"] || { streak: 0, level: 1, achievements: [] }
       };
-      const contentWorkspace = savedState.contentWorkspace || { archive: [] };
+      const defaultContentIdeas = [
+        ["Создаю сайт за 1 день", "Проект", "высокий"],
+        ["Создаю игру без знания кода", "Проект", "высокий"],
+        ["Проверяю идеи подписчиков", "Эксперимент", "средний"],
+        ["5 ошибок новичков", "Ошибка", "средний"],
+        ["Что умеет ChatGPT в 2026 году", "ChatGPT", "высокий"],
+        ["Создаю семейную CRM", "Проект", "высокий"],
+        ["Создаю приложение с нуля", "Проект", "высокий"],
+        ["Мой день в Vibe Coding", "Vibe Coding", "средний"],
+        ["Сколько проектов можно сделать за месяц", "Челлендж", "средний"],
+        ["Самый странный запрос для ИИ", "Эксперимент", "низкий"]
+      ].map(([title, category, priority], index) => ({ id: `idea-${index + 1}`, title, category, priority, status: "Новая" }));
+      const defaultContentHooks = [
+        "Мне скоро 13 лет и я решила...",
+        "ChatGPT сделал это за 30 секунд",
+        "Эта ошибка чуть не сломала мой проект",
+        "Я потратила на это весь день",
+        "Смотрите, что получилось",
+        "Я решила проверить...",
+        "Никто не говорил мне об этом"
+      ].map((text, index) => ({ id: `hook-${index + 1}`, text }));
+      const defaultContentProjects = [
+        { id: "content-project-family-os", title: "Family OS", status: "в работе", description: "Семейная операционная система для планов, задач и быта.", videos: "как строится Family OS; что уже работает; какие ошибки были" },
+        { id: "content-project-crm", title: "Семейная CRM", status: "идея", description: "CRM для семьи и домашних процессов.", videos: "зачем семье CRM; как выглядит dashboard; что будет дальше" },
+        { id: "content-project-roblox", title: "Roblox-проекты", status: "идея", description: "Игры и эксперименты в Roblox.", videos: "делаю игру; показываю механику; тестирую идею" },
+        { id: "content-project-copybanner", title: "CopyBanner", status: "идея", description: "Проект для баннеров и креативов.", videos: "идея сервиса; первый экран; как ИИ помогает" },
+        { id: "content-project-new", title: "Новые идеи", status: "сбор", description: "Место для будущих проектов.", videos: "выбираю идею; проверяю гипотезу; делаю прототип" }
+      ];
+      const contentWorkspace = savedState.contentWorkspace || {};
+      if (!Array.isArray(contentWorkspace.ideas) || !contentWorkspace.ideas.length) contentWorkspace.ideas = defaultContentIdeas;
+      if (!Array.isArray(contentWorkspace.hooks) || !contentWorkspace.hooks.length) contentWorkspace.hooks = defaultContentHooks;
+      if (!Array.isArray(contentWorkspace.projects) || !contentWorkspace.projects.length) contentWorkspace.projects = defaultContentProjects;
+      if (!Array.isArray(contentWorkspace.bestVideos)) contentWorkspace.bestVideos = [];
+      if (!Array.isArray(contentWorkspace.conveyor) || !contentWorkspace.conveyor.length) {
+        contentWorkspace.conveyor = defaultContentIdeas.slice(0, 5).map((idea) => ({ id: `card-${idea.id}`, title: idea.title, status: "idea" }));
+      }
       const foodMeals = savedState.foodMeals || [
         { id: "food-breakfast-default", title: "Омлет / яичница", type: "приготовить", time: "завтрак", note: "быстро и понятно", done: false },
         { id: "food-order-default", title: "Роллы / пицца / боул", type: "заказать", time: "обед", note: "когда нет сил готовить", done: false }
@@ -3385,10 +3450,189 @@
       }
 
       function renderContentWorkspace() {
-        contentWorkspace.archive = [];
-        contentWorkspace.weekPlan = [];
-        contentWorkspace.monthIdeas = [];
+        const ideaStatuses = ["Новая", "В работе", "Снято", "Опубликовано", "Залетело"];
+        const conveyorColumns = [
+          ["idea", "Идея"],
+          ["script", "Сценарий"],
+          ["shot", "Снято"],
+          ["edited", "Смонтировано"],
+          ["published", "Опубликовано"]
+        ];
+        const ideaTable = document.getElementById("contentIdeasTable");
+        const hooksList = document.getElementById("contentHooksList");
+        const kanban = document.getElementById("contentKanban");
+        const bestTable = document.getElementById("bestVideosTable");
+        const projectsList = document.getElementById("contentProjectsList");
+        if (!ideaTable || !hooksList || !kanban || !bestTable || !projectsList) return;
+
+        setText("contentIdeasCount", contentWorkspace.ideas.length);
+        ideaTable.innerHTML = contentWorkspace.ideas.map((idea) => `
+          <tr>
+            <td><strong>${escapeHtml(idea.title)}</strong></td>
+            <td>${escapeHtml(idea.category)}</td>
+            <td><span class="pill ${idea.priority === "высокий" ? "peach" : idea.priority === "средний" ? "blue" : ""}">${escapeHtml(idea.priority)}</span></td>
+            <td><select data-content-idea-status="${escapeHtml(idea.id)}">${ideaStatuses.map((status) => `<option ${idea.status === status ? "selected" : ""}>${escapeHtml(status)}</option>`).join("")}</select></td>
+            <td><button class="delete-message" type="button" data-delete-content-idea="${escapeHtml(idea.id)}">Удалить</button></td>
+          </tr>
+        `).join("");
+
+        setText("contentHooksCount", contentWorkspace.hooks.length);
+        hooksList.innerHTML = contentWorkspace.hooks.map((hook) => `
+          <div class="activity-item"><span class="mini-icon">Х</span><div><h3>${escapeHtml(hook.text)}</h3></div><button class="delete-message" type="button" data-delete-content-hook="${escapeHtml(hook.id)}">Удалить</button></div>
+        `).join("");
+
+        kanban.innerHTML = conveyorColumns.map(([key, title]) => {
+          const cards = contentWorkspace.conveyor.filter((card) => card.status === key);
+          return `<div class="content-column" data-content-column="${key}">
+            <div class="lane-head"><h3>${escapeHtml(title)}</h3><span class="pill">${cards.length}</span></div>
+            ${cards.map((card) => `<div class="content-card" draggable="true" data-content-card="${escapeHtml(card.id)}"><strong>${escapeHtml(card.title)}</strong></div>`).join("")}
+          </div>`;
+        }).join("");
+
+        setText("bestVideosCount", contentWorkspace.bestVideos.length);
+        bestTable.innerHTML = contentWorkspace.bestVideos.length ? contentWorkspace.bestVideos.map((video) => `
+          <tr>
+            <td><strong>${escapeHtml(video.title)}</strong></td>
+            <td>${escapeHtml(video.views || 0)}</td>
+            <td>${escapeHtml(video.likes || 0)}</td>
+            <td>${escapeHtml(video.comments || 0)}</td>
+            <td>${escapeHtml(video.reason || "")}</td>
+            <td><button class="delete-message" type="button" data-delete-best-video="${escapeHtml(video.id)}">Удалить</button></td>
+          </tr>
+        `).join("") : `<tr><td colspan="6" class="muted">Пока нет роликов для анализа.</td></tr>`;
+
+        setText("contentProjectsCount", contentWorkspace.projects.length);
+        projectsList.innerHTML = contentWorkspace.projects.map((project) => `
+          <div class="activity-item">
+            <span class="mini-icon">П</span>
+            <div>
+              <h3>${escapeHtml(project.title)}</h3>
+              <p class="muted">${escapeHtml(project.status)} · ${escapeHtml(project.description)}</p>
+              <p class="muted" style="margin-top: 6px">Ролики: ${escapeHtml(project.videos)}</p>
+            </div>
+          </div>
+        `).join("");
       }
+
+      function contentStatusToColumn(status) {
+        return {
+          "Новая": "idea",
+          "В работе": "script",
+          "Снято": "shot",
+          "Опубликовано": "published",
+          "Залетело": "published"
+        }[status] || "idea";
+      }
+
+      document.getElementById("contentIdeaForm")?.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const titleInput = document.getElementById("contentIdeaTitle");
+        const title = titleInput.value.trim();
+        if (!title) return;
+        const idea = {
+          id: `idea-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+          title,
+          category: document.getElementById("contentIdeaCategory").value,
+          priority: document.getElementById("contentIdeaPriority").value,
+          status: "Новая"
+        };
+        contentWorkspace.ideas.unshift(idea);
+        contentWorkspace.conveyor.unshift({ id: `card-${idea.id}`, title: idea.title, status: "idea" });
+        titleInput.value = "";
+        renderContentWorkspace();
+        saveState();
+        showNotice("Идея добавлена.");
+      });
+
+      document.getElementById("contentHookForm")?.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const input = document.getElementById("contentHookText");
+        const text = input.value.trim();
+        if (!text) return;
+        contentWorkspace.hooks.unshift({ id: `hook-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`, text });
+        input.value = "";
+        renderContentWorkspace();
+        saveState();
+        showNotice("Хук добавлен.");
+      });
+
+      document.getElementById("bestVideoForm")?.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const titleInput = document.getElementById("bestVideoTitle");
+        const title = titleInput.value.trim();
+        if (!title) return;
+        contentWorkspace.bestVideos.unshift({
+          id: `best-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+          title,
+          views: document.getElementById("bestVideoViews").value || 0,
+          likes: document.getElementById("bestVideoLikes").value || 0,
+          comments: document.getElementById("bestVideoComments").value || 0,
+          reason: document.getElementById("bestVideoReason").value.trim()
+        });
+        ["bestVideoTitle", "bestVideoViews", "bestVideoLikes", "bestVideoComments", "bestVideoReason"].forEach((id) => { document.getElementById(id).value = ""; });
+        renderContentWorkspace();
+        saveState();
+        showNotice("Ролик добавлен в анализ.");
+      });
+
+      document.getElementById("content")?.addEventListener("change", (event) => {
+        const select = event.target.closest("[data-content-idea-status]");
+        if (!select) return;
+        const idea = contentWorkspace.ideas.find((item) => item.id === select.dataset.contentIdeaStatus);
+        if (!idea) return;
+        idea.status = select.value;
+        const card = contentWorkspace.conveyor.find((item) => item.id === `card-${idea.id}`);
+        if (card) card.status = contentStatusToColumn(select.value);
+        renderContentWorkspace();
+        saveState();
+      });
+
+      document.getElementById("content")?.addEventListener("click", (event) => {
+        const ideaDelete = event.target.closest("[data-delete-content-idea]");
+        const hookDelete = event.target.closest("[data-delete-content-hook]");
+        const videoDelete = event.target.closest("[data-delete-best-video]");
+        if (ideaDelete) {
+          const id = ideaDelete.dataset.deleteContentIdea;
+          contentWorkspace.ideas = contentWorkspace.ideas.filter((item) => item.id !== id);
+          contentWorkspace.conveyor = contentWorkspace.conveyor.filter((item) => item.id !== `card-${id}`);
+        }
+        if (hookDelete) contentWorkspace.hooks = contentWorkspace.hooks.filter((item) => item.id !== hookDelete.dataset.deleteContentHook);
+        if (videoDelete) contentWorkspace.bestVideos = contentWorkspace.bestVideos.filter((item) => item.id !== videoDelete.dataset.deleteBestVideo);
+        if (ideaDelete || hookDelete || videoDelete) {
+          renderContentWorkspace();
+          saveState();
+        }
+      });
+
+      document.getElementById("contentKanban")?.addEventListener("dragstart", (event) => {
+        const card = event.target.closest("[data-content-card]");
+        if (!card) return;
+        event.dataTransfer.setData("text/plain", card.dataset.contentCard);
+      });
+
+      document.getElementById("contentKanban")?.addEventListener("dragover", (event) => {
+        const column = event.target.closest("[data-content-column]");
+        if (!column) return;
+        event.preventDefault();
+        column.classList.add("drag-over");
+      });
+
+      document.getElementById("contentKanban")?.addEventListener("dragleave", (event) => {
+        event.target.closest("[data-content-column]")?.classList.remove("drag-over");
+      });
+
+      document.getElementById("contentKanban")?.addEventListener("drop", (event) => {
+        const column = event.target.closest("[data-content-column]");
+        if (!column) return;
+        event.preventDefault();
+        document.querySelectorAll(".content-column").forEach((item) => item.classList.remove("drag-over"));
+        const id = event.dataTransfer.getData("text/plain");
+        const card = contentWorkspace.conveyor.find((item) => item.id === id);
+        if (!card) return;
+        card.status = column.dataset.contentColumn;
+        renderContentWorkspace();
+        saveState();
+      });
 
       function renderFoodMeals() {
         const list = document.getElementById("foodList");
