@@ -1169,6 +1169,52 @@
         font-size: 20px;
       }
 
+      .content-static-list {
+        display: grid;
+        gap: 10px;
+        margin: 14px 0 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .content-static-list li {
+        border: 1px solid rgba(255, 255, 255, 0.075);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.045);
+        padding: 12px;
+        color: var(--soft);
+        line-height: 1.45;
+      }
+
+      .content-week-list {
+        display: grid;
+        grid-template-columns: repeat(7, minmax(190px, 1fr));
+        gap: 12px;
+        margin-top: 14px;
+        overflow-x: auto;
+        padding-bottom: 4px;
+      }
+
+      .content-week-day {
+        min-width: 190px;
+        border: 1px solid rgba(255, 255, 255, 0.075);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.045);
+        padding: 14px;
+      }
+
+      .content-week-day h3 {
+        margin-top: 10px;
+        font-size: 15px;
+      }
+
+      .content-week-day ul {
+        margin: 10px 0 0;
+        padding-left: 18px;
+        color: var(--soft);
+        line-height: 1.45;
+      }
+
       .quick-preset-grid {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -2355,13 +2401,119 @@
 
           <section class="page" id="content">
             <div class="page-head">
-              <div><p class="eyebrow">Content</p><h1>Контент</h1><p class="muted" style="margin-top: 8px">Вкладка очищена. Соберём её заново, когда решим точный формат.</p></div>
+              <div><p class="eyebrow">Content</p><h1>Контент</h1><p class="muted" style="margin-top: 8px">Стратегия, первая неделя, идеи роликов и метрики для YouTube, Instagram и Telegram.</p></div>
             </div>
-            <article class="card">
-              <div class="onboarding-card">
-                <h3>Контент пока пустой</h3>
-                <p class="muted">Здесь больше нет стратегии, плана недели, идей роликов и метрик. Оставили чистое место.</p>
+            <article class="card" style="margin-bottom: 18px">
+              <div class="card-title"><h2>Контент-стратегия</h2><span class="pill blue">основа</span></div>
+              <div class="grid cols-2" style="margin-top: 14px">
+                <div>
+                  <p class="muted">Главная идея</p>
+                  <h3 style="margin-top: 8px">Мне скоро 13 лет. Я создаю сайты, приложения и проекты с помощью ИИ и показываю весь путь от идеи до результата простыми словами.</h3>
+                </div>
+                <div>
+                  <p class="muted">Целевая аудитория</p>
+                  <ul class="content-static-list">
+                    <li>Подростки 10-18 лет</li>
+                    <li>Новички в Vibe Coding</li>
+                    <li>Родители, интересующиеся ИИ</li>
+                    <li>Люди, которые хотят создавать проекты без глубоких знаний программирования</li>
+                  </ul>
+                </div>
               </div>
+              <p class="muted" style="margin-top: 18px">Контентные направления</p>
+              <ul class="content-static-list">
+                <li>Мой путь в Vibe Coding</li>
+                <li>Создание реальных проектов</li>
+                <li>Ошибки и их решения</li>
+                <li>Работа с ChatGPT и другими ИИ</li>
+                <li>Эксперименты и челленджи</li>
+                <li>Закулисье создания проектов</li>
+              </ul>
+            </article>
+
+            <article class="card" style="margin-bottom: 18px">
+              <div class="card-title"><h2>План на первую неделю</h2><span class="pill peach">7 дней</span></div>
+              <div class="content-week-list">
+                <div class="content-week-day">
+                  <span class="pill blue">Понедельник</span>
+                  <ul>
+                    <li>Создать Instagram</li>
+                    <li>Создать Telegram</li>
+                    <li>Оформить профили</li>
+                    <li>Снять видео: "Почему я меняю контент"</li>
+                  </ul>
+                </div>
+                <div class="content-week-day">
+                  <span class="pill blue">Вторник</span>
+                  <ul>
+                    <li>Видео: "Мне скоро 13 лет и я создаю проекты с ИИ"</li>
+                    <li>Подготовить идеи для следующих роликов</li>
+                  </ul>
+                </div>
+                <div class="content-week-day">
+                  <span class="pill blue">Среда</span>
+                  <ul><li>Видео: "Показываю проект, над которым сейчас работаю"</li></ul>
+                </div>
+                <div class="content-week-day">
+                  <span class="pill blue">Четверг</span>
+                  <ul><li>Видео: "Первая серьёзная ошибка и как я её исправила"</li></ul>
+                </div>
+                <div class="content-week-day">
+                  <span class="pill blue">Пятница</span>
+                  <ul><li>Видео: "Что умеет ChatGPT при создании сайтов"</li></ul>
+                </div>
+                <div class="content-week-day">
+                  <span class="pill blue">Суббота</span>
+                  <ul><li>Видео: "Что получилось сделать за неделю"</li></ul>
+                </div>
+                <div class="content-week-day">
+                  <span class="pill blue">Воскресенье</span>
+                  <ul><li>Видео: "Итоги недели и планы дальше"</li></ul>
+                </div>
+              </div>
+            </article>
+
+            <div class="grid cols-2">
+              <article class="card">
+                <div class="card-title"><h2>Шаблон ролика</h2><span class="pill">структура</span></div>
+                <ul class="content-static-list">
+                  <li>Хук: 1-3 секунды</li>
+                  <li>Проблема</li>
+                  <li>Процесс</li>
+                  <li>Результат</li>
+                  <li>Призыв подписаться</li>
+                </ul>
+              </article>
+              <article class="card">
+                <div class="card-title"><h2>Метрики</h2><span class="pill">прогресс</span></div>
+                <p class="muted">Отслеживать</p>
+                <ul class="content-static-list">
+                  <li>Количество роликов</li>
+                  <li>Просмотры</li>
+                  <li>Лайки</li>
+                  <li>Комментарии</li>
+                  <li>Подписчики YouTube</li>
+                  <li>Подписчики Instagram</li>
+                  <li>Подписчики Telegram</li>
+                </ul>
+                <p class="muted" style="margin-top: 14px">Показывать прогресс по неделе и месяцу.</p>
+              </article>
+            </div>
+
+            <article class="card" style="margin-top: 18px">
+              <div class="card-title"><h2>Идеи для роликов</h2><span class="pill peach">10 идей</span></div>
+              <ul class="content-static-list">
+                <li>Создаю сайт за 1 день</li>
+                <li>Создаю игру без знания кода</li>
+                <li>Проверяю идеи подписчиков</li>
+                <li>5 ошибок новичков</li>
+                <li>Что умеет ChatGPT в 2026 году</li>
+                <li>Создаю семейную CRM</li>
+                <li>Создаю приложение с нуля</li>
+                <li>Мой день в Vibe Coding</li>
+                <li>Сколько проектов можно сделать за месяц</li>
+                <li>Самый странный запрос для ИИ</li>
+              </ul>
             </article>
           </section>
 
