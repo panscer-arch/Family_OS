@@ -2308,6 +2308,23 @@
               </article>
             </div>
 
+            <div class="grid cols-2" style="margin-top: 18px">
+              <article class="card">
+                <div class="card-title"><h2>Фокус дня</h2><span class="pill blue">сегодня</span></div>
+                <form class="form-row" id="dailyFocusForm" style="margin-top: 12px">
+                  <input class="field" id="dailyFocusInput" placeholder="Сегодня главное: снять ролик про Family OS" />
+                  <button class="btn secondary" type="submit">Сохранить</button>
+                </form>
+                <p class="muted" id="dailyFocusPreview" style="margin-top: 10px">Сегодня главное: снять ролик про Family OS</p>
+              </article>
+              <article class="card">
+                <div class="card-title"><h2>Следующая награда</h2><span class="pill peach" id="nextRewardBadge">0 XP</span></div>
+                <h3 id="nextRewardTitle" style="margin-top: 10px">Кино вечером</h3>
+                <p class="muted" id="nextRewardProgress" style="margin-top: 8px">До награды осталось 120 XP</p>
+                <div class="progress" style="margin-top: 12px"><span id="nextRewardBar" style="--value: 0%"></span></div>
+              </article>
+            </div>
+
             <div class="grid layout-dashboard" style="margin-top: 18px">
               <div class="grid">
                 <article class="card">
@@ -2492,7 +2509,17 @@
             </article>
 
             <article class="card">
-              <div class="card-title"><h2>Банк идей</h2><span class="pill peach" id="contentIdeasCount">0</span></div>
+              <div class="card-title">
+                <h2>Банк идей</h2>
+                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap">
+                  <span class="pill peach" id="contentIdeasCount">0</span>
+                  <button class="btn secondary" id="quickContentIdeaOpen" type="button">+ Быстро записать идею</button>
+                </div>
+              </div>
+              <form class="form-row" id="quickContentIdeaForm" style="display: none; margin-bottom: 14px">
+                <input class="field" id="quickContentIdeaInput" placeholder="Быстрая идея ролика" />
+                <button class="btn" type="submit">Сохранить</button>
+              </form>
               <form class="grid cols-4" id="contentIdeaForm" style="margin-bottom: 14px">
                 <input class="field" id="contentIdeaTitle" placeholder="Название идеи" required />
                 <select id="contentIdeaCategory"><option>Vibe Coding</option><option>Проект</option><option>Ошибка</option><option>ChatGPT</option><option>Челлендж</option><option>Закулисье</option></select>
@@ -3009,6 +3036,7 @@
       const childPoints = {
         "Ева": savedState.childPoints?.["Ева"] || 0
       };
+      let dailyFocus = savedState.dailyFocus || "Сегодня главное: снять ролик про Family OS";
       const childStats = {
         "Ева": savedState.childStats?.["Ева"] || { streak: 0, level: 1, achievements: [] }
       };
@@ -3077,6 +3105,7 @@
           selectedChild,
           checklistTasks,
           childPoints,
+          dailyFocus,
           childStats,
           contentWorkspace,
           foodMeals,
@@ -3524,24 +3553,51 @@
         }[status] || "idea";
       }
 
+      function addContentIdea(title, category = "Проект", priority = "средний") {
+        const idea = {
+          id: `idea-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+          title,
+          category,
+          priority,
+          status: "Новая"
+        };
+        contentWorkspace.ideas.unshift(idea);
+        contentWorkspace.conveyor.unshift({ id: `card-${idea.id}`, title: idea.title, status: "idea" });
+        renderContentWorkspace();
+        saveState();
+        showNotice("Идея добавлена.");
+      }
+
+      document.getElementById("quickContentIdeaOpen")?.addEventListener("click", () => {
+        const form = document.getElementById("quickContentIdeaForm");
+        const input = document.getElementById("quickContentIdeaInput");
+        if (!form) return;
+        const isHidden = form.style.display === "none" || !form.style.display;
+        form.style.display = isHidden ? "flex" : "none";
+        if (isHidden) input?.focus();
+      });
+
+      document.getElementById("quickContentIdeaForm")?.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const input = document.getElementById("quickContentIdeaInput");
+        const title = input.value.trim();
+        if (!title) return;
+        addContentIdea(title, "Быстрая идея", "средний");
+        input.value = "";
+        document.getElementById("quickContentIdeaForm").style.display = "none";
+      });
+
       document.getElementById("contentIdeaForm")?.addEventListener("submit", (event) => {
         event.preventDefault();
         const titleInput = document.getElementById("contentIdeaTitle");
         const title = titleInput.value.trim();
         if (!title) return;
-        const idea = {
-          id: `idea-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        addContentIdea(
           title,
-          category: document.getElementById("contentIdeaCategory").value,
-          priority: document.getElementById("contentIdeaPriority").value,
-          status: "Новая"
-        };
-        contentWorkspace.ideas.unshift(idea);
-        contentWorkspace.conveyor.unshift({ id: `card-${idea.id}`, title: idea.title, status: "idea" });
+          document.getElementById("contentIdeaCategory").value,
+          document.getElementById("contentIdeaPriority").value
+        );
         titleInput.value = "";
-        renderContentWorkspace();
-        saveState();
-        showNotice("Идея добавлена.");
       });
 
       document.getElementById("contentHookForm")?.addEventListener("submit", (event) => {
@@ -4070,7 +4126,50 @@
         });
       }
 
+      function renderDailyFocus() {
+        const input = document.getElementById("dailyFocusInput");
+        if (input) input.value = dailyFocus;
+        setText("dailyFocusPreview", dailyFocus);
+      }
+
+      function renderNextReward() {
+        const xp = childPoints["Ева"] || 0;
+        const rewards = [...document.querySelectorAll("#rewardsGrid .reward-card")]
+          .map((card) => ({
+            title: card.querySelector("h2")?.textContent?.trim() || "Награда",
+            cost: Number(card.dataset.rewardCost || 0)
+          }))
+          .filter((reward) => reward.cost > 0)
+          .sort((a, b) => a.cost - b.cost);
+        const nextReward = rewards.find((reward) => reward.cost > xp) || rewards[rewards.length - 1];
+        if (!nextReward) {
+          setText("nextRewardTitle", "Добавьте награду");
+          setText("nextRewardBadge", `${xp} XP`);
+          setText("nextRewardProgress", "Создайте награду, и здесь появится цель.");
+          document.getElementById("nextRewardBar")?.style.setProperty("--value", "0%");
+          return;
+        }
+        const left = Math.max(0, nextReward.cost - xp);
+        const percent = Math.min(100, Math.round((xp / nextReward.cost) * 100));
+        setText("nextRewardTitle", nextReward.title);
+        setText("nextRewardBadge", `${xp} / ${nextReward.cost} XP`);
+        setText("nextRewardProgress", left ? `До награды осталось ${left} XP` : "Награда уже доступна");
+        document.getElementById("nextRewardBar")?.style.setProperty("--value", `${percent}%`);
+      }
+
+      document.getElementById("dailyFocusForm")?.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const input = document.getElementById("dailyFocusInput");
+        const nextFocus = input.value.trim();
+        dailyFocus = nextFocus || "Сегодня главное: снять ролик про Family OS";
+        renderDailyFocus();
+        saveState();
+        showNotice("Фокус дня сохранён.");
+      });
+
       function updateDashboard() {
+        renderDailyFocus();
+        renderNextReward();
         const tasks = allTasks();
         const done = tasks.filter((task) => task.status === "done").length;
         const pending = tasks.filter((task) => task.status === "waiting_confirmation").length;
