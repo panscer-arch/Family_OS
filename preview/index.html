@@ -1133,6 +1133,10 @@
         background: rgba(142, 230, 200, 0.055);
       }
 
+      .week-day.today {
+        box-shadow: inset 0 0 0 1px rgba(115, 184, 255, 0.26);
+      }
+
       .week-items {
         display: grid;
         gap: 8px;
@@ -2276,11 +2280,13 @@
                   <div><p class="muted">Streak</p><h2 id="childStreakValue">0</h2></div>
                 </div>
                 <p class="muted" style="margin-top: 12px">Уровень <strong id="childLevelValue" style="color: var(--mint)">1</strong> · в процессе: <strong id="childPendingValue" style="color: var(--yellow)">0</strong></p>
+                <div class="card-title" style="margin-top: 18px"><h2>Мои задачи на сегодня</h2><span class="pill blue" id="childTaskCount">0</span></div>
+                <div class="checklist" id="childDashboardTasks" style="margin-top: 12px"></div>
                 <div class="task-actions"><button class="btn big-action" data-route-jump="tasks">Открыть мои задачи</button></div>
               </article>
-              <article class="card">
-                <div class="card-title"><h2>Мои задачи на сегодня</h2><span class="pill blue" id="childTaskCount">0</span></div>
-                <div class="checklist" id="childDashboardTasks"></div>
+              <article class="card" style="display: none">
+                <div class="card-title"><h2>Мои задачи на сегодня</h2><span class="pill blue">0</span></div>
+                <div class="checklist"></div>
               </article>
             </div>
 
@@ -2330,8 +2336,8 @@
                 <article class="card">
                   <div class="card-title">
                     <div>
-                      <h2>Что сделать сейчас</h2>
-                      <p class="muted" id="weeklyStatsCaption" style="margin-top: 5px">Создайте задачу, создайте задачи из плана или отметьте готовое.</p>
+                      <h2>Сегодня: фокус и задачи</h2>
+                      <p class="muted" id="weeklyStatsCaption" style="margin-top: 5px">Один блок: что сделать сейчас, задачи дня и быстрые действия.</p>
                     </div>
                     <span class="pill blue">фокус</span>
                   </div>
@@ -2340,6 +2346,7 @@
                     <div class="onboarding-card"><h3>Создать задачи из плана</h3><p class="muted">Перенести план в чек-лист.</p><button class="btn secondary" id="quickGenerateDay" type="button">Создать задачи</button></div>
                     <div class="onboarding-card"><h3>Открыть план</h3><p class="muted">Посмотреть неделю и поправить дела.</p><button class="btn secondary" type="button" data-route-jump="week">План</button></div>
                   </div>
+                  <div class="activity" id="dashboardUpcoming" style="margin-top: 14px"><div class="onboarding-card"><h3>Создайте задачи из плана</h3><p class="muted">Недельный план превратится в ближайшие задачи.</p><button class="btn secondary" type="button" id="upcomingBuildDay">Создать задачи из плана</button></div></div>
                 </article>
 
                 <article class="card">
@@ -2369,9 +2376,9 @@
                   <div class="activity timeline" id="dashboardActivity"><div class="onboarding-card"><h3>Запустите первое действие</h3><p class="muted">Создайте задачу, и история дня начнёт собираться автоматически.</p><button class="btn secondary" type="button" data-route-jump="tasks">Создать задачу</button></div></div>
                 </article>
 
-                <article class="card">
+                <article class="card" style="display: none">
                   <div class="card-title"><h2>Задачи сегодня</h2><span class="pill peach">сейчас</span></div>
-                  <div class="activity" id="dashboardUpcoming"><div class="onboarding-card"><h3>Создайте задачи из плана</h3><p class="muted">Недельный план превратится в ближайшие задачи.</p><button class="btn secondary" type="button" id="upcomingBuildDay">Создать задачи из плана</button></div></div>
+                  <div class="activity"><div class="onboarding-card"><h3>Создайте задачи из плана</h3><p class="muted">Недельный план превратится в ближайшие задачи.</p><button class="btn secondary" type="button">Создать задачи из плана</button></div></div>
                 </article>
               </aside>
             </div>
@@ -2513,9 +2520,16 @@
                 <h2>Банк идей</h2>
                 <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap">
                   <span class="pill peach" id="contentIdeasCount">0</span>
+                  <button class="btn secondary" id="randomContentIdea" type="button">Случайная идея</button>
                   <button class="btn secondary" id="quickContentIdeaOpen" type="button">+ Быстро записать идею</button>
                 </div>
               </div>
+              <div class="grid cols-3" style="margin-bottom: 14px">
+                <input class="field" id="contentSearchInput" placeholder="Поиск по идеям и хукам" />
+                <select id="contentStatusFilter"><option value="all">Все статусы</option><option>Новая</option><option>В работе</option><option>Снято</option><option>Опубликовано</option><option>Залетело</option></select>
+                <button class="btn secondary" id="toggleIdeasList" type="button">Показать все идеи</button>
+              </div>
+              <div class="onboarding-card" id="randomIdeaResult" style="display: none; margin-bottom: 14px"></div>
               <form class="form-row" id="quickContentIdeaForm" style="display: none; margin-bottom: 14px">
                 <input class="field" id="quickContentIdeaInput" placeholder="Быстрая идея ролика" />
                 <button class="btn" type="submit">Сохранить</button>
@@ -2536,7 +2550,15 @@
 
             <div class="grid cols-2">
               <article class="card">
-                <div class="card-title"><h2>Банк хуков</h2><span class="pill blue" id="contentHooksCount">0</span></div>
+                <div class="card-title">
+                  <h2>Банк хуков</h2>
+                  <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap">
+                    <span class="pill blue" id="contentHooksCount">0</span>
+                    <button class="btn secondary" id="randomContentHook" type="button">Случайный хук</button>
+                    <button class="btn secondary" id="toggleHooksList" type="button">Показать все</button>
+                  </div>
+                </div>
+                <div class="onboarding-card" id="randomHookResult" style="display: none; margin-bottom: 14px"></div>
                 <form class="form-row" id="contentHookForm" style="margin-bottom: 14px">
                   <input class="field" id="contentHookText" placeholder="Первая фраза ролика" required />
                   <button class="btn" type="submit">Добавить хук</button>
@@ -3204,6 +3226,8 @@
         { id: "project-life", title: "Быт", createdAt: new Date().toLocaleDateString("ru-RU") }
       ];
       let activeNotesView = savedState.activeNotesView || savedState.notesFilter || "inbox";
+      let contentShowAllIdeas = false;
+      let contentShowAllHooks = false;
 
       function collectLaneHtml() {
         const lanes = {};
@@ -3608,9 +3632,21 @@
         const bestTable = document.getElementById("bestVideosTable");
         const projectsList = document.getElementById("contentProjectsList");
         if (!ideaTable || !hooksList || !kanban || !bestTable || !projectsList) return;
+        const search = (document.getElementById("contentSearchInput")?.value || "").trim().toLowerCase();
+        const statusFilter = document.getElementById("contentStatusFilter")?.value || "all";
+        const matchesSearch = (value) => !search || String(value || "").toLowerCase().includes(search);
+        const filteredIdeas = contentWorkspace.ideas.filter((idea) => {
+          const statusOk = statusFilter === "all" || idea.status === statusFilter;
+          const textOk = matchesSearch(`${idea.title} ${idea.category} ${idea.priority} ${idea.status}`);
+          return statusOk && textOk;
+        });
+        const visibleIdeas = contentShowAllIdeas ? filteredIdeas : filteredIdeas.slice(0, 5);
+        const filteredHooks = contentWorkspace.hooks.filter((hook) => matchesSearch(hook.text));
+        const visibleHooks = contentShowAllHooks ? filteredHooks : filteredHooks.slice(0, 5);
 
-        setText("contentIdeasCount", contentWorkspace.ideas.length);
-        ideaTable.innerHTML = contentWorkspace.ideas.map((idea) => `
+        setText("contentIdeasCount", `${visibleIdeas.length}/${filteredIdeas.length}`);
+        setText("toggleIdeasList", contentShowAllIdeas ? "Свернуть идеи" : "Показать все идеи");
+        ideaTable.innerHTML = visibleIdeas.length ? visibleIdeas.map((idea) => `
           <tr>
             <td><strong>${escapeHtml(idea.title)}</strong></td>
             <td>${escapeHtml(idea.category)}</td>
@@ -3618,12 +3654,13 @@
             <td><select data-content-idea-status="${escapeHtml(idea.id)}">${ideaStatuses.map((status) => `<option ${idea.status === status ? "selected" : ""}>${escapeHtml(status)}</option>`).join("")}</select></td>
             <td><button class="delete-message" type="button" data-delete-content-idea="${escapeHtml(idea.id)}">Удалить</button></td>
           </tr>
-        `).join("");
+        `).join("") : `<tr><td colspan="5" class="muted">Ничего не найдено.</td></tr>`;
 
-        setText("contentHooksCount", contentWorkspace.hooks.length);
-        hooksList.innerHTML = contentWorkspace.hooks.map((hook) => `
+        setText("contentHooksCount", `${visibleHooks.length}/${filteredHooks.length}`);
+        setText("toggleHooksList", contentShowAllHooks ? "Свернуть" : "Показать все");
+        hooksList.innerHTML = visibleHooks.length ? visibleHooks.map((hook) => `
           <div class="activity-item"><span class="mini-icon">Х</span><div><h3>${escapeHtml(hook.text)}</h3></div><button class="delete-message" type="button" data-delete-content-hook="${escapeHtml(hook.id)}">Удалить</button></div>
-        `).join("");
+        `).join("") : `<div class="onboarding-card"><h3>Хуки не найдены</h3><p class="muted">Попробуйте другой поиск.</p></div>`;
 
         kanban.innerHTML = conveyorColumns.map(([key, title]) => {
           const cards = contentWorkspace.conveyor.filter((card) => card.status === key);
@@ -3713,6 +3750,45 @@
           document.getElementById("contentIdeaPriority").value
         );
         titleInput.value = "";
+      });
+
+      document.getElementById("contentSearchInput")?.addEventListener("input", () => {
+        contentShowAllIdeas = false;
+        contentShowAllHooks = false;
+        renderContentWorkspace();
+      });
+
+      document.getElementById("contentStatusFilter")?.addEventListener("change", () => {
+        contentShowAllIdeas = false;
+        renderContentWorkspace();
+      });
+
+      document.getElementById("toggleIdeasList")?.addEventListener("click", () => {
+        contentShowAllIdeas = !contentShowAllIdeas;
+        renderContentWorkspace();
+      });
+
+      document.getElementById("toggleHooksList")?.addEventListener("click", () => {
+        contentShowAllHooks = !contentShowAllHooks;
+        renderContentWorkspace();
+      });
+
+      document.getElementById("randomContentIdea")?.addEventListener("click", () => {
+        const ideas = contentWorkspace.ideas || [];
+        const idea = ideas[Math.floor(Math.random() * ideas.length)];
+        const result = document.getElementById("randomIdeaResult");
+        if (!idea || !result) return;
+        result.style.display = "grid";
+        result.innerHTML = `<h3>${escapeHtml(idea.title)}</h3><p class="muted">${escapeHtml(idea.category)} · ${escapeHtml(idea.status)} · ${escapeHtml(idea.priority)}</p>`;
+      });
+
+      document.getElementById("randomContentHook")?.addEventListener("click", () => {
+        const hooks = contentWorkspace.hooks || [];
+        const hook = hooks[Math.floor(Math.random() * hooks.length)];
+        const result = document.getElementById("randomHookResult");
+        if (!hook || !result) return;
+        result.style.display = "grid";
+        result.innerHTML = `<h3>${escapeHtml(hook.text)}</h3>`;
       });
 
       document.getElementById("contentHookForm")?.addEventListener("submit", (event) => {
@@ -4621,6 +4697,12 @@
         return document.querySelector(".week-day.active");
       }
 
+      function scrollToActiveWeekDay() {
+        const activeDay = activeWeekDay();
+        if (!activeDay) return;
+        activeDay.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
+      }
+
       function syncDayEditor() {
         const day = activeWeekDay();
         if (!day) return;
@@ -4654,6 +4736,7 @@
           const day = document.createElement("div");
           day.className = "week-day";
           if (sameDay(date, selectedDate)) day.classList.add("active");
+          if (sameDay(date, today)) day.classList.add("today");
           day.dataset.date = formatDate(date);
           day.dataset.iso = key;
           day.dataset.child = plan.child;
@@ -4789,6 +4872,7 @@
         calendarMonth = new Date(today.getFullYear(), today.getMonth(), 1);
         renderMonthCalendar();
         renderWeekPlan();
+        scrollToActiveWeekDay();
         saveState();
       });
 
