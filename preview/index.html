@@ -1127,6 +1127,10 @@
         transition: 180ms ease;
       }
 
+      .week-day.collapsed {
+        min-height: auto;
+      }
+
       .week-day.active,
       .week-day:hover {
         border-color: rgba(142, 230, 200, 0.28);
@@ -1143,6 +1147,28 @@
         margin-top: 12px;
       }
 
+      .week-day.collapsed .week-items {
+        display: none;
+      }
+
+      .week-day-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .week-toggle {
+        border: 0;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.075);
+        color: var(--soft);
+        cursor: pointer;
+        font-weight: 800;
+        height: 28px;
+        min-width: 28px;
+      }
+
       .week-item {
         border-radius: 12px;
         background: rgba(255, 255, 255, 0.055);
@@ -1150,6 +1176,13 @@
         color: var(--soft);
         font-size: 13px;
         line-height: 1.35;
+      }
+
+      .week-day-stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 12px;
       }
 
       .day-summary {
@@ -2472,7 +2505,14 @@
               </div>
             </div>
             <div class="card" style="margin-bottom: 18px">
-              <div class="card-title"><h2 id="weekRangeTitle">Неделя</h2><span class="pill blue">Ева</span></div>
+              <div class="card-title">
+                <h2 id="weekRangeTitle">Неделя</h2>
+                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap">
+                  <button class="btn secondary" id="collapseWeekDays" type="button">Свернуть все</button>
+                  <button class="btn secondary" id="jumpToTodayWeek" type="button">Перейти к сегодня</button>
+                  <span class="pill blue">Ева</span>
+                </div>
+              </div>
               <div class="week-grid" id="weekGrid"></div>
             </div>
             <div class="day-summary" id="selectedDaySummary">
@@ -3253,6 +3293,7 @@
           activeNotesView,
           authProfile,
           onboarded: Boolean(authProfile),
+          planTemplateVersion: typeof PLAN_TEMPLATE_VERSION !== "undefined" ? PLAN_TEMPLATE_VERSION : savedState.planTemplateVersion,
           planStore: typeof planStore !== "undefined" ? planStore : savedState.planStore,
           selectedDate: typeof selectedDate !== "undefined" ? isoDate(selectedDate) : savedState.selectedDate,
           calendarMonth: typeof calendarMonth !== "undefined" ? isoDate(calendarMonth) : savedState.calendarMonth,
@@ -4549,6 +4590,7 @@
       const evaPlanStartDate = new Date(2026, 4, 31);
       let selectedDate = savedState.selectedDate ? new Date(savedState.selectedDate) : new Date(evaPlanStartDate);
       let calendarMonth = savedState.calendarMonth ? new Date(savedState.calendarMonth) : new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+      const PLAN_TEMPLATE_VERSION = "eva-week-plan-v3";
       const planStore = savedState.planStore || {};
 
       function isoDate(date) {
@@ -4579,62 +4621,103 @@
 
       function makeFamilyDayTemplate(date) {
         const day = date.getDay() || 7;
-        const weekdayRoomFocus = {
-          1: [
-            "09:00 Ева · шкаф с одеждой: разобрать вещи #комната",
-            "09:20 Ева · шкаф с одеждой: решить, что оставить #комната",
-            "09:40 Ева · шкаф с одеждой: что убрать в кладовую #кладовые"
-          ],
-          2: [
-            "09:00 Ева · рабочий стол и полки: разобрать стол #комната",
-            "09:20 Ева · рабочий стол и полки: разобрать ящики #комната",
-            "09:40 Ева · рабочий стол и полки: разобрать полочки #комната"
-          ],
-          3: [
-            "09:00 Ева · левый шкаф: разобрать полки #комната",
-            "09:35 Ева · левый шкаф: подготовить лишнее в кладовую #кладовые"
-          ],
-          4: [
-            "09:00 Ева · шкафы над кроватью: перебрать содержимое #комната",
-            "09:35 Ева · шкафы над кроватью: убрать лишнее #комната"
-          ],
-          5: [
-            "09:00 Ева · боковой шкаф: оставить нужное #комната",
-            "09:20 Ева · боковой шкаф: перенести лишнее в кладовую #кладовые",
-            "09:40 Ева · финальная проверка комнаты: выбросить лишнее #комната"
-          ]
-        };
-        const breakfast = {
-          1: "омлет / яичница",
-          2: "йогурт + банан",
-          3: "тост + яйцо / йогурт",
-          4: "омлет / каша",
-          5: "йогурт / яйцо + тост",
-          6: "омлет / йогурт",
-          7: "омлет / тост + яйцо"
-        }[day];
-        const wakeTime = day === 6 ? "08:30" : day === 7 ? "09:00" : "07:30";
-        const breakfastTime = day === 6 ? "09:00" : day === 7 ? "09:30" : "08:30";
-        const workStart = day === 7 ? "10:30" : "10:00";
-        const shootStart = day === 7 ? "12:00" : "11:30";
-        const items = [
-          `${wakeTime} Ева · подъём #режим`,
-          `${breakfastTime} Ева · завтрак: ${breakfast} #еда`,
-          ...(weekdayRoomFocus[day] || []),
-          `${workStart} Ева · GPT + вайб-кодинг #вайбкодинг`,
-          `${shootStart} Ева · съёмка и монтаж видео #контент`,
-          "13:00 Ева · работа над каналом #контент",
+        const weekday = [
+          "07:30 Ева · подъём #режим",
+          "08:30 Ева · завтрак #еда",
+          "09:00 Ева · GPT + вайб-кодинг #вайбкодинг",
+          "11:00 Ева · съёмка и монтаж видео #контент",
+          "12:30 Ева · работа над каналом #контент",
+          "13:30 Ева · чтение книги #библиотека",
           "14:00 Ева · обед #еда",
           "15:00 Ева · выкладка видео #контент",
           "15:10 Ева · запуск робота #робот-пылесос",
-          "15:15 Ева · запустить пылесос #дом",
-          "15:25 Ева · поиграть с кошкой #кошки",
+          "15:20 Ева · робот-пылесос #робот-пылесос",
+          "15:30 Ева · поиграть с кошкой #кошки",
           "17:30 Ева · тренировка #спорт",
           "18:00 Ева · прогулка #прогулка",
-          "20:30 Ева · книга #библиотека",
+          "19:00 Ева · уборка на кухне #кухня",
           "21:00 Ева · сон #сон"
         ];
-        return items;
+        const trainingDay = [
+          "07:30 Ева · подъём #режим",
+          "08:30 Ева · завтрак #еда",
+          "09:00 Ева · GPT + вайб-кодинг #вайбкодинг",
+          "11:00 Ева · съёмка и монтаж видео #контент",
+          "12:30 Ева · работа над каналом #контент",
+          "13:30 Ева · чтение книги #библиотека",
+          "14:00 Ева · обед #еда",
+          "15:00 Ева · выкладка видео #контент",
+          "15:10 Ева · запуск робота #робот-пылесос",
+          "15:20 Ева · робот-пылесос #робот-пылесос",
+          "15:30 Ева · поиграть с кошкой #кошки",
+          "15:40 Ева · сборы #режим",
+          "16:00 Ева · тренировка #спорт",
+          "19:00 Ева · уборка на кухне #кухня",
+          "21:00 Ева · сон #сон"
+        ];
+        if (day === 2 || day === 4) return trainingDay;
+        if (day === 6) {
+          return [
+            "08:00 Ева · подъём #режим",
+            "08:30 Ева · завтрак #еда",
+            "09:00 Ева · GPT + вайб-кодинг #вайбкодинг",
+            "10:00 Ева · съёмка и монтаж видео #контент",
+            "11:30 Ева · тренировка #спорт",
+            "14:00 Ева · обед #еда",
+            "15:00 Ева · выкладка видео #контент",
+            "15:10 Ева · запуск робота #робот-пылесос",
+            "15:20 Ева · робот-пылесос #робот-пылесос",
+            "15:30 Ева · поиграть с кошкой #кошки",
+            "17:30 Ева · прогулка #прогулка",
+            "19:00 Ева · уборка на кухне #кухня",
+            "20:00 Ева · чтение книги #библиотека",
+            "21:00 Ева · сон #сон"
+          ];
+        }
+        if (day === 7) {
+          return [
+            "09:00 Ева · подъём #режим",
+            "09:30 Ева · завтрак #еда",
+            "10:00 Ева · GPT + вайб-кодинг #вайбкодинг",
+            "12:00 Ева · съёмка и монтаж видео #контент",
+            "13:00 Ева · работа над каналом #контент",
+            "13:30 Ева · чтение книги #библиотека",
+            "14:00 Ева · обед #еда",
+            "15:00 Ева · выкладка видео #контент",
+            "15:10 Ева · запуск робота #робот-пылесос",
+            "15:20 Ева · робот-пылесос #робот-пылесос",
+            "15:30 Ева · поиграть с кошкой #кошки",
+            "17:30 Ева · прогулка #прогулка",
+            "19:00 Ева · уборка на кухне #кухня",
+            "21:00 Ева · сон #сон"
+          ];
+        }
+        return weekday;
+      }
+
+      function refreshPlanTemplateIfNeeded() {
+        if (savedState.planTemplateVersion === PLAN_TEMPLATE_VERSION) return;
+        selectedDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        calendarMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        const keys = new Set(Object.keys(planStore));
+        for (let index = 0; index < 7; index += 1) {
+          keys.add(isoDate(addDays(selectedDate, index)));
+        }
+        keys.forEach((key) => {
+          const [year, month, day] = key.split("-").map(Number);
+          const date = new Date(year, month - 1, day);
+          planStore[key] = { child: "Ева", items: makeFamilyDayTemplate(date) };
+        });
+      }
+
+      function planStats(items) {
+        const count = (words) => items.filter((item) => words.some((word) => item.toLowerCase().includes(word))).length;
+        return {
+          content: count(["#контент", "#вайбкодинг", "ролик", "монтаж", "канал"]),
+          home: count(["#кухня", "#дом", "#робот-пылесос", "#кошки", "пылесос", "робот", "кош"]),
+          food: count(["#еда", "#режим", "#сон", "завтрак", "обед", "подъём"]),
+          sport: count(["#спорт", "#прогулка", "тренировка", "прогулка"])
+        };
       }
 
       function ensurePlan(date) {
@@ -4703,6 +4786,15 @@
         activeDay.scrollIntoView({ behavior: "smooth", block: "center", inline: "nearest" });
       }
 
+      function jumpToTodayInWeek() {
+        selectedDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        calendarMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+        renderMonthCalendar();
+        renderWeekPlan();
+        scrollToActiveWeekDay();
+        saveState();
+      }
+
       function syncDayEditor() {
         const day = activeWeekDay();
         if (!day) return;
@@ -4715,11 +4807,11 @@
       function updateSelectedDaySummary() {
         const plan = ensurePlan(selectedDate);
         const items = plan.items || [];
-        const hasAny = (words) => items.filter((item) => words.some((word) => item.toLowerCase().includes(word))).length;
+        const stats = planStats(items);
         setText("summaryTotalItems", items.length);
-        setText("summaryContentItems", hasAny(["#контент", "ролик", "монтаж", "канал"]));
-        setText("summaryHomeItems", hasAny(["#дом", "#комната", "#кухня", "пылесос", "робот", "кош"]));
-        setText("summaryRoutineItems", hasAny(["#еда", "#режим", "#сон", "завтрак", "обед", "подъём"]));
+        setText("summaryContentItems", stats.content);
+        setText("summaryHomeItems", stats.home);
+        setText("summaryRoutineItems", stats.food);
       }
 
       function renderWeekPlan() {
@@ -4737,14 +4829,23 @@
           day.className = "week-day";
           if (sameDay(date, selectedDate)) day.classList.add("active");
           if (sameDay(date, today)) day.classList.add("today");
+          if (!sameDay(date, selectedDate)) day.classList.add("collapsed");
           day.dataset.date = formatDate(date);
           day.dataset.iso = key;
           day.dataset.child = plan.child;
-          day.innerHTML = `<h3>${weekdayShort[weekdayIndex]} ${date.getDate()}</h3><div class="week-items">${plan.items.map((item) => `<div class="week-item">${escapeHtml(item)}</div>`).join("")}</div>`;
+          const stats = planStats(plan.items || []);
+          day.innerHTML = `<div class="week-day-head"><h3>${weekdayShort[weekdayIndex]} ${date.getDate()}</h3><button class="week-toggle" type="button" aria-label="Открыть день">${sameDay(date, selectedDate) ? "−" : "+"}</button></div><div class="week-items">${plan.items.map((item) => `<div class="week-item">${escapeHtml(item)}</div>`).join("")}</div><div class="week-day-stats"><span class="pill blue">Контент: ${stats.content}</span><span class="pill">Дом: ${stats.home}</span><span class="pill peach">Еда: ${stats.food}</span><span class="pill rose">Спорт: ${stats.sport}</span></div>`;
           day.addEventListener("click", () => {
             selectedDate = date;
-            document.querySelectorAll(".week-day").forEach((item) => item.classList.remove("active"));
+            document.querySelectorAll(".week-day").forEach((item) => {
+              item.classList.remove("active");
+              item.classList.add("collapsed");
+              const toggle = item.querySelector(".week-toggle");
+              if (toggle) toggle.textContent = "+";
+            });
             day.classList.add("active");
+            day.classList.remove("collapsed");
+            day.querySelector(".week-toggle").textContent = "−";
             renderMonthCalendar();
             syncDayEditor();
             saveState();
@@ -4868,14 +4969,23 @@
       });
 
       document.getElementById("todayButton").addEventListener("click", () => {
-        selectedDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-        calendarMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-        renderMonthCalendar();
-        renderWeekPlan();
-        scrollToActiveWeekDay();
-        saveState();
+        jumpToTodayInWeek();
       });
 
+      document.getElementById("jumpToTodayWeek")?.addEventListener("click", () => {
+        jumpToTodayInWeek();
+      });
+
+      document.getElementById("collapseWeekDays")?.addEventListener("click", () => {
+        document.querySelectorAll(".week-day").forEach((day) => {
+          day.classList.add("collapsed");
+          day.classList.remove("active");
+          const toggle = day.querySelector(".week-toggle");
+          if (toggle) toggle.textContent = "+";
+        });
+      });
+
+      refreshPlanTemplateIfNeeded();
       renderMonthCalendar();
       renderWeekPlan();
       renderDashboardCalendar();
