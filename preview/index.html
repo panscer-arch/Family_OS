@@ -694,6 +694,16 @@
         margin-top: 12px;
       }
 
+      .compact-help {
+        border: 1px solid rgba(255, 255, 255, 0.075);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--muted);
+        padding: 10px 12px;
+        font-size: 13px;
+        line-height: 1.45;
+      }
+
       .segmented {
         display: flex;
         flex-wrap: wrap;
@@ -1492,6 +1502,12 @@
         flex-wrap: wrap;
         gap: 10px;
         margin-top: 14px;
+      }
+
+      .saved-frame-hint {
+        margin-top: 10px;
+        font-size: 13px;
+        line-height: 1.45;
       }
 
       .saved-frame-card {
@@ -2574,6 +2590,11 @@
                 <input class="field" id="quickContentIdeaInput" placeholder="Быстрая идея ролика" />
                 <button class="btn" type="submit">Сохранить</button>
               </form>
+              <div class="helper-actions" style="margin-bottom: 14px">
+                <button class="mini-action" type="button" data-content-preset="Что я изменила в Family OS сегодня">Family OS сегодня</button>
+                <button class="mini-action" type="button" data-content-preset="Ошибка, которую я нашла и исправила">Ошибка и фикс</button>
+                <button class="mini-action" type="button" data-content-preset="Показываю путь от идеи до результата">Идея → результат</button>
+              </div>
               <form class="grid cols-4" id="contentIdeaForm" style="margin-bottom: 14px">
                 <input class="field" id="contentIdeaTitle" placeholder="Название идеи" required />
                 <select id="contentIdeaCategory"><option>Vibe Coding</option><option>Проект</option><option>Ошибка</option><option>ChatGPT</option><option>Челлендж</option><option>Закулисье</option></select>
@@ -2655,6 +2676,7 @@
                   <button class="btn secondary" type="button" data-food-preset="Роллы / пицца / боул" data-food-type="заказать">Заказать</button>
                   <button class="btn secondary" type="button" data-food-preset="Фрукты / йогурт" data-food-type="быстро">Быстро</button>
                 </div>
+                <p class="compact-help" style="margin-top: 12px">Кнопки выше только заполняют форму. Нажми «Добавить идею», когда вариант подходит.</p>
                 <form class="grid" id="foodForm" style="margin-top: 16px">
                   <input class="field" id="foodTitleInput" placeholder="Идея еды: омлет, паста, роллы" required />
                   <div class="form-row">
@@ -2712,6 +2734,11 @@
                   <button class="btn" type="submit">Добавить</button>
                   <input class="field" id="noteTextInput" placeholder="Заметка или ссылка" />
                 </form>
+                <div class="helper-actions" style="margin-top: 12px">
+                  <button class="mini-action" type="button" data-note-preset="Идея для ролика">Идея ролика</button>
+                  <button class="mini-action" type="button" data-note-preset="Что проверить в проекте">Проверить проект</button>
+                  <button class="mini-action" type="button" data-note-preset="Что купить или заказать">Купить / заказать</button>
+                </div>
               </main>
             </div>
           </section>
@@ -2780,6 +2807,7 @@
                   <a class="btn" href="/igkb/index.html" target="_blank" rel="noreferrer">Открыть отдельно</a>
                   <button class="btn secondary" type="button" id="reloadSavedFrame">Обновить базу</button>
                 </div>
+                <p class="muted saved-frame-hint">Если внутри пусто после деплоя, открой базу отдельно: так проще понять, загрузились ли файлы IGKB.</p>
               </article>
               <article class="card saved-frame-card">
                 <iframe class="saved-frame" id="savedFrame" src="/igkb/index.html" title="База Instagram сохранёнок"></iframe>
@@ -3695,7 +3723,7 @@
             <td><select data-content-idea-status="${escapeHtml(idea.id)}">${ideaStatuses.map((status) => `<option ${idea.status === status ? "selected" : ""}>${escapeHtml(status)}</option>`).join("")}</select></td>
             <td><button class="delete-message" type="button" data-delete-content-idea="${escapeHtml(idea.id)}">Удалить</button></td>
           </tr>
-        `).join("") : `<tr><td colspan="5" class="muted">Ничего не найдено.</td></tr>`;
+        `).join("") : `<tr><td colspan="5" class="muted">${search || statusFilter !== "all" ? "По этому фильтру идей нет. Очистите поиск или смените статус." : "Идей пока нет. Добавьте первую через форму выше."}</td></tr>`;
 
         setText("contentHooksCount", `${visibleHooks.length}/${filteredHooks.length}`);
         setText("toggleHooksList", contentShowAllHooks ? "Свернуть" : "Показать все");
@@ -3707,7 +3735,7 @@
           const cards = contentWorkspace.conveyor.filter((card) => card.status === key);
           return `<div class="content-column" data-content-column="${key}">
             <div class="lane-head"><h3>${escapeHtml(title)}</h3><span class="pill">${cards.length}</span></div>
-            ${cards.map((card) => `<div class="content-card" draggable="true" data-content-card="${escapeHtml(card.id)}"><strong>${escapeHtml(card.title)}</strong></div>`).join("")}
+            ${cards.length ? cards.map((card) => `<div class="content-card" draggable="true" data-content-card="${escapeHtml(card.id)}"><strong>${escapeHtml(card.title)}</strong></div>`).join("") : `<div class="compact-help">Перетащите сюда карточку, когда она будет на этом шаге.</div>`}
           </div>`;
         }).join("");
 
@@ -3778,6 +3806,19 @@
         addContentIdea(title, "Быстрая идея", "средний");
         input.value = "";
         document.getElementById("quickContentIdeaForm").style.display = "none";
+      });
+
+      document.querySelectorAll("[data-content-preset]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const input = document.getElementById("contentIdeaTitle");
+          const category = document.getElementById("contentIdeaCategory");
+          const priority = document.getElementById("contentIdeaPriority");
+          if (!input) return;
+          input.value = button.dataset.contentPreset;
+          if (category) category.value = button.dataset.contentPreset.includes("Family OS") ? "Проект" : "Vibe Coding";
+          if (priority) priority.value = "средний";
+          input.focus();
+        });
       });
 
       document.getElementById("contentIdeaForm")?.addEventListener("submit", (event) => {
@@ -3938,7 +3979,7 @@
         setText("foodCookSummary", cookCount);
         setText("foodOrderSummary", orderCount);
         if (!foodMeals.length) {
-          list.innerHTML = `<div class="onboarding-card"><h3>Идей еды пока нет</h3><p class="muted">Добавьте блюдо, доставку или быстрый перекус.</p></div>`;
+          list.innerHTML = `<div class="onboarding-card"><h3>Идей еды пока нет</h3><p class="muted">Добавьте блюдо, доставку или быстрый перекус. Самый быстрый путь — выбрать пресет слева и сохранить.</p><button class="btn secondary" type="button" data-focus-food-form>Добавить идею</button></div>`;
           return;
         }
         foodMeals.forEach((meal) => {
@@ -3980,8 +4021,13 @@
       });
 
       document.getElementById("foodList")?.addEventListener("click", (event) => {
+        const focusForm = event.target.closest("[data-focus-food-form]");
         const toggle = event.target.closest("[data-toggle-food]");
         const remove = event.target.closest("[data-delete-food]");
+        if (focusForm) {
+          document.getElementById("foodTitleInput")?.focus();
+          return;
+        }
         if (toggle) {
           const meal = foodMeals.find((item) => item.id === toggle.dataset.toggleFood);
           if (!meal) return;
@@ -4103,7 +4149,7 @@
         list.innerHTML = "";
         if (!currentItems.length) {
           const hint = activeNotesView.startsWith("project:") ? "Добавьте первую задачу в этот проект." : (noteViewMap[activeNotesView]?.hint || "Добавьте первую запись.");
-          list.innerHTML = `<div class="things-task"><span></span><div><h3 style="color:rgba(244,247,249,0.55)">Пока пусто</h3><p class="muted">${escapeHtml(hint)}</p></div></div>`;
+          list.innerHTML = `<div class="things-task"><span></span><div><h3 style="color:rgba(244,247,249,0.55)">Пока пусто</h3><p class="muted">${escapeHtml(hint)}</p></div><button class="btn secondary" type="button" data-focus-note-form>Добавить</button></div>`;
           return;
         }
         currentItems.forEach((note) => {
@@ -4205,11 +4251,16 @@
       });
 
       document.getElementById("notesList")?.addEventListener("click", (event) => {
+        const focusForm = event.target.closest("[data-focus-note-form]");
         const complete = event.target.closest("[data-note-complete]");
         const move = event.target.closest("[data-note-list]");
         const remove = event.target.closest("[data-note-delete]");
         const restore = event.target.closest("[data-note-restore]");
         const destroy = event.target.closest("[data-note-destroy]");
+        if (focusForm) {
+          document.getElementById("noteTitleInput")?.focus();
+          return;
+        }
         if (complete) {
           const note = notesItems.find((item) => item.id === complete.dataset.noteComplete);
           if (!note) return;
@@ -4258,6 +4309,17 @@
         renderNotes();
         saveState();
         showNotice("Корзина очищена.");
+      });
+
+      document.querySelectorAll("[data-note-preset]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const titleInput = document.getElementById("noteTitleInput");
+          const destination = document.getElementById("noteDestinationInput");
+          if (!titleInput) return;
+          titleInput.value = button.dataset.notePreset;
+          if (destination) destination.value = button.dataset.notePreset.includes("ролик") ? "plans" : "inbox";
+          titleInput.focus();
+        });
       });
 
       document.addEventListener("invalid", (event) => {
