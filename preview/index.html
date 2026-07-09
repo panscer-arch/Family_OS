@@ -778,6 +778,27 @@
         border-color: rgba(142, 230, 200, 0.18);
       }
 
+      .mentor-subjects {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .mentor-subject {
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.045);
+        padding: 16px;
+        transition: 180ms ease;
+      }
+
+      .mentor-subject.active,
+      .mentor-subject:hover {
+        border-color: rgba(143, 199, 255, 0.28);
+        background: rgba(143, 199, 255, 0.08);
+        transform: translateY(-1px);
+      }
+
       .segmented {
         display: flex;
         flex-wrap: wrap;
@@ -1804,6 +1825,7 @@
         .things-app,
         .mentor-hero,
         .mentor-memory-grid,
+        .mentor-subjects,
         .things-bottom-composer {
           grid-template-columns: 1fr;
         }
@@ -2895,6 +2917,17 @@
                 <p class="compact-help" style="margin-top: 12px">Пока это встроенный локальный наставник. Позже можно подключить настоящий ИИ API, но память и сценарий уже готовы.</p>
               </article>
             </div>
+
+            <article class="card" style="margin-top: 18px">
+              <div class="card-title">
+                <div>
+                  <h2>ОГЭ: предметы</h2>
+                  <p class="muted" style="margin-top: 6px">Математика, русский и обществознание. Сначала подтягиваем базу, потом решаем задания ОГЭ.</p>
+                </div>
+                <span class="pill peach" id="mentorSubjectBadge">3 предмета</span>
+              </div>
+              <div class="mentor-subjects" id="mentorSubjects" style="margin-top: 14px"></div>
+            </article>
           </section>
 
           <section class="page" id="plan">
@@ -3456,6 +3489,12 @@
         hardTopics: "таблица умножения, деление, дроби",
         nextStep: "таблица умножения",
         dailyTopic: "таблица умножения",
+        activeSubject: "math",
+        subjects: [
+          { id: "math", title: "Математика", level: "старт с нуля", nextTopic: "таблица умножения и деление", progress: 0, topics: ["таблица умножения", "деление", "дроби", "проценты", "уравнения", "геометрия"] },
+          { id: "russian", title: "Русский", level: "повторяем базу", nextTopic: "орфография и пунктуация", progress: 0, topics: ["части речи", "орфография", "пунктуация", "изложение", "сочинение", "тест ОГЭ"] },
+          { id: "social", title: "Обществознание", level: "с нуля", nextTopic: "человек и общество", progress: 0, topics: ["человек и общество", "право", "экономика", "политика", "социальные отношения", "термины"] }
+        ],
         completedLessons: [],
         chat: [
           { role: "assistant", text: "Привет. Тут можно начинать с нуля и без стыда. Если не знаешь деление или таблицу умножения, мы просто разберём это маленькими шагами." }
@@ -3470,6 +3509,14 @@
       mentorMemory.hardTopics ||= "таблица умножения, деление, дроби";
       mentorMemory.nextStep ||= "таблица умножения";
       mentorMemory.dailyTopic ||= "таблица умножения";
+      mentorMemory.activeSubject ||= "math";
+      if (!Array.isArray(mentorMemory.subjects)) {
+        mentorMemory.subjects = [
+          { id: "math", title: "Математика", level: "старт с нуля", nextTopic: "таблица умножения и деление", progress: 0, topics: ["таблица умножения", "деление", "дроби", "проценты", "уравнения", "геометрия"] },
+          { id: "russian", title: "Русский", level: "повторяем базу", nextTopic: "орфография и пунктуация", progress: 0, topics: ["части речи", "орфография", "пунктуация", "изложение", "сочинение", "тест ОГЭ"] },
+          { id: "social", title: "Обществознание", level: "с нуля", nextTopic: "человек и общество", progress: 0, topics: ["человек и общество", "право", "экономика", "политика", "социальные отношения", "термины"] }
+        ];
+      }
       let activeNotesView = savedState.activeNotesView || savedState.notesFilter || "inbox";
       let contentShowAllIdeas = false;
       let contentShowAllHooks = false;
@@ -4169,11 +4216,41 @@
           mentorMemory.nextStep = "база перед ОГЭ";
           return "К ОГЭ пойдём не сразу. Сначала база: умножение, деление, дроби, проценты, простые уравнения. Когда это станет спокойнее, начнём решать типовые задания ОГЭ по одному номеру.";
         }
+        if (text.includes("рус") || text.includes("сочин") || text.includes("излож")) {
+          mentorMemory.activeSubject = "russian";
+          mentorMemory.nextStep = "русский: база";
+          return "По русскому начнём спокойно: части речи, орфография, пунктуация, потом изложение и сочинение ОГЭ. Первый шаг: научиться находить основу предложения — кто делает и что делает.";
+        }
+        if (text.includes("обще") || text.includes("прав") || text.includes("эконом") || text.includes("полит")) {
+          mentorMemory.activeSubject = "social";
+          mentorMemory.nextStep = "обществознание: термины";
+          return "По обществознанию главное — понимать слова простыми примерами. Начнём с темы «человек и общество»: человек живёт среди людей, учится правилам, общается, работает, выбирает и несёт ответственность.";
+        }
         if (text.includes("сайт") || text.includes("код")) {
           mentorMemory.nextStep = "маленький сайт";
           return "Для сайта начнём с трёх вещей: HTML отвечает за текст и блоки, CSS за внешний вид, JavaScript за действия. Первый мини-урок: сделать кнопку и понять, что происходит при клике.";
         }
         return "Давай разберём это маленькими шагами. Напиши конкретный пример, который не получается, например: 48 : 4 или 7 x 8. Я объясню без сложных слов и дам одну тренировку.";
+      }
+
+      function renderMentorSubjects() {
+        const subjects = document.getElementById("mentorSubjects");
+        if (!subjects) return;
+        subjects.innerHTML = mentorMemory.subjects.map((subject) => {
+          const active = mentorMemory.activeSubject === subject.id;
+          const progress = Math.min(100, Number(subject.progress || 0));
+          return `<article class="mentor-subject ${active ? "active" : ""}">
+            <div class="card-title"><h3>${escapeHtml(subject.title)}</h3><span class="pill ${active ? "blue" : ""}">${progress}%</span></div>
+            <p class="muted" style="margin-top: 8px">Уровень: ${escapeHtml(subject.level)}</p>
+            <p class="muted" style="margin-top: 6px">Следующая тема: <strong style="color: var(--soft)">${escapeHtml(subject.nextTopic)}</strong></p>
+            <div class="progress"><span style="--value: ${progress}%"></span></div>
+            <div class="helper-actions">
+              <button class="mini-action" type="button" data-mentor-subject="${escapeHtml(subject.id)}">Учить</button>
+              <button class="mini-action approve" type="button" data-mentor-subject-done="${escapeHtml(subject.id)}">Тему прошла</button>
+            </div>
+          </article>`;
+        }).join("");
+        setText("mentorSubjectBadge", `${mentorMemory.subjects.length} предмета`);
       }
 
       function renderMentor() {
@@ -4210,6 +4287,7 @@
           chat.innerHTML = (mentorMemory.chat || []).map((message) => `<div class="mentor-message ${message.role === "user" ? "user" : "assistant"}"><p>${escapeHtml(message.text)}</p></div>`).join("");
           chat.scrollTop = chat.scrollHeight;
         }
+        renderMentorSubjects();
       }
 
       document.getElementById("mentorMemoryForm")?.addEventListener("submit", (event) => {
@@ -4237,9 +4315,32 @@
       document.getElementById("mentor")?.addEventListener("click", (event) => {
         const topic = event.target.closest("[data-mentor-topic]");
         const complete = event.target.closest("[data-mentor-complete]");
+        const subjectButton = event.target.closest("[data-mentor-subject]");
+        const subjectDone = event.target.closest("[data-mentor-subject-done]");
         if (topic) {
           mentorMemory.dailyTopic = topic.dataset.mentorTopic;
           mentorMemory.nextStep = topic.dataset.mentorTopic;
+          renderMentor();
+          saveState();
+          return;
+        }
+        if (subjectButton) {
+          const subject = mentorMemory.subjects.find((item) => item.id === subjectButton.dataset.mentorSubject);
+          if (!subject) return;
+          mentorMemory.activeSubject = subject.id;
+          mentorMemory.nextStep = subject.nextTopic;
+          mentorMemory.dailyTopic = subject.nextTopic;
+          mentorMemory.chat.push({ role: "assistant", text: `Окей, берём предмет: ${subject.title}. Следующая тема: ${subject.nextTopic}. Делаем маленький шаг, без гонки.` });
+          renderMentor();
+          saveState();
+          return;
+        }
+        if (subjectDone) {
+          const subject = mentorMemory.subjects.find((item) => item.id === subjectDone.dataset.mentorSubjectDone);
+          if (!subject) return;
+          subject.progress = Math.min(100, Number(subject.progress || 0) + 10);
+          mentorMemory.activeSubject = subject.id;
+          mentorMemory.chat.push({ role: "assistant", text: `Запомнила: по предмету «${subject.title}» тема отмечена. Прогресс теперь ${subject.progress}%.` });
           renderMentor();
           saveState();
           return;
