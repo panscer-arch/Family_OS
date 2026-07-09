@@ -107,7 +107,7 @@
         display: none !important;
       }
 
-      .plan-only .nav-btn:not([data-route="week"]):not([data-route="content"]):not([data-route="food"]):not([data-route="notes"]):not([data-route="saved"]),
+      .plan-only .nav-btn:not([data-route="week"]):not([data-route="content"]):not([data-route="food"]):not([data-route="notes"]):not([data-route="saved"]):not([data-route="mentor"]),
       .plan-only .sidebar-card,
       .plan-only .search,
       .plan-only .top-actions,
@@ -702,6 +702,80 @@
         padding: 10px 12px;
         font-size: 13px;
         line-height: 1.45;
+      }
+
+      .mentor-hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+        gap: 18px;
+        align-items: stretch;
+      }
+
+      .mentor-card {
+        min-height: 100%;
+      }
+
+      .mentor-memory-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 14px;
+      }
+
+      .mentor-memory-item {
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.04);
+        padding: 12px;
+      }
+
+      .mentor-path {
+        display: grid;
+        gap: 10px;
+      }
+
+      .mentor-step {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 12px;
+        align-items: center;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.04);
+        padding: 13px;
+      }
+
+      .mentor-step.done {
+        border-color: rgba(126, 226, 168, 0.24);
+        background: rgba(126, 226, 168, 0.08);
+      }
+
+      .mentor-chat {
+        display: grid;
+        gap: 12px;
+        max-height: 430px;
+        overflow: auto;
+        padding-right: 4px;
+      }
+
+      .mentor-message {
+        max-width: 88%;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 18px;
+        padding: 12px 14px;
+        background: rgba(255, 255, 255, 0.045);
+      }
+
+      .mentor-message.user {
+        justify-self: end;
+        background: rgba(143, 199, 255, 0.11);
+        border-color: rgba(143, 199, 255, 0.22);
+      }
+
+      .mentor-message.assistant {
+        justify-self: start;
+        background: rgba(142, 230, 200, 0.08);
+        border-color: rgba(142, 230, 200, 0.18);
       }
 
       .segmented {
@@ -1728,8 +1802,14 @@
         .quick-preset-grid,
         .notes-workspace,
         .things-app,
+        .mentor-hero,
+        .mentor-memory-grid,
         .things-bottom-composer {
           grid-template-columns: 1fr;
+        }
+
+        .mentor-message {
+          max-width: 100%;
         }
 
         .things-app {
@@ -2239,6 +2319,10 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v16H4z"/><path d="M8 8h8"/><path d="M8 12h6"/><path d="M8 16h4"/></svg>
             Заметки
           </button>
+          <button class="nav-btn" data-route="mentor" data-title="Наставник">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 3 8l9 5 9-5-9-5Z"/><path d="M5 10v5c0 2 3 4 7 4s7-2 7-4v-5"/><path d="M12 13v7"/></svg>
+            Наставник
+          </button>
           <button class="nav-btn parent-only" data-route="plan" data-title="План дня" style="display:none">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
             Задачи дня
@@ -2743,6 +2827,76 @@
             </div>
           </section>
 
+          <section class="page" id="mentor">
+            <div class="page-head">
+              <div>
+                <p class="eyebrow">Mentor</p>
+                <h1>Наставник</h1>
+                <p class="muted" style="margin-top: 8px">Личный репетитор без стыда: сначала база, потом подготовка к ОГЭ.</p>
+              </div>
+              <button class="btn secondary" id="mentorResetToday" type="button">Сбросить урок дня</button>
+            </div>
+
+            <div class="mentor-hero">
+              <article class="card mentor-card">
+                <div class="card-title">
+                  <div>
+                    <h2>Память наставника</h2>
+                    <p class="muted" style="margin-top: 6px">Он помнит стартовый уровень, цель и темы, которые пока страшные.</p>
+                  </div>
+                  <span class="pill blue" id="mentorLevelBadge">старт с нуля</span>
+                </div>
+                <div class="mentor-memory-grid">
+                  <div class="mentor-memory-item"><p class="muted">Ученица</p><h3 id="mentorNameView">Ева, 12 лет</h3></div>
+                  <div class="mentor-memory-item"><p class="muted">Класс</p><h3 id="mentorGradeView">перехожу в 9 класс</h3></div>
+                  <div class="mentor-memory-item"><p class="muted">Цель</p><h3 id="mentorGoalView">подтянуть базу и ОГЭ</h3></div>
+                  <div class="mentor-memory-item"><p class="muted">Следующий шаг</p><h3 id="mentorNextStepView">таблица умножения</h3></div>
+                </div>
+                <form class="grid cols-2" id="mentorMemoryForm" style="margin-top: 16px">
+                  <input class="field" id="mentorGoalInput" placeholder="Цель: ОГЭ, математика, сайты" />
+                  <input class="field" id="mentorHardTopicsInput" placeholder="Что сложно: деление, дроби, уравнения" />
+                  <select id="mentorLevelInput">
+                    <option>старт с нуля</option>
+                    <option>начальная школа</option>
+                    <option>5-6 класс</option>
+                    <option>7-8 класс</option>
+                    <option>готовлюсь к ОГЭ</option>
+                  </select>
+                  <button class="btn" type="submit">Сохранить память</button>
+                </form>
+              </article>
+
+              <article class="card mentor-card">
+                <div class="card-title"><h2>Урок дня</h2><span class="pill peach" id="mentorTodayBadge">15 минут</span></div>
+                <div class="activity" id="mentorDailyLesson" style="margin-top: 12px"></div>
+                <div class="helper-actions">
+                  <button class="mini-action" type="button" data-mentor-topic="таблица умножения">Таблица умножения</button>
+                  <button class="mini-action" type="button" data-mentor-topic="деление">Деление</button>
+                  <button class="mini-action" type="button" data-mentor-topic="дроби">Дроби</button>
+                  <button class="mini-action" type="button" data-mentor-topic="уравнения">Уравнения</button>
+                  <button class="mini-action" type="button" data-mentor-topic="сайты">Сайты</button>
+                </div>
+              </article>
+            </div>
+
+            <div class="grid cols-2" style="margin-top: 18px">
+              <article class="card">
+                <div class="card-title"><h2>Маршрут обучения</h2><span class="pill" id="mentorProgressBadge">0/6</span></div>
+                <div class="mentor-path" id="mentorPath" style="margin-top: 12px"></div>
+              </article>
+
+              <article class="card">
+                <div class="card-title"><h2>Спросить наставника</h2><span class="pill blue">чат</span></div>
+                <div class="mentor-chat" id="mentorChat"></div>
+                <form class="form-row" id="mentorQuestionForm" style="margin-top: 14px">
+                  <input class="field" id="mentorQuestionInput" placeholder="Например: объясни деление в столбик" required />
+                  <button class="btn" type="submit">Спросить</button>
+                </form>
+                <p class="compact-help" style="margin-top: 12px">Пока это встроенный локальный наставник. Позже можно подключить настоящий ИИ API, но память и сценарий уже готовы.</p>
+              </article>
+            </div>
+          </section>
+
           <section class="page" id="plan">
             <div class="page-head">
               <div><p class="eyebrow">День</p><h1>Задачи дня</h1><p class="muted" style="margin-top: 8px">Этот экран заполняется автоматически из недельного плана и выполненных задач.</p></div>
@@ -3077,7 +3231,7 @@
       let authProfile = SOLO_MODE ? { role: "solo", name: "Ева", familyName: "План Евы", inviteCode: "" } : (savedState.authProfile || null);
 
       function go(route) {
-        const publicRoutes = PLAN_ONLY_MODE ? ["week", "content", "food", "notes", "saved"] : (SOLO_MODE ? ["dashboard", "tasks", "children", "week", "reports", "notes", "saved"] : ["dashboard", "tasks", "children", "reports", "settings", "notes", "saved"]);
+        const publicRoutes = PLAN_ONLY_MODE ? ["week", "content", "food", "notes", "saved", "mentor"] : (SOLO_MODE ? ["dashboard", "tasks", "children", "week", "reports", "notes", "saved", "mentor"] : ["dashboard", "tasks", "children", "reports", "settings", "notes", "saved", "mentor"]);
         if (!publicRoutes.includes(route)) route = PLAN_ONLY_MODE ? "week" : "dashboard";
         if (authProfile?.role === "child" && ["children", "reports", "settings"].includes(route)) {
           route = "dashboard";
@@ -3090,6 +3244,7 @@
         if (route === "content") renderContentWorkspace();
         if (route === "food") renderFoodMeals();
         if (route === "notes") renderNotes();
+        if (route === "mentor") renderMentor();
         location.hash = route;
       }
 
@@ -3293,6 +3448,28 @@
         { id: "project-content", title: "Контент", createdAt: new Date().toLocaleDateString("ru-RU") },
         { id: "project-life", title: "Быт", createdAt: new Date().toLocaleDateString("ru-RU") }
       ];
+      const mentorMemory = savedState.mentorMemory || {
+        name: "Ева, 12 лет",
+        grade: "перехожу в 9 класс",
+        level: "старт с нуля",
+        goal: "подтянуть базу по математике, потом готовиться к ОГЭ",
+        hardTopics: "таблица умножения, деление, дроби",
+        nextStep: "таблица умножения",
+        dailyTopic: "таблица умножения",
+        completedLessons: [],
+        chat: [
+          { role: "assistant", text: "Привет. Тут можно начинать с нуля и без стыда. Если не знаешь деление или таблицу умножения, мы просто разберём это маленькими шагами." }
+        ]
+      };
+      if (!Array.isArray(mentorMemory.completedLessons)) mentorMemory.completedLessons = [];
+      if (!Array.isArray(mentorMemory.chat)) mentorMemory.chat = [{ role: "assistant", text: "Привет. Тут можно начинать с нуля и без стыда. Спроси меня про таблицу умножения, деление, дроби или ОГЭ." }];
+      mentorMemory.name ||= "Ева, 12 лет";
+      mentorMemory.grade ||= "перехожу в 9 класс";
+      mentorMemory.level ||= "старт с нуля";
+      mentorMemory.goal ||= "подтянуть базу по математике, потом готовиться к ОГЭ";
+      mentorMemory.hardTopics ||= "таблица умножения, деление, дроби";
+      mentorMemory.nextStep ||= "таблица умножения";
+      mentorMemory.dailyTopic ||= "таблица умножения";
       let activeNotesView = savedState.activeNotesView || savedState.notesFilter || "inbox";
       let contentShowAllIdeas = false;
       let contentShowAllHooks = false;
@@ -3318,6 +3495,7 @@
           foodMeals,
           notesItems,
           noteProjects,
+          mentorMemory,
           activeNotesView,
           authProfile,
           onboarded: Boolean(authProfile),
@@ -3960,6 +4138,125 @@
         if (!card) return;
         card.status = column.dataset.contentColumn;
         renderContentWorkspace();
+        saveState();
+      });
+
+      const mentorLessons = [
+        { id: "multiply", title: "Таблица умножения", tag: "база", task: "Выучи сегодня только 2, 5 и 10. Потом проверь себя: 2x7, 5x8, 10x6.", why: "Это быстрые ряды, они дают уверенность." },
+        { id: "division", title: "Деление без паники", tag: "база", task: "Пойми связь: 24 : 6 = 4, потому что 6 x 4 = 24. Деление проверяется умножением.", why: "Так деление становится обратным действием, а не страшной магией." },
+        { id: "columns", title: "Деление в столбик", tag: "математика", task: "Начни с простого: 48 : 2, 84 : 4, 96 : 3. Пиши шаги медленно.", why: "Нужна механика: взять число, разделить, умножить, вычесть, снести следующую цифру." },
+        { id: "fractions", title: "Дроби", tag: "математика", task: "Запомни образ: 1/2 это половина, 1/4 это четверть. Нарисуй круг или шоколадку.", why: "Дроби проще понимать через части предмета." },
+        { id: "percent", title: "Проценты", tag: "ОГЭ", task: "10% это одна десятая. Чтобы найти 10% от 300, делим 300 на 10 = 30.", why: "Проценты часто встречаются в ОГЭ и жизни." },
+        { id: "equations", title: "Уравнения", tag: "ОГЭ", task: "x + 7 = 12. Чтобы найти x, убираем 7: x = 12 - 7 = 5.", why: "Уравнение это весы: что делаешь с одной стороной, должно быть честно." }
+      ];
+
+      function mentorAnswer(question) {
+        const text = question.toLowerCase();
+        mentorMemory.hardTopics = mentorMemory.hardTopics || "";
+        if (text.includes("дел")) {
+          mentorMemory.nextStep = "деление";
+          return "Деление можно понять через умножение. Пример: 24 : 6. Спроси себя: на какое число надо умножить 6, чтобы получить 24? 6 x 4 = 24, значит 24 : 6 = 4. Проверка всегда такая: ответ умножаем на делитель.";
+        }
+        if (text.includes("таблиц") || text.includes("умнож")) {
+          mentorMemory.nextStep = "таблица умножения";
+          return "Не учи всю таблицу сразу. Сегодня бери только один ряд. Например, на 2: 2, 4, 6, 8, 10, 12, 14, 16, 18, 20. Это просто прибавлять по 2. Потом закрываешь ответы и проверяешь 5 примеров.";
+        }
+        if (text.includes("дроб")) {
+          mentorMemory.nextStep = "дроби";
+          return "Дробь это часть целого. 1/2 значит одну из двух равных частей. 3/4 значит три части из четырёх. Сначала рисуй: круг, пиццу, шоколадку. Потом уже будем складывать и сравнивать.";
+        }
+        if (text.includes("огэ")) {
+          mentorMemory.nextStep = "база перед ОГЭ";
+          return "К ОГЭ пойдём не сразу. Сначала база: умножение, деление, дроби, проценты, простые уравнения. Когда это станет спокойнее, начнём решать типовые задания ОГЭ по одному номеру.";
+        }
+        if (text.includes("сайт") || text.includes("код")) {
+          mentorMemory.nextStep = "маленький сайт";
+          return "Для сайта начнём с трёх вещей: HTML отвечает за текст и блоки, CSS за внешний вид, JavaScript за действия. Первый мини-урок: сделать кнопку и понять, что происходит при клике.";
+        }
+        return "Давай разберём это маленькими шагами. Напиши конкретный пример, который не получается, например: 48 : 4 или 7 x 8. Я объясню без сложных слов и дам одну тренировку.";
+      }
+
+      function renderMentor() {
+        setText("mentorNameView", mentorMemory.name || "Ева, 12 лет");
+        setText("mentorGradeView", mentorMemory.grade || "перехожу в 9 класс");
+        setText("mentorGoalView", mentorMemory.goal || "подтянуть базу и ОГЭ");
+        setText("mentorNextStepView", mentorMemory.nextStep || "таблица умножения");
+        setText("mentorLevelBadge", mentorMemory.level || "старт с нуля");
+        const goalInput = document.getElementById("mentorGoalInput");
+        const hardInput = document.getElementById("mentorHardTopicsInput");
+        const levelInput = document.getElementById("mentorLevelInput");
+        if (goalInput) goalInput.value = mentorMemory.goal || "";
+        if (hardInput) hardInput.value = mentorMemory.hardTopics || "";
+        if (levelInput) levelInput.value = mentorMemory.level || "старт с нуля";
+
+        const completed = new Set(mentorMemory.completedLessons || []);
+        const path = document.getElementById("mentorPath");
+        if (path) {
+          path.innerHTML = mentorLessons.map((lesson, index) => {
+            const done = completed.has(lesson.id);
+            return `<div class="mentor-step ${done ? "done" : ""}"><span class="mini-icon">${done ? "✓" : index + 1}</span><div><h3>${escapeHtml(lesson.title)}</h3><p class="muted">${escapeHtml(lesson.why)}</p></div><button class="btn secondary" type="button" data-mentor-complete="${escapeHtml(lesson.id)}">${done ? "Повторить" : "Готово"}</button></div>`;
+          }).join("");
+        }
+        setText("mentorProgressBadge", `${completed.size}/${mentorLessons.length}`);
+
+        const daily = mentorLessons.find((lesson) => lesson.title.toLowerCase().includes(String(mentorMemory.dailyTopic || "").toLowerCase())) || mentorLessons[0];
+        const lessonBox = document.getElementById("mentorDailyLesson");
+        if (lessonBox) {
+          lessonBox.innerHTML = `<div class="activity-item"><span class="mini-icon">У</span><div><h3>${escapeHtml(daily.title)}</h3><p class="muted">${escapeHtml(daily.task)}</p></div><button class="btn secondary" type="button" data-mentor-complete="${escapeHtml(daily.id)}">Сделала</button></div>`;
+        }
+
+        const chat = document.getElementById("mentorChat");
+        if (chat) {
+          chat.innerHTML = (mentorMemory.chat || []).map((message) => `<div class="mentor-message ${message.role === "user" ? "user" : "assistant"}"><p>${escapeHtml(message.text)}</p></div>`).join("");
+          chat.scrollTop = chat.scrollHeight;
+        }
+      }
+
+      document.getElementById("mentorMemoryForm")?.addEventListener("submit", (event) => {
+        event.preventDefault();
+        mentorMemory.goal = document.getElementById("mentorGoalInput").value.trim() || mentorMemory.goal;
+        mentorMemory.hardTopics = document.getElementById("mentorHardTopicsInput").value.trim() || mentorMemory.hardTopics;
+        mentorMemory.level = document.getElementById("mentorLevelInput").value;
+        renderMentor();
+        saveState();
+        showNotice("Наставник запомнил.");
+      });
+
+      document.getElementById("mentorQuestionForm")?.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const input = document.getElementById("mentorQuestionInput");
+        const question = input.value.trim();
+        if (!question) return;
+        mentorMemory.chat.push({ role: "user", text: question });
+        mentorMemory.chat.push({ role: "assistant", text: mentorAnswer(question) });
+        input.value = "";
+        renderMentor();
+        saveState();
+      });
+
+      document.getElementById("mentor")?.addEventListener("click", (event) => {
+        const topic = event.target.closest("[data-mentor-topic]");
+        const complete = event.target.closest("[data-mentor-complete]");
+        if (topic) {
+          mentorMemory.dailyTopic = topic.dataset.mentorTopic;
+          mentorMemory.nextStep = topic.dataset.mentorTopic;
+          renderMentor();
+          saveState();
+          return;
+        }
+        if (complete) {
+          const id = complete.dataset.mentorComplete;
+          mentorMemory.completedLessons = mentorMemory.completedLessons || [];
+          if (!mentorMemory.completedLessons.includes(id)) mentorMemory.completedLessons.push(id);
+          renderMentor();
+          saveState();
+        }
+      });
+
+      document.getElementById("mentorResetToday")?.addEventListener("click", () => {
+        mentorMemory.dailyTopic = "таблица умножения";
+        mentorMemory.nextStep = "таблица умножения";
+        renderMentor();
         saveState();
       });
 
