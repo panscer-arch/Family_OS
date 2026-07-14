@@ -2961,23 +2961,34 @@
               <div class="mentor-subjects" id="mentorSubjects" style="margin-top: 14px"></div>
             </article>
 
-            <article class="card" style="margin-top: 18px">
+            <article class="card" id="mentorSubjectDetail" style="margin-top: 18px">
               <div class="card-title">
                 <div>
-                  <h2>ОГЭ математика: программа</h2>
-                  <p class="muted" style="margin-top: 6px">По ФИПИ 2026: сначала база, потом задания 1–19, потом вторая часть.</p>
+                  <h2 id="mentorDetailTitle">ОГЭ математика: программа</h2>
+                  <p class="muted" id="mentorDetailSubtitle" style="margin-top: 6px">По ФИПИ 2026: сначала база, потом задания 1–19, потом вторая часть.</p>
                 </div>
-                <span class="pill blue" id="mentorMathProgressBadge">0/10</span>
+                <span class="pill blue" id="mentorSubjectProgressBadge">0/10</span>
               </div>
               <div class="day-summary" style="margin: 14px 0">
-                <div class="summary-tile"><p class="muted">Каждый день</p><strong>25 мин</strong></div>
-                <div class="summary-tile"><p class="muted">Минимум</p><strong>1 тема</strong></div>
-                <div class="summary-tile"><p class="muted">Практика</p><strong>5 задач</strong></div>
-                <div class="summary-tile"><p class="muted">Разбор</p><strong>ошибки</strong></div>
+                <div class="summary-tile"><p class="muted">Заданий</p><strong id="mentorDetailTasksCount">25</strong></div>
+                <div class="summary-tile"><p class="muted">Время</p><strong id="mentorDetailTime">235 мин</strong></div>
+                <div class="summary-tile"><p class="muted">Баллы</p><strong id="mentorDetailPoints">31</strong></div>
+                <div class="summary-tile"><p class="muted">Каждый день</p><strong id="mentorDetailDaily">25 мин</strong></div>
               </div>
-              <div class="mentor-program" id="mentorMathProgram"></div>
+              <div class="grid cols-2" style="margin-bottom: 16px">
+                <div class="mentor-program-card">
+                  <h3>Теория: что выучить</h3>
+                  <div class="activity" id="mentorTheoryList" style="margin-top: 12px"></div>
+                </div>
+                <div class="mentor-program-card">
+                  <h3>Практика: как тренироваться</h3>
+                  <div class="activity" id="mentorPracticeList" style="margin-top: 12px"></div>
+                </div>
+              </div>
+              <h3>Этапы подготовки</h3>
+              <div class="mentor-program" id="mentorSubjectProgram" style="margin-top: 12px"></div>
               <h3 style="margin-top: 18px">Карта заданий ОГЭ</h3>
-              <div class="mentor-task-map" id="mentorMathTaskMap" style="margin-top: 12px"></div>
+              <div class="mentor-task-map" id="mentorSubjectTaskMap" style="margin-top: 12px"></div>
             </article>
           </section>
 
@@ -3542,6 +3553,7 @@
         dailyTopic: "таблица умножения",
         activeSubject: "math",
         mathOgeCompleted: [],
+        ogeCompleted: { math: [], russian: [], social: [] },
         subjects: [
           { id: "math", title: "Математика", level: "старт с нуля", nextTopic: "таблица умножения и деление", progress: 0, topics: ["таблица умножения", "деление", "дроби", "проценты", "уравнения", "геометрия"] },
           { id: "russian", title: "Русский", level: "повторяем базу", nextTopic: "орфография и пунктуация", progress: 0, topics: ["части речи", "орфография", "пунктуация", "изложение", "сочинение", "тест ОГЭ"] },
@@ -3563,6 +3575,10 @@
       mentorMemory.dailyTopic ||= "таблица умножения";
       mentorMemory.activeSubject ||= "math";
       if (!Array.isArray(mentorMemory.mathOgeCompleted)) mentorMemory.mathOgeCompleted = [];
+      if (!mentorMemory.ogeCompleted || Array.isArray(mentorMemory.ogeCompleted)) mentorMemory.ogeCompleted = { math: mentorMemory.mathOgeCompleted || [], russian: [], social: [] };
+      mentorMemory.ogeCompleted.math ||= mentorMemory.mathOgeCompleted || [];
+      mentorMemory.ogeCompleted.russian ||= [];
+      mentorMemory.ogeCompleted.social ||= [];
       if (!Array.isArray(mentorMemory.subjects)) {
         mentorMemory.subjects = [
           { id: "math", title: "Математика", level: "старт с нуля", nextTopic: "таблица умножения и деление", progress: 0, topics: ["таблица умножения", "деление", "дроби", "проценты", "уравнения", "геометрия"] },
@@ -4276,6 +4292,119 @@
         ["20–25", "вторая часть", "полное решение, алгебра и геометрия"]
       ];
 
+      const mentorOgeDetails = {
+        math: {
+          title: "ОГЭ математика: программа",
+          subtitle: "По ФИПИ 2026: сначала база, потом задания 1–19, потом вторая часть.",
+          tasksCount: "25",
+          time: "235 мин",
+          points: "31",
+          daily: "25 мин",
+          theory: [
+            "Арифметика: таблица умножения, деление, дроби, проценты, степени.",
+            "Алгебра: выражения, формулы, уравнения, неравенства, системы.",
+            "Функции: графики, свойства, чтение зависимостей.",
+            "Геометрия: треугольники, окружность, четырёхугольники, площади, Пифагор.",
+            "Вероятность, статистика, таблицы и диаграммы."
+          ],
+          practice: [
+            "Каждый день 5 задач из открытого банка ФИПИ.",
+            "После каждой ошибки записывать: тема, почему ошиблась, правильный способ.",
+            "Раз в неделю мини-вариант из 10 заданий.",
+            "Раз в месяц полный пробник на время.",
+            "Вторая часть только с полным оформлением решения."
+          ],
+          plan: mentorMathOgePlan,
+          taskMap: mentorMathTaskMap
+        },
+        russian: {
+          title: "ОГЭ русский: программа",
+          subtitle: "По ФИПИ 2026: изложение, задания 2–12 с кратким ответом и сочинение 13.",
+          tasksCount: "13",
+          time: "235 мин",
+          points: "37",
+          daily: "20 мин",
+          theory: [
+            "Изложение: слушать текст, выделять микротемы, сжимать без потери смысла.",
+            "Синтаксис: грамматическая основа, виды предложений, словосочетания.",
+            "Пунктуация: запятые в простом и сложном предложении, обособление.",
+            "Орфография: корни, приставки, суффиксы, Н/НН, НЕ/НИ, слитно-раздельно.",
+            "Текст: смысловой анализ, выразительные средства, лексика.",
+            "Сочинение: тезис, 2 примера, объяснение, вывод."
+          ],
+          practice: [
+            "2 раза в неделю писать короткое сжатое изложение.",
+            "Каждый день 5 коротких заданий по орфографии/пунктуации/синтаксису.",
+            "1 раз в неделю писать мини-сочинение по шаблону.",
+            "Вести список ошибок: правило + пример + правильный ответ.",
+            "Перед пробником повторять критерии изложения и сочинения."
+          ],
+          plan: [
+            { id: "ru-exposition", title: "Сжатое изложение", weeks: "1–2", tasks: "задание 1", focus: "микротемы, сжатие, логика текста", daily: "слушать/читать текст и писать 70–100 слов" },
+            { id: "ru-syntax", title: "Синтаксис", weeks: "3", tasks: "задания 2–3, 9", focus: "основа предложения, виды связи, грамматическая синонимия", daily: "5 предложений на разбор" },
+            { id: "ru-punctuation", title: "Пунктуация", weeks: "4", tasks: "задания 4–5", focus: "запятые, сложные предложения, обособление", daily: "10 предложений с объяснением" },
+            { id: "ru-spelling", title: "Орфография", weeks: "5", tasks: "задания 6–7", focus: "корни, приставки, суффиксы, НЕ/НИ, Н/НН", daily: "1 правило + 10 слов" },
+            { id: "ru-text", title: "Текст и выразительность", weeks: "6", tasks: "задания 10–12", focus: "смысл текста, средства выразительности, лексика", daily: "1 текст + 3 вопроса" },
+            { id: "ru-essay", title: "Сочинение", weeks: "7–8", tasks: "задание 13", focus: "тезис, примеры, комментарий, вывод", daily: "1 абзац или мини-сочинение" },
+            { id: "ru-variants", title: "Пробники и грамотность", weeks: "9+", tasks: "вариант целиком", focus: "изложение + тест + сочинение + проверка ошибок", daily: "20 минут по листу ошибок" }
+          ],
+          taskMap: [
+            ["1", "изложение", "сжатый пересказ прослушанного текста"],
+            ["2–3", "синтаксис", "анализ предложений"],
+            ["4–5", "пунктуация", "запятые и знаки препинания"],
+            ["6–7", "орфография", "правописание слов"],
+            ["8–9", "нормы и словосочетания", "грамматика и синонимия"],
+            ["10", "смысл текста", "понимание содержания"],
+            ["11", "выразительность", "эпитеты, метафоры, сравнения"],
+            ["12", "лексика", "значение слова"],
+            ["13", "сочинение", "рассуждение по тексту"]
+          ]
+        },
+        social: {
+          title: "ОГЭ обществознание: программа",
+          subtitle: "По ФИПИ 2026: 24 задания, теория по обществу и практические задания с развёрнутыми ответами.",
+          tasksCount: "24",
+          time: "180 мин",
+          points: "37",
+          daily: "20 мин",
+          theory: [
+            "Человек и общество: личность, деятельность, общение, социализация.",
+            "Духовная сфера: культура, образование, наука, религия, мораль.",
+            "Экономика: деньги, рынок, труд, собственность, семья и бюджет.",
+            "Социальные отношения: группы, роли, статусы, нормы, конфликты.",
+            "Политика: государство, власть, демократия, выборы, гражданин.",
+            "Право: Конституция, права человека, обязанности, юридическая ответственность."
+          ],
+          practice: [
+            "Каждый день 5 терминов: объяснить простыми словами и привести пример.",
+            "2–3 задания из открытого банка ФИПИ по одной теме.",
+            "Для развёрнутых ответов писать структуру: понятие → объяснение → пример.",
+            "Раз в неделю тренировать фото/текст/таблицу.",
+            "После ошибок делать карточку: термин, правильный смысл, пример."
+          ],
+          plan: [
+            { id: "soc-human", title: "Человек и общество", weeks: "1–2", tasks: "задания 2–4", focus: "личность, деятельность, общение, общество", daily: "5 терминов + 2 примера" },
+            { id: "soc-culture", title: "Культура и духовная сфера", weeks: "3", tasks: "задания 2–4", focus: "культура, образование, наука, мораль, религия", daily: "1 понятие + пример из жизни" },
+            { id: "soc-economy", title: "Экономика", weeks: "4–5", tasks: "задания 6–9", focus: "рынок, деньги, труд, бюджет, финансовая грамотность", daily: "3 термина + 3 задачи" },
+            { id: "soc-social", title: "Социальные отношения", weeks: "6", tasks: "задания 10–13", focus: "группы, роли, нормы, конфликты, семья", daily: "ситуация + объяснение" },
+            { id: "soc-politics", title: "Политика", weeks: "7", tasks: "задания 14–16", focus: "государство, власть, выборы, гражданство", daily: "схема + 5 вопросов" },
+            { id: "soc-law", title: "Право", weeks: "8–9", tasks: "задания 17–20", focus: "Конституция, права, обязанности, ответственность", daily: "1 право + 1 обязанность + пример" },
+            { id: "soc-long", title: "Развёрнутые ответы", weeks: "10–11", tasks: "задания 1, 5, 6, 12, 21–24", focus: "аргументы, примеры, анализ текста/фото/таблицы", daily: "1 ответ по шаблону" },
+            { id: "soc-variants", title: "Пробники и термины", weeks: "12+", tasks: "вариант целиком", focus: "тайминг, ошибки, повтор терминов", daily: "20 минут по слабым темам" }
+          ],
+          taskMap: [
+            ["1", "развёрнутый ответ", "понятие/объяснение"],
+            ["2–4", "человек и общество", "база курса"],
+            ["5", "фото", "анализ социальной ситуации"],
+            ["6–9", "экономика", "финансы, рынок, труд"],
+            ["10–13", "социальная сфера", "роли, нормы, отношения"],
+            ["14–16", "политика", "государство, гражданин"],
+            ["17–20", "право", "Конституция и нормы"],
+            ["21–24", "развёрнутые", "текст, аргументы, примеры"]
+          ]
+        }
+      };
+
       function mentorAnswer(question) {
         const text = question.toLowerCase();
         mentorMemory.hardTopics = mentorMemory.hardTopics || "";
@@ -4324,7 +4453,7 @@
             <p class="muted" style="margin-top: 6px">Следующая тема: <strong style="color: var(--soft)">${escapeHtml(subject.nextTopic)}</strong></p>
             <div class="progress"><span style="--value: ${progress}%"></span></div>
             <div class="helper-actions">
-              <button class="mini-action" type="button" data-mentor-subject="${escapeHtml(subject.id)}">Учить</button>
+              <button class="mini-action" type="button" data-mentor-subject="${escapeHtml(subject.id)}">Открыть</button>
               <button class="mini-action approve" type="button" data-mentor-subject-done="${escapeHtml(subject.id)}">Тему прошла</button>
             </div>
           </article>`;
@@ -4332,26 +4461,42 @@
         setText("mentorSubjectBadge", `${mentorMemory.subjects.length} предмета`);
       }
 
-      function renderMentorMathProgram() {
-        const program = document.getElementById("mentorMathProgram");
-        const taskMap = document.getElementById("mentorMathTaskMap");
-        const completed = new Set(mentorMemory.mathOgeCompleted || []);
+      function renderMentorSubjectDetail() {
+        const subjectId = mentorMemory.activeSubject || "math";
+        const detail = mentorOgeDetails[subjectId] || mentorOgeDetails.math;
+        const program = document.getElementById("mentorSubjectProgram");
+        const taskMap = document.getElementById("mentorSubjectTaskMap");
+        const theoryList = document.getElementById("mentorTheoryList");
+        const practiceList = document.getElementById("mentorPracticeList");
+        const completed = new Set(mentorMemory.ogeCompleted?.[subjectId] || []);
+        setText("mentorDetailTitle", detail.title);
+        setText("mentorDetailSubtitle", detail.subtitle);
+        setText("mentorDetailTasksCount", detail.tasksCount);
+        setText("mentorDetailTime", detail.time);
+        setText("mentorDetailPoints", detail.points);
+        setText("mentorDetailDaily", detail.daily);
+        if (theoryList) {
+          theoryList.innerHTML = detail.theory.map((item) => `<div class="activity-item"><span class="mini-icon">Т</span><div><h3>${escapeHtml(item)}</h3></div></div>`).join("");
+        }
+        if (practiceList) {
+          practiceList.innerHTML = detail.practice.map((item) => `<div class="activity-item"><span class="mini-icon">П</span><div><h3>${escapeHtml(item)}</h3></div></div>`).join("");
+        }
         if (program) {
-          program.innerHTML = mentorMathOgePlan.map((step) => {
+          program.innerHTML = detail.plan.map((step) => {
             const done = completed.has(step.id);
             return `<div class="mentor-program-card ${done ? "status-done" : ""}">
               <div class="card-title"><h3>${escapeHtml(step.title)}</h3><span class="pill ${done ? "status-done" : "blue"}">${escapeHtml(step.weeks)}</span></div>
               <p class="muted" style="margin-top: 8px">ОГЭ: ${escapeHtml(step.tasks)}</p>
               <p class="muted" style="margin-top: 6px">Тема: ${escapeHtml(step.focus)}</p>
               <p class="compact-help" style="margin-top: 10px">${escapeHtml(step.daily)}</p>
-              <button class="btn secondary" type="button" data-mentor-math-step="${escapeHtml(step.id)}" style="margin-top: 12px">${done ? "Повторять" : "Этап прошла"}</button>
+              <button class="btn secondary" type="button" data-mentor-oge-step="${escapeHtml(step.id)}" style="margin-top: 12px">${done ? "Повторять" : "Этап прошла"}</button>
             </div>`;
           }).join("");
         }
         if (taskMap) {
-          taskMap.innerHTML = mentorMathTaskMap.map(([num, title, hint]) => `<div class="mentor-task-chip"><h3>${escapeHtml(num)}</h3><p class="muted">${escapeHtml(title)}</p><p class="muted" style="margin-top: 5px; font-size: 12px">${escapeHtml(hint)}</p></div>`).join("");
+          taskMap.innerHTML = detail.taskMap.map(([num, title, hint]) => `<div class="mentor-task-chip"><h3>${escapeHtml(num)}</h3><p class="muted">${escapeHtml(title)}</p><p class="muted" style="margin-top: 5px; font-size: 12px">${escapeHtml(hint)}</p></div>`).join("");
         }
-        setText("mentorMathProgressBadge", `${completed.size}/${mentorMathOgePlan.length}`);
+        setText("mentorSubjectProgressBadge", `${completed.size}/${detail.plan.length}`);
       }
 
       function renderMentor() {
@@ -4389,7 +4534,7 @@
           chat.scrollTop = chat.scrollHeight;
         }
         renderMentorSubjects();
-        renderMentorMathProgram();
+        renderMentorSubjectDetail();
       }
 
       document.getElementById("mentorMemoryForm")?.addEventListener("submit", (event) => {
@@ -4419,7 +4564,7 @@
         const complete = event.target.closest("[data-mentor-complete]");
         const subjectButton = event.target.closest("[data-mentor-subject]");
         const subjectDone = event.target.closest("[data-mentor-subject-done]");
-        const mathStep = event.target.closest("[data-mentor-math-step]");
+        const ogeStep = event.target.closest("[data-mentor-oge-step]");
         if (topic) {
           mentorMemory.dailyTopic = topic.dataset.mentorTopic;
           mentorMemory.nextStep = topic.dataset.mentorTopic;
@@ -4435,6 +4580,7 @@
           mentorMemory.dailyTopic = subject.nextTopic;
           mentorMemory.chat.push({ role: "assistant", text: `Окей, берём предмет: ${subject.title}. Следующая тема: ${subject.nextTopic}. Делаем маленький шаг, без гонки.` });
           renderMentor();
+          document.getElementById("mentorSubjectDetail")?.scrollIntoView({ behavior: "smooth", block: "start" });
           saveState();
           return;
         }
@@ -4448,16 +4594,18 @@
           saveState();
           return;
         }
-        if (mathStep) {
-          const id = mathStep.dataset.mentorMathStep;
-          const step = mentorMathOgePlan.find((item) => item.id === id);
-          mentorMemory.mathOgeCompleted = mentorMemory.mathOgeCompleted || [];
-          if (step && !mentorMemory.mathOgeCompleted.includes(id)) {
-            mentorMemory.mathOgeCompleted.push(id);
-            mentorMemory.activeSubject = "math";
+        if (ogeStep) {
+          const subjectId = mentorMemory.activeSubject || "math";
+          const detail = mentorOgeDetails[subjectId] || mentorOgeDetails.math;
+          const id = ogeStep.dataset.mentorOgeStep;
+          const step = detail.plan.find((item) => item.id === id);
+          mentorMemory.ogeCompleted = mentorMemory.ogeCompleted || { math: [], russian: [], social: [] };
+          mentorMemory.ogeCompleted[subjectId] = mentorMemory.ogeCompleted[subjectId] || [];
+          if (step && !mentorMemory.ogeCompleted[subjectId].includes(id)) {
+            mentorMemory.ogeCompleted[subjectId].push(id);
             mentorMemory.nextStep = step.title;
             mentorMemory.dailyTopic = step.focus;
-            mentorMemory.chat.push({ role: "assistant", text: `Отметила этап по математике: ${step.title}. Теперь следующий фокус: ${step.focus}.` });
+            mentorMemory.chat.push({ role: "assistant", text: `Отметила этап «${step.title}» по предмету «${detail.title.replace("ОГЭ ", "").replace(": программа", "")}». Следующий фокус: ${step.focus}.` });
           }
           renderMentor();
           saveState();
