@@ -799,6 +799,33 @@
         transform: translateY(-1px);
       }
 
+      .mentor-program {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .mentor-program-card {
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.04);
+        padding: 14px;
+      }
+
+      .mentor-task-map {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .mentor-task-chip {
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        padding: 10px;
+        background: rgba(255, 255, 255, 0.04);
+        min-height: 84px;
+      }
+
       .segmented {
         display: flex;
         flex-wrap: wrap;
@@ -1826,12 +1853,17 @@
         .mentor-hero,
         .mentor-memory-grid,
         .mentor-subjects,
+        .mentor-program,
         .things-bottom-composer {
           grid-template-columns: 1fr;
         }
 
         .mentor-message {
           max-width: 100%;
+        }
+
+        .mentor-task-map {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
         }
 
         .things-app {
@@ -2928,6 +2960,25 @@
               </div>
               <div class="mentor-subjects" id="mentorSubjects" style="margin-top: 14px"></div>
             </article>
+
+            <article class="card" style="margin-top: 18px">
+              <div class="card-title">
+                <div>
+                  <h2>ОГЭ математика: программа</h2>
+                  <p class="muted" style="margin-top: 6px">По ФИПИ 2026: сначала база, потом задания 1–19, потом вторая часть.</p>
+                </div>
+                <span class="pill blue" id="mentorMathProgressBadge">0/10</span>
+              </div>
+              <div class="day-summary" style="margin: 14px 0">
+                <div class="summary-tile"><p class="muted">Каждый день</p><strong>25 мин</strong></div>
+                <div class="summary-tile"><p class="muted">Минимум</p><strong>1 тема</strong></div>
+                <div class="summary-tile"><p class="muted">Практика</p><strong>5 задач</strong></div>
+                <div class="summary-tile"><p class="muted">Разбор</p><strong>ошибки</strong></div>
+              </div>
+              <div class="mentor-program" id="mentorMathProgram"></div>
+              <h3 style="margin-top: 18px">Карта заданий ОГЭ</h3>
+              <div class="mentor-task-map" id="mentorMathTaskMap" style="margin-top: 12px"></div>
+            </article>
           </section>
 
           <section class="page" id="plan">
@@ -3490,6 +3541,7 @@
         nextStep: "таблица умножения",
         dailyTopic: "таблица умножения",
         activeSubject: "math",
+        mathOgeCompleted: [],
         subjects: [
           { id: "math", title: "Математика", level: "старт с нуля", nextTopic: "таблица умножения и деление", progress: 0, topics: ["таблица умножения", "деление", "дроби", "проценты", "уравнения", "геометрия"] },
           { id: "russian", title: "Русский", level: "повторяем базу", nextTopic: "орфография и пунктуация", progress: 0, topics: ["части речи", "орфография", "пунктуация", "изложение", "сочинение", "тест ОГЭ"] },
@@ -3510,6 +3562,7 @@
       mentorMemory.nextStep ||= "таблица умножения";
       mentorMemory.dailyTopic ||= "таблица умножения";
       mentorMemory.activeSubject ||= "math";
+      if (!Array.isArray(mentorMemory.mathOgeCompleted)) mentorMemory.mathOgeCompleted = [];
       if (!Array.isArray(mentorMemory.subjects)) {
         mentorMemory.subjects = [
           { id: "math", title: "Математика", level: "старт с нуля", nextTopic: "таблица умножения и деление", progress: 0, topics: ["таблица умножения", "деление", "дроби", "проценты", "уравнения", "геометрия"] },
@@ -4197,6 +4250,32 @@
         { id: "equations", title: "Уравнения", tag: "ОГЭ", task: "x + 7 = 12. Чтобы найти x, убираем 7: x = 12 - 7 = 5.", why: "Уравнение это весы: что делаешь с одной стороной, должно быть честно." }
       ];
 
+      const mentorMathOgePlan = [
+        { id: "base-arithmetic", title: "База арифметики", weeks: "1–2", tasks: "задания 6–8", focus: "таблица умножения, деление, дроби, проценты, координатная прямая", daily: "10 устных примеров + 5 заданий ФИПИ" },
+        { id: "practical", title: "Практико-ориентированные задачи", weeks: "3–4", tasks: "задания 1–5", focus: "читать условие, схема, величины, единицы измерения, бытовые расчёты", daily: "1 мини-сюжет полностью + разбор ошибок" },
+        { id: "algebra-basic", title: "Алгебра базовая", weeks: "5–6", tasks: "задания 8, 9, 12, 13", focus: "выражения, формулы сокращённого умножения, уравнения, неравенства", daily: "1 правило + 5 коротких задач" },
+        { id: "functions", title: "Функции и графики", weeks: "7", tasks: "задания 11, 22", focus: "графики, свойства функций, чтение по графику, построение", daily: "1 график руками + 3 вопроса по нему" },
+        { id: "probability-stats", title: "Вероятность и таблицы", weeks: "8", tasks: "задания 5, 10", focus: "таблицы, диаграммы, вероятность равновозможных событий", daily: "2 таблицы/диаграммы + 3 вероятности" },
+        { id: "sequences", title: "Последовательности", weeks: "9", tasks: "задание 14", focus: "арифметическая и геометрическая прогрессии, формулы n-го члена и суммы", daily: "5 примеров по формулам" },
+        { id: "geometry-basic", title: "Геометрия база", weeks: "10–12", tasks: "задания 15–19", focus: "треугольники, окружность, четырёхугольники, площади, Пифагор", daily: "1 чертёж + 4 задачи" },
+        { id: "part2-algebra", title: "Вторая часть: алгебра", weeks: "13–14", tasks: "задания 20–22", focus: "оформление решения, уравнения/неравенства, текстовые задачи, графики", daily: "1 развёрнутое решение" },
+        { id: "part2-geometry", title: "Вторая часть: геометрия", weeks: "15–16", tasks: "задания 23–25", focus: "доказательство, вычисление, сложная геометрия", daily: "1 задача с полным объяснением" },
+        { id: "variants", title: "Пробники и добивание ошибок", weeks: "17+", tasks: "вариант целиком", focus: "тайминг, лист ошибок, повтор слабых тем", daily: "мини-вариант или 25 минут ошибок" }
+      ];
+
+      const mentorMathTaskMap = [
+        ["1–5", "практические задачи", "сюжет, расчёты, геометрия в жизни"],
+        ["6–7", "числа", "дроби, степени, координатная прямая"],
+        ["8, 12", "выражения", "формулы, преобразования"],
+        ["9, 13", "уравнения и неравенства", "линейные, квадратные, системы"],
+        ["10", "вероятность", "равновозможные события"],
+        ["11", "графики", "читать график и формулу"],
+        ["14", "прогрессии", "последовательности"],
+        ["15–18", "геометрия", "площади, Пифагор, окружность"],
+        ["19", "утверждения", "истина/ложь, контрпример"],
+        ["20–25", "вторая часть", "полное решение, алгебра и геометрия"]
+      ];
+
       function mentorAnswer(question) {
         const text = question.toLowerCase();
         mentorMemory.hardTopics = mentorMemory.hardTopics || "";
@@ -4253,6 +4332,28 @@
         setText("mentorSubjectBadge", `${mentorMemory.subjects.length} предмета`);
       }
 
+      function renderMentorMathProgram() {
+        const program = document.getElementById("mentorMathProgram");
+        const taskMap = document.getElementById("mentorMathTaskMap");
+        const completed = new Set(mentorMemory.mathOgeCompleted || []);
+        if (program) {
+          program.innerHTML = mentorMathOgePlan.map((step) => {
+            const done = completed.has(step.id);
+            return `<div class="mentor-program-card ${done ? "status-done" : ""}">
+              <div class="card-title"><h3>${escapeHtml(step.title)}</h3><span class="pill ${done ? "status-done" : "blue"}">${escapeHtml(step.weeks)}</span></div>
+              <p class="muted" style="margin-top: 8px">ОГЭ: ${escapeHtml(step.tasks)}</p>
+              <p class="muted" style="margin-top: 6px">Тема: ${escapeHtml(step.focus)}</p>
+              <p class="compact-help" style="margin-top: 10px">${escapeHtml(step.daily)}</p>
+              <button class="btn secondary" type="button" data-mentor-math-step="${escapeHtml(step.id)}" style="margin-top: 12px">${done ? "Повторять" : "Этап прошла"}</button>
+            </div>`;
+          }).join("");
+        }
+        if (taskMap) {
+          taskMap.innerHTML = mentorMathTaskMap.map(([num, title, hint]) => `<div class="mentor-task-chip"><h3>${escapeHtml(num)}</h3><p class="muted">${escapeHtml(title)}</p><p class="muted" style="margin-top: 5px; font-size: 12px">${escapeHtml(hint)}</p></div>`).join("");
+        }
+        setText("mentorMathProgressBadge", `${completed.size}/${mentorMathOgePlan.length}`);
+      }
+
       function renderMentor() {
         setText("mentorNameView", mentorMemory.name || "Ева, 12 лет");
         setText("mentorGradeView", mentorMemory.grade || "перехожу в 9 класс");
@@ -4288,6 +4389,7 @@
           chat.scrollTop = chat.scrollHeight;
         }
         renderMentorSubjects();
+        renderMentorMathProgram();
       }
 
       document.getElementById("mentorMemoryForm")?.addEventListener("submit", (event) => {
@@ -4317,6 +4419,7 @@
         const complete = event.target.closest("[data-mentor-complete]");
         const subjectButton = event.target.closest("[data-mentor-subject]");
         const subjectDone = event.target.closest("[data-mentor-subject-done]");
+        const mathStep = event.target.closest("[data-mentor-math-step]");
         if (topic) {
           mentorMemory.dailyTopic = topic.dataset.mentorTopic;
           mentorMemory.nextStep = topic.dataset.mentorTopic;
@@ -4341,6 +4444,21 @@
           subject.progress = Math.min(100, Number(subject.progress || 0) + 10);
           mentorMemory.activeSubject = subject.id;
           mentorMemory.chat.push({ role: "assistant", text: `Запомнила: по предмету «${subject.title}» тема отмечена. Прогресс теперь ${subject.progress}%.` });
+          renderMentor();
+          saveState();
+          return;
+        }
+        if (mathStep) {
+          const id = mathStep.dataset.mentorMathStep;
+          const step = mentorMathOgePlan.find((item) => item.id === id);
+          mentorMemory.mathOgeCompleted = mentorMemory.mathOgeCompleted || [];
+          if (step && !mentorMemory.mathOgeCompleted.includes(id)) {
+            mentorMemory.mathOgeCompleted.push(id);
+            mentorMemory.activeSubject = "math";
+            mentorMemory.nextStep = step.title;
+            mentorMemory.dailyTopic = step.focus;
+            mentorMemory.chat.push({ role: "assistant", text: `Отметила этап по математике: ${step.title}. Теперь следующий фокус: ${step.focus}.` });
+          }
           renderMentor();
           saveState();
           return;
