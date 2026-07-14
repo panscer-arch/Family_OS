@@ -785,10 +785,16 @@
       }
 
       .mentor-subject {
+        appearance: none;
+        width: 100%;
+        color: inherit;
+        font: inherit;
+        text-align: left;
+        cursor: pointer;
         border: 1px solid rgba(255, 255, 255, 0.08);
         border-radius: 20px;
         background: rgba(255, 255, 255, 0.045);
-        padding: 16px;
+        padding: 18px;
         transition: 180ms ease;
       }
 
@@ -797,6 +803,44 @@
         border-color: rgba(143, 199, 255, 0.28);
         background: rgba(143, 199, 255, 0.08);
         transform: translateY(-1px);
+      }
+
+      .mentor-subject:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 3px;
+      }
+
+      .mentor-subject-open {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 16px;
+        color: var(--accent);
+        font-weight: 700;
+      }
+
+      .mentor-subject-view[hidden],
+      .mentor-overview[hidden],
+      #mentorResetToday[hidden] {
+        display: none !important;
+      }
+
+      .mentor-subject-view {
+        animation: mentor-subject-in 220ms ease both;
+      }
+
+      .mentor-subject-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 18px;
+      }
+
+      @keyframes mentor-subject-in {
+        from { opacity: 0; transform: translateY(8px); }
+        to { opacity: 1; transform: translateY(0); }
       }
 
       .mentor-program {
@@ -2891,6 +2935,18 @@
               <button class="btn secondary" id="mentorResetToday" type="button">Сбросить урок дня</button>
             </div>
 
+            <div class="mentor-overview" id="mentorOverview">
+              <article class="card" id="mentorSubjectsCard" style="margin-bottom: 18px">
+                <div class="card-title">
+                  <div>
+                    <h2>Выбери предмет ОГЭ</h2>
+                    <p class="muted" style="margin-top: 6px">Нажми на математику, русский или обществознание, чтобы открыть отдельную программу.</p>
+                  </div>
+                  <span class="pill peach" id="mentorSubjectBadge">3 предмета</span>
+                </div>
+                <div class="mentor-subjects" id="mentorSubjects" style="margin-top: 14px"></div>
+              </article>
+
             <div class="mentor-hero">
               <article class="card mentor-card">
                 <div class="card-title">
@@ -2950,24 +3006,19 @@
               </article>
             </div>
 
-            <article class="card" style="margin-top: 18px">
-              <div class="card-title">
-                <div>
-                  <h2>ОГЭ: предметы</h2>
-                  <p class="muted" style="margin-top: 6px">Математика, русский и обществознание. Сначала подтягиваем базу, потом решаем задания ОГЭ.</p>
-                </div>
-                <span class="pill peach" id="mentorSubjectBadge">3 предмета</span>
-              </div>
-              <div class="mentor-subjects" id="mentorSubjects" style="margin-top: 14px"></div>
-            </article>
+            </div>
 
-            <article class="card" id="mentorSubjectDetail" style="margin-top: 18px">
+            <div class="mentor-subject-view" id="mentorSubjectDetail" hidden>
+              <div class="mentor-subject-header">
+                <button class="btn secondary" id="mentorSubjectsBack" type="button">← К предметам</button>
+                <span class="pill blue" id="mentorSubjectProgressBadge">0/10</span>
+              </div>
+              <article class="card">
               <div class="card-title">
                 <div>
                   <h2 id="mentorDetailTitle">ОГЭ математика: программа</h2>
                   <p class="muted" id="mentorDetailSubtitle" style="margin-top: 6px">По ФИПИ 2026: сначала база, потом задания 1–19, потом вторая часть.</p>
                 </div>
-                <span class="pill blue" id="mentorSubjectProgressBadge">0/10</span>
               </div>
               <div class="day-summary" style="margin: 14px 0">
                 <div class="summary-tile"><p class="muted">Заданий</p><strong id="mentorDetailTasksCount">25</strong></div>
@@ -2989,7 +3040,8 @@
               <div class="mentor-program" id="mentorSubjectProgram" style="margin-top: 12px"></div>
               <h3 style="margin-top: 18px">Карта заданий ОГЭ</h3>
               <div class="mentor-task-map" id="mentorSubjectTaskMap" style="margin-top: 12px"></div>
-            </article>
+              </article>
+            </div>
           </section>
 
           <section class="page" id="plan">
@@ -3552,6 +3604,7 @@
         nextStep: "таблица умножения",
         dailyTopic: "таблица умножения",
         activeSubject: "math",
+        subjectViewOpen: false,
         mathOgeCompleted: [],
         ogeCompleted: { math: [], russian: [], social: [] },
         subjects: [
@@ -3574,6 +3627,7 @@
       mentorMemory.nextStep ||= "таблица умножения";
       mentorMemory.dailyTopic ||= "таблица умножения";
       mentorMemory.activeSubject ||= "math";
+      mentorMemory.subjectViewOpen = Boolean(mentorMemory.subjectViewOpen);
       if (!Array.isArray(mentorMemory.mathOgeCompleted)) mentorMemory.mathOgeCompleted = [];
       if (!mentorMemory.ogeCompleted || Array.isArray(mentorMemory.ogeCompleted)) mentorMemory.ogeCompleted = { math: mentorMemory.mathOgeCompleted || [], russian: [], social: [] };
       mentorMemory.ogeCompleted.math ||= mentorMemory.mathOgeCompleted || [];
@@ -4446,17 +4500,16 @@
         if (!subjects) return;
         subjects.innerHTML = mentorMemory.subjects.map((subject) => {
           const active = mentorMemory.activeSubject === subject.id;
-          const progress = Math.min(100, Number(subject.progress || 0));
-          return `<article class="mentor-subject ${active ? "active" : ""}">
+          const total = mentorOgeDetails[subject.id]?.plan.length || 1;
+          const completed = mentorMemory.ogeCompleted?.[subject.id]?.length || 0;
+          const progress = Math.min(100, Math.round((completed / total) * 100));
+          return `<button class="mentor-subject ${active ? "active" : ""}" type="button" data-mentor-subject="${escapeHtml(subject.id)}" aria-label="Открыть ОГЭ ${escapeHtml(subject.title)}">
             <div class="card-title"><h3>${escapeHtml(subject.title)}</h3><span class="pill ${active ? "blue" : ""}">${progress}%</span></div>
             <p class="muted" style="margin-top: 8px">Уровень: ${escapeHtml(subject.level)}</p>
             <p class="muted" style="margin-top: 6px">Следующая тема: <strong style="color: var(--soft)">${escapeHtml(subject.nextTopic)}</strong></p>
             <div class="progress"><span style="--value: ${progress}%"></span></div>
-            <div class="helper-actions">
-              <button class="mini-action" type="button" data-mentor-subject="${escapeHtml(subject.id)}">Открыть</button>
-              <button class="mini-action approve" type="button" data-mentor-subject-done="${escapeHtml(subject.id)}">Тему прошла</button>
-            </div>
-          </article>`;
+            <span class="mentor-subject-open">Открыть программу <span aria-hidden="true">→</span></span>
+          </button>`;
         }).join("");
         setText("mentorSubjectBadge", `${mentorMemory.subjects.length} предмета`);
       }
@@ -4464,11 +4517,17 @@
       function renderMentorSubjectDetail() {
         const subjectId = mentorMemory.activeSubject || "math";
         const detail = mentorOgeDetails[subjectId] || mentorOgeDetails.math;
+        const overview = document.getElementById("mentorOverview");
+        const detailView = document.getElementById("mentorSubjectDetail");
         const program = document.getElementById("mentorSubjectProgram");
         const taskMap = document.getElementById("mentorSubjectTaskMap");
         const theoryList = document.getElementById("mentorTheoryList");
         const practiceList = document.getElementById("mentorPracticeList");
         const completed = new Set(mentorMemory.ogeCompleted?.[subjectId] || []);
+        const resetToday = document.getElementById("mentorResetToday");
+        if (overview) overview.hidden = Boolean(mentorMemory.subjectViewOpen);
+        if (detailView) detailView.hidden = !mentorMemory.subjectViewOpen;
+        if (resetToday) resetToday.hidden = Boolean(mentorMemory.subjectViewOpen);
         setText("mentorDetailTitle", detail.title);
         setText("mentorDetailSubtitle", detail.subtitle);
         setText("mentorDetailTasksCount", detail.tasksCount);
@@ -4563,7 +4622,6 @@
         const topic = event.target.closest("[data-mentor-topic]");
         const complete = event.target.closest("[data-mentor-complete]");
         const subjectButton = event.target.closest("[data-mentor-subject]");
-        const subjectDone = event.target.closest("[data-mentor-subject-done]");
         const ogeStep = event.target.closest("[data-mentor-oge-step]");
         if (topic) {
           mentorMemory.dailyTopic = topic.dataset.mentorTopic;
@@ -4576,21 +4634,11 @@
           const subject = mentorMemory.subjects.find((item) => item.id === subjectButton.dataset.mentorSubject);
           if (!subject) return;
           mentorMemory.activeSubject = subject.id;
+          mentorMemory.subjectViewOpen = true;
           mentorMemory.nextStep = subject.nextTopic;
           mentorMemory.dailyTopic = subject.nextTopic;
-          mentorMemory.chat.push({ role: "assistant", text: `Окей, берём предмет: ${subject.title}. Следующая тема: ${subject.nextTopic}. Делаем маленький шаг, без гонки.` });
           renderMentor();
-          document.getElementById("mentorSubjectDetail")?.scrollIntoView({ behavior: "smooth", block: "start" });
-          saveState();
-          return;
-        }
-        if (subjectDone) {
-          const subject = mentorMemory.subjects.find((item) => item.id === subjectDone.dataset.mentorSubjectDone);
-          if (!subject) return;
-          subject.progress = Math.min(100, Number(subject.progress || 0) + 10);
-          mentorMemory.activeSubject = subject.id;
-          mentorMemory.chat.push({ role: "assistant", text: `Запомнила: по предмету «${subject.title}» тема отмечена. Прогресс теперь ${subject.progress}%.` });
-          renderMentor();
+          document.getElementById("mentor")?.scrollIntoView({ behavior: "smooth", block: "start" });
           saveState();
           return;
         }
@@ -4618,6 +4666,13 @@
           renderMentor();
           saveState();
         }
+      });
+
+      document.getElementById("mentorSubjectsBack")?.addEventListener("click", () => {
+        mentorMemory.subjectViewOpen = false;
+        renderMentor();
+        document.getElementById("mentor")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        saveState();
       });
 
       document.getElementById("mentorResetToday")?.addEventListener("click", () => {
