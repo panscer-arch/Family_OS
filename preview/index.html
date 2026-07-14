@@ -899,6 +899,78 @@
         padding: 12px 14px;
       }
 
+      .mentor-readiness-board {
+        display: grid;
+        grid-template-columns: minmax(180px, 0.9fr) minmax(0, 1.6fr);
+        gap: 14px;
+        align-items: stretch;
+        margin-bottom: 16px;
+      }
+
+      .mentor-readiness-score,
+      .mentor-readiness-detail,
+      .mentor-request-card {
+        border: 1px solid rgba(143, 199, 255, 0.16);
+        border-radius: 18px;
+        background: rgba(143, 199, 255, 0.055);
+        padding: 16px;
+      }
+
+      .mentor-readiness-score strong {
+        display: block;
+        margin-top: 6px;
+        color: var(--accent);
+        font-size: 38px;
+        line-height: 1;
+      }
+
+      .mentor-readiness-metrics {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .mentor-readiness-metric {
+        border: 1px solid rgba(255, 255, 255, 0.075);
+        border-radius: 14px;
+        padding: 11px;
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      .mentor-readiness-metric strong {
+        display: block;
+        margin-top: 5px;
+        color: var(--soft);
+        font-size: 19px;
+      }
+
+      .mentor-weak-list,
+      .mentor-request-list,
+      .mentor-session-list {
+        display: grid;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .mentor-weak-item,
+      .mentor-request-item,
+      .mentor-session-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.075);
+        border-radius: 14px;
+        padding: 10px 12px;
+        background: rgba(255, 255, 255, 0.028);
+      }
+
+      .mentor-request-card {
+        margin-top: 18px;
+        border-color: rgba(142, 230, 200, 0.16);
+        background: rgba(142, 230, 200, 0.05);
+      }
+
       .mentor-training-view[hidden],
       .mentor-subject-program-view[hidden] {
         display: none !important;
@@ -2009,6 +2081,8 @@
         .mentor-program,
         .mentor-coach-card,
         .mentor-mastery-row,
+        .mentor-readiness-board,
+        .mentor-readiness-metrics,
         .things-bottom-composer {
           grid-template-columns: 1fr;
         }
@@ -3137,6 +3211,23 @@
                 <div class="summary-tile"><p class="muted">Баллы</p><strong id="mentorDetailPoints">31</strong></div>
                 <div class="summary-tile"><p class="muted">Каждый день</p><strong id="mentorDetailDaily">25 мин</strong></div>
               </div>
+              <div class="mentor-readiness-board" id="mentorReadinessBoard">
+                <div class="mentor-readiness-score">
+                  <p class="eyebrow">Готовность по тренажёру</p>
+                  <strong id="mentorReadinessScore">0%</strong>
+                  <p class="muted" id="mentorReadinessCaption" style="margin-top: 8px">Начни с первой темы.</p>
+                  <button class="btn secondary" id="mentorExportProgress" type="button" style="margin-top: 14px">Скачать учебную историю</button>
+                </div>
+                <div class="mentor-readiness-detail">
+                  <div class="mentor-readiness-metrics">
+                    <div class="mentor-readiness-metric"><p class="muted">Освоено</p><strong id="mentorReadinessMastered">0/10</strong></div>
+                    <div class="mentor-readiness-metric"><p class="muted">Решено</p><strong id="mentorReadinessAnswered">0</strong></div>
+                    <div class="mentor-readiness-metric"><p class="muted">Точность</p><strong id="mentorReadinessAccuracy">—</strong></div>
+                  </div>
+                  <div class="progress" style="margin-top: 14px"><span id="mentorReadinessProgress" style="--value: 0%"></span></div>
+                  <p class="compact-help" style="margin-top: 12px">Процент растёт за точные ответы по всем темам. Это оценка внутри тренажёра, а не обещание результата на экзамене.</p>
+                </div>
+              </div>
               <div class="mentor-coach-card">
                 <div>
                   <p class="eyebrow">Следующее занятие</p>
@@ -3157,10 +3248,36 @@
               </div>
               <div class="card-title" style="margin-top: 18px"><h3>Мои темы</h3><span class="pill" id="mentorMasterySummary">0 освоено</span></div>
               <div class="mentor-mastery-list" id="mentorMasteryList" style="margin-top: 12px"></div>
+              <div class="grid cols-2" style="margin-top: 18px">
+                <div class="mentor-program-card">
+                  <div class="card-title"><h3>Повторить в первую очередь</h3><span class="pill peach">слабые темы</span></div>
+                  <div class="mentor-weak-list" id="mentorWeakTopics"></div>
+                </div>
+                <div class="mentor-program-card">
+                  <div class="card-title"><h3>Последние занятия</h3><span class="pill blue">история</span></div>
+                  <div class="mentor-session-list" id="mentorSessionHistory"></div>
+                </div>
+              </div>
               <h3>Полная программа</h3>
               <div class="mentor-program" id="mentorSubjectProgram" style="margin-top: 12px"></div>
               <h3 style="margin-top: 18px">Карта заданий ОГЭ</h3>
               <div class="mentor-task-map" id="mentorSubjectTaskMap" style="margin-top: 12px"></div>
+              <div class="mentor-request-card">
+                <div class="card-title">
+                  <div><h3>Нужны задания по другой теме?</h3><p class="muted" style="margin-top: 5px">Сохрани запрос, а я добавлю тему и тренировки в следующем обновлении.</p></div>
+                  <span class="pill blue">база заданий</span>
+                </div>
+                <form class="form-row" id="mentorQuestionRequestForm" style="margin-top: 14px">
+                  <select id="mentorQuestionRequestType" aria-label="Тип материала">
+                    <option value="Тренировка">Тренировка</option>
+                    <option value="Теория">Теория</option>
+                    <option value="Мини-вариант">Мини-вариант</option>
+                  </select>
+                  <input class="field" id="mentorQuestionRequestInput" placeholder="Например: дроби с разными знаменателями" required />
+                  <button class="btn" type="submit">Запросить</button>
+                </form>
+                <div class="mentor-request-list" id="mentorQuestionRequests"></div>
+              </div>
               </article>
 
               <div class="mentor-training-view" id="mentorTrainingView" hidden>
@@ -3772,6 +3889,7 @@
         subjectViewOpen: false,
         mastery: { math: {}, russian: {}, social: {} },
         studySessions: [],
+        questionRequests: [],
         studyStreak: 0,
         lastStudyDate: "",
         mathOgeCompleted: [],
@@ -3802,6 +3920,7 @@
       mentorMemory.mastery.russian ||= {};
       mentorMemory.mastery.social ||= {};
       if (!Array.isArray(mentorMemory.studySessions)) mentorMemory.studySessions = [];
+      if (!Array.isArray(mentorMemory.questionRequests)) mentorMemory.questionRequests = [];
       mentorMemory.studyStreak = Number(mentorMemory.studyStreak || 0);
       mentorMemory.lastStudyDate ||= "";
       if (!Array.isArray(mentorMemory.mathOgeCompleted)) mentorMemory.mathOgeCompleted = [];
@@ -4938,6 +5057,83 @@
         return mastered;
       }
 
+      function getMentorReadiness(subjectId, detail) {
+        const topics = detail.plan.map((step) => ({ step, mastery: getMentorMastery(subjectId, step.id) }));
+        const answered = topics.reduce((sum, item) => sum + item.mastery.attempts, 0);
+        const correct = topics.reduce((sum, item) => sum + item.mastery.correct, 0);
+        const mastered = topics.filter((item) => item.mastery.mastered).length;
+        const coverage = topics.reduce((sum, item) => {
+          if (!item.mastery.attempts) return sum;
+          return sum + Math.min(1, item.mastery.attempts / 3) * (item.mastery.correct / item.mastery.attempts);
+        }, 0);
+        return {
+          topics,
+          answered,
+          correct,
+          mastered,
+          accuracy: answered ? Math.round((correct / answered) * 100) : 0,
+          readiness: Math.round((coverage / Math.max(1, topics.length)) * 100)
+        };
+      }
+
+      function renderMentorReadiness(subjectId, detail) {
+        const readiness = getMentorReadiness(subjectId, detail);
+        const activeName = mentorMemory.subjects.find((subject) => subject.id === subjectId)?.title || "предмет";
+        const weak = readiness.topics.filter((item) => item.mastery.attempts >= 2 && item.mastery.percent < 80).sort((a, b) => a.mastery.percent - b.mastery.percent);
+        setText("mentorReadinessScore", `${readiness.readiness}%`);
+        setText("mentorReadinessMastered", `${readiness.mastered}/${detail.plan.length}`);
+        setText("mentorReadinessAnswered", String(readiness.answered));
+        setText("mentorReadinessAccuracy", readiness.answered ? `${readiness.accuracy}%` : "—");
+        const progress = document.getElementById("mentorReadinessProgress");
+        if (progress) progress.style.setProperty("--value", `${readiness.readiness}%`);
+        setText("mentorReadinessCaption", readiness.answered ? `${activeName}: ${readiness.correct} верных ответов из ${readiness.answered}.` : "Пока нет ответов: начни с первой темы.");
+
+        const weakList = document.getElementById("mentorWeakTopics");
+        if (weakList) {
+          if (weak.length) {
+            weakList.innerHTML = weak.slice(0, 4).map(({ step, mastery }) => `<div class="mentor-weak-item"><div><h3>${escapeHtml(step.title)}</h3><p class="muted" style="margin-top: 3px">${mastery.correct} из ${mastery.attempts} верно</p></div><button class="btn secondary" type="button" data-mentor-train-step="${escapeHtml(step.id)}">Повторить</button></div>`).join("");
+          } else if (readiness.answered) {
+            weakList.innerHTML = `<div class="mentor-weak-item"><p class="muted">Пока слабых тем нет. Продолжай закрывать новые.</p></div>`;
+          } else {
+            weakList.innerHTML = `<div class="mentor-weak-item"><p class="muted">После первых двух ответов по теме она появится здесь, если нужна практика.</p></div>`;
+          }
+        }
+
+        const sessions = document.getElementById("mentorSessionHistory");
+        if (sessions) {
+          const latest = (mentorMemory.studySessions || []).filter((item) => item.subject === subjectId).slice(0, 4);
+          sessions.innerHTML = latest.length ? latest.map((item) => `<div class="mentor-session-item"><div><h3>${escapeHtml(item.topic)}</h3><p class="muted" style="margin-top: 3px">${escapeHtml(item.date)} · ${item.minutes} мин</p></div><span class="pill ${item.percent >= 80 ? "status-done" : "peach"}">${item.percent}%</span></div>`).join("") : `<div class="mentor-session-item"><p class="muted">Здесь появятся результаты занятий.</p></div>`;
+        }
+      }
+
+      function renderMentorQuestionRequests(subjectId) {
+        const list = document.getElementById("mentorQuestionRequests");
+        if (!list) return;
+        const requests = (mentorMemory.questionRequests || []).filter((request) => request.subjectId === subjectId).slice(0, 5);
+        list.innerHTML = requests.length ? requests.map((request) => `<div class="mentor-request-item"><div><h3>${escapeHtml(request.topic)}</h3><p class="muted" style="margin-top: 3px">${escapeHtml(request.type)} · ждёт обновления базы</p></div><button class="delete-message" type="button" data-mentor-request-delete="${escapeHtml(request.id)}" aria-label="Удалить запрос">×</button></div>`).join("") : `<p class="compact-help" style="margin-top: 12px">Запросов по этому предмету пока нет.</p>`;
+      }
+
+      function exportMentorProgress() {
+        const payload = {
+          exportedAt: new Date().toISOString(),
+          profile: { name: mentorMemory.name, grade: mentorMemory.grade, goal: mentorMemory.goal },
+          mastery: mentorMemory.mastery,
+          studySessions: mentorMemory.studySessions,
+          questionRequests: mentorMemory.questionRequests,
+          streak: mentorMemory.studyStreak
+        };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `family-os-oge-progress-${new Date().toISOString().slice(0, 10)}.json`;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+        showNotice("Учебная история сохранена в файл.");
+      }
+
       function renderMentorMastery(subjectId, detail) {
         const list = document.getElementById("mentorMasteryList");
         const summary = document.getElementById("mentorMasterySummary");
@@ -5192,6 +5388,8 @@
         const mastered = setMentorSubjectProgress(subjectId, detail);
         setText("mentorSubjectProgressBadge", `${mastered}/${detail.plan.length}`);
         renderMentorMastery(subjectId, detail);
+        renderMentorReadiness(subjectId, detail);
+        renderMentorQuestionRequests(subjectId);
         renderMentorTraining();
       }
 
@@ -5255,11 +5453,38 @@
         saveState();
       });
 
+      document.getElementById("mentorQuestionRequestForm")?.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const input = document.getElementById("mentorQuestionRequestInput");
+        const type = document.getElementById("mentorQuestionRequestType");
+        const topic = input.value.trim();
+        if (!topic) return;
+        mentorMemory.questionRequests.unshift({
+          id: `mentor-request-${Date.now()}`,
+          subjectId: mentorMemory.activeSubject || "math",
+          topic,
+          type: type.value || "Тренировка",
+          createdAt: new Date().toISOString()
+        });
+        mentorMemory.questionRequests = mentorMemory.questionRequests.slice(0, 30);
+        input.value = "";
+        renderMentorQuestionRequests(mentorMemory.activeSubject || "math");
+        saveState();
+        showNotice("Запрос сохранён. Добавлю эту тему в базу при следующем обновлении.");
+      });
+
       document.getElementById("mentor")?.addEventListener("click", (event) => {
         const topic = event.target.closest("[data-mentor-topic]");
         const complete = event.target.closest("[data-mentor-complete]");
         const subjectButton = event.target.closest("[data-mentor-subject]");
         const trainStep = event.target.closest("[data-mentor-train-step]");
+        const deleteRequest = event.target.closest("[data-mentor-request-delete]");
+        if (deleteRequest) {
+          mentorMemory.questionRequests = mentorMemory.questionRequests.filter((request) => request.id !== deleteRequest.dataset.mentorRequestDelete);
+          renderMentorQuestionRequests(mentorMemory.activeSubject || "math");
+          saveState();
+          return;
+        }
         if (topic) {
           mentorMemory.dailyTopic = topic.dataset.mentorTopic;
           mentorMemory.nextStep = topic.dataset.mentorTopic;
@@ -5339,6 +5564,8 @@
           showNotice("Не получилось скопировать автоматически. Выдели текст отчёта и скопируй его.");
         }
       });
+
+      document.getElementById("mentorExportProgress")?.addEventListener("click", exportMentorProgress);
 
       document.getElementById("mentorResetToday")?.addEventListener("click", () => {
         mentorMemory.dailyTopic = "таблица умножения";
