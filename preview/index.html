@@ -870,6 +870,115 @@
         min-height: 84px;
       }
 
+      .mentor-coach-card {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 18px;
+        align-items: center;
+        border: 1px solid rgba(142, 230, 200, 0.18);
+        border-radius: 18px;
+        background: rgba(142, 230, 200, 0.07);
+        padding: 16px;
+        margin-bottom: 16px;
+      }
+
+      .mentor-mastery-list {
+        display: grid;
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+
+      .mentor-mastery-row {
+        display: grid;
+        grid-template-columns: minmax(180px, 1fr) minmax(140px, 0.8fr) auto auto;
+        gap: 12px;
+        align-items: center;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.035);
+        padding: 12px 14px;
+      }
+
+      .mentor-training-view[hidden],
+      .mentor-subject-program-view[hidden] {
+        display: none !important;
+      }
+
+      .mentor-training-view {
+        animation: mentor-subject-in 220ms ease both;
+      }
+
+      .mentor-training-progress {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 6px;
+        margin: 16px 0;
+      }
+
+      .mentor-training-dot {
+        height: 7px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .mentor-training-dot.active,
+      .mentor-training-dot.done {
+        background: var(--accent);
+      }
+
+      .mentor-question-card {
+        border: 1px solid rgba(143, 199, 255, 0.18);
+        border-radius: 18px;
+        background: rgba(143, 199, 255, 0.06);
+        padding: 18px;
+      }
+
+      .mentor-answer-options {
+        display: grid;
+        gap: 9px;
+        margin-top: 16px;
+      }
+
+      .mentor-answer-option {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 48px;
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.035);
+        padding: 10px 12px;
+        cursor: pointer;
+      }
+
+      .mentor-answer-option:has(input:checked) {
+        border-color: rgba(143, 199, 255, 0.42);
+        background: rgba(143, 199, 255, 0.1);
+      }
+
+      .mentor-feedback {
+        display: none;
+        border-radius: 14px;
+        padding: 13px 14px;
+        margin-top: 14px;
+      }
+
+      .mentor-feedback.show {
+        display: block;
+      }
+
+      .mentor-feedback.correct {
+        color: #a8f0ca;
+        background: rgba(126, 226, 168, 0.1);
+        border: 1px solid rgba(126, 226, 168, 0.2);
+      }
+
+      .mentor-feedback.wrong {
+        color: #ffd3d3;
+        background: rgba(255, 122, 122, 0.1);
+        border: 1px solid rgba(255, 122, 122, 0.2);
+      }
+
       .segmented {
         display: flex;
         flex-wrap: wrap;
@@ -1898,6 +2007,8 @@
         .mentor-memory-grid,
         .mentor-subjects,
         .mentor-program,
+        .mentor-coach-card,
+        .mentor-mastery-row,
         .things-bottom-composer {
           grid-template-columns: 1fr;
         }
@@ -2546,7 +2657,7 @@
             </div>
 
             <div class="grid cols-2" style="margin-top: 18px">
-              <article class="card">
+              <article class="card mentor-subject-program-view" id="mentorSubjectProgramView">
                 <div class="card-title"><h2>Фокус дня</h2><span class="pill blue">сегодня</span></div>
                 <form class="form-row" id="dailyFocusForm" style="margin-top: 12px">
                   <input class="field" id="dailyFocusInput" placeholder="Сегодня главное: снять ролик про Family OS" />
@@ -3026,6 +3137,14 @@
                 <div class="summary-tile"><p class="muted">Баллы</p><strong id="mentorDetailPoints">31</strong></div>
                 <div class="summary-tile"><p class="muted">Каждый день</p><strong id="mentorDetailDaily">25 мин</strong></div>
               </div>
+              <div class="mentor-coach-card">
+                <div>
+                  <p class="eyebrow">Следующее занятие</p>
+                  <h3 id="mentorRecommendedTopic" style="margin-top: 5px">База арифметики</h3>
+                  <p class="muted" id="mentorRecommendedReason" style="margin-top: 6px">Начинаем с первой непройденной темы.</p>
+                </div>
+                <button class="btn" id="mentorStartRecommended" type="button">Начать занятие</button>
+              </div>
               <div class="grid cols-2" style="margin-bottom: 16px">
                 <div class="mentor-program-card">
                   <h3>Теория: что выучить</h3>
@@ -3036,11 +3155,57 @@
                   <div class="activity" id="mentorPracticeList" style="margin-top: 12px"></div>
                 </div>
               </div>
-              <h3>Этапы подготовки</h3>
+              <div class="card-title" style="margin-top: 18px"><h3>Мои темы</h3><span class="pill" id="mentorMasterySummary">0 освоено</span></div>
+              <div class="mentor-mastery-list" id="mentorMasteryList" style="margin-top: 12px"></div>
+              <h3>Полная программа</h3>
               <div class="mentor-program" id="mentorSubjectProgram" style="margin-top: 12px"></div>
               <h3 style="margin-top: 18px">Карта заданий ОГЭ</h3>
               <div class="mentor-task-map" id="mentorSubjectTaskMap" style="margin-top: 12px"></div>
               </article>
+
+              <div class="mentor-training-view" id="mentorTrainingView" hidden>
+                <div class="mentor-subject-header">
+                  <button class="btn secondary" id="mentorTrainingBack" type="button">← К программе</button>
+                  <span class="pill peach" id="mentorTrainingCounter">1 из 3</span>
+                </div>
+                <article class="card">
+                  <div class="card-title">
+                    <div>
+                      <p class="eyebrow" id="mentorTrainingSubject">Математика</p>
+                      <h2 id="mentorTrainingTitle">База арифметики</h2>
+                    </div>
+                    <span class="pill blue">свой тренажёр</span>
+                  </div>
+                  <div class="mentor-training-progress" id="mentorTrainingProgress"></div>
+                  <div class="grid cols-2" style="margin-bottom: 16px">
+                    <div class="mentor-program-card"><p class="eyebrow">Короткая теория</p><p id="mentorTrainingTheory" style="margin-top: 8px; line-height: 1.6"></p></div>
+                    <div class="mentor-program-card"><p class="eyebrow">Пример</p><p id="mentorTrainingExample" style="margin-top: 8px; line-height: 1.6"></p></div>
+                  </div>
+                  <div id="mentorTrainingQuestionArea">
+                    <form class="mentor-question-card" id="mentorTrainingForm">
+                      <p class="muted" id="mentorQuestionKind">Задание 1</p>
+                      <h3 id="mentorQuestionText" style="margin-top: 8px; line-height: 1.5"></h3>
+                      <div id="mentorAnswerArea" style="margin-top: 16px"></div>
+                      <div class="mentor-feedback" id="mentorTrainingFeedback"></div>
+                      <div class="helper-actions" style="margin-top: 16px">
+                        <button class="btn" id="mentorCheckAnswer" type="submit">Проверить</button>
+                        <button class="btn secondary" id="mentorNextQuestion" type="button" hidden>Следующее →</button>
+                      </div>
+                    </form>
+                  </div>
+                  <div class="mentor-question-card" id="mentorTrainingResult" hidden>
+                    <p class="eyebrow">Занятие закончено</p>
+                    <h2 id="mentorTrainingScore" style="margin-top: 6px">3 из 3</h2>
+                    <p class="muted" id="mentorTrainingResultText" style="margin-top: 8px"></p>
+                    <pre id="mentorTrainingReport" style="white-space: pre-wrap; margin-top: 14px; font-family: inherit; line-height: 1.55"></pre>
+                    <div class="helper-actions" style="margin-top: 16px">
+                      <button class="btn" id="mentorCopyReport" type="button">Скопировать для Telegram</button>
+                      <button class="btn secondary" id="mentorRepeatTraining" type="button">Повторить тему</button>
+                      <button class="btn secondary" id="mentorFinishTraining" type="button">К программе</button>
+                    </div>
+                  </div>
+                </article>
+              </div>
             </div>
           </section>
 
@@ -3605,6 +3770,10 @@
         dailyTopic: "таблица умножения",
         activeSubject: "math",
         subjectViewOpen: false,
+        mastery: { math: {}, russian: {}, social: {} },
+        studySessions: [],
+        studyStreak: 0,
+        lastStudyDate: "",
         mathOgeCompleted: [],
         ogeCompleted: { math: [], russian: [], social: [] },
         subjects: [
@@ -3628,6 +3797,13 @@
       mentorMemory.dailyTopic ||= "таблица умножения";
       mentorMemory.activeSubject ||= "math";
       mentorMemory.subjectViewOpen = Boolean(mentorMemory.subjectViewOpen);
+      if (!mentorMemory.mastery || typeof mentorMemory.mastery !== "object") mentorMemory.mastery = { math: {}, russian: {}, social: {} };
+      mentorMemory.mastery.math ||= {};
+      mentorMemory.mastery.russian ||= {};
+      mentorMemory.mastery.social ||= {};
+      if (!Array.isArray(mentorMemory.studySessions)) mentorMemory.studySessions = [];
+      mentorMemory.studyStreak = Number(mentorMemory.studyStreak || 0);
+      mentorMemory.lastStudyDate ||= "";
       if (!Array.isArray(mentorMemory.mathOgeCompleted)) mentorMemory.mathOgeCompleted = [];
       if (!mentorMemory.ogeCompleted || Array.isArray(mentorMemory.ogeCompleted)) mentorMemory.ogeCompleted = { math: mentorMemory.mathOgeCompleted || [], russian: [], social: [] };
       mentorMemory.ogeCompleted.math ||= mentorMemory.mathOgeCompleted || [];
@@ -4459,6 +4635,462 @@
         }
       };
 
+      const mentorOfficialSources = {
+        math: {
+          title: "ФИПИ: навигатор по математике ОГЭ-2026",
+          url: "https://doc.fipi.ru/navigator-podgotovki/navigator-oge/Ma-9_1_Chisla.pdf",
+          note: "ФИПИ публикует темы и номера заданий открытого банка. Задания внутри Family OS авторские, но построены по тем же типам."
+        },
+        russian: {
+          title: "ФИПИ: навигатор по русскому языку ОГЭ-2026",
+          url: "https://doc.fipi.ru/navigator-podgotovki/navigator-oge/ru-9_4_grammatika._morfologija.pdf",
+          note: "ФИПИ публикует темы и номера заданий открытого банка. Задания внутри Family OS авторские, но построены по тем же типам."
+        },
+        social: {
+          title: "ФИПИ: рекомендации по обществознанию ОГЭ-2026",
+          url: "https://doc.fipi.ru/navigator-podgotovki/navigator-oge/MR_obcschestvo_oge_2026.pdf",
+          note: "ФИПИ публикует темы и номера заданий открытого банка. Задания внутри Family OS авторские, но построены по тем же типам."
+        }
+      };
+
+      function mentorQuestion(text, answers, explanation, options = []) {
+        return { text, answers: Array.isArray(answers) ? answers : [answers], explanation, options };
+      }
+
+      function mentorMathLesson(step) {
+        const lessons = {
+          "base-arithmetic": {
+            theory: "Умножение и деление - база для большинства вычислений. Деление всегда можно проверить умножением. Процент - это часть из ста: 10% значит разделить число на 10.",
+            example: "56 : 7 = 8, потому что 7 x 8 = 56.",
+            questions: [
+              mentorQuestion("7 x 8 = ?", "56", "7 x 8 = 56. Этот пример нужен для деления и задач ОГЭ."),
+              mentorQuestion("72 : 8 = ?", "9", "8 x 9 = 72, значит 72 : 8 = 9."),
+              mentorQuestion("Найди 10% от 240.", "24", "10% - это одна десятая: 240 : 10 = 24.")
+            ]
+          },
+          practical: {
+            theory: "В заданиях 1-5 сначала выписывай данные, переводи единицы и только потом считай. Не угадывай по тексту.",
+            example: "3 кг яблок по 80 рублей стоят 3 x 80 = 240 рублей.",
+            questions: [
+              mentorQuestion("Тетрадь стоит 35 рублей. Сколько стоят 4 тетради?", "140", "35 x 4 = 140 рублей."),
+              mentorQuestion("В 1 километре сколько метров?", "1000", "1 км = 1000 м. Единицы в задачах ОГЭ часто нужно перевести до вычисления."),
+              mentorQuestion("Скидка 20% на вещь стоимостью 500 рублей. Сколько рублей составляет скидка?", "100", "20% от 500 = 0,2 x 500 = 100.")
+            ]
+          },
+          "algebra-basic": {
+            theory: "В уравнении цель - оставить x один. Одинаковые действия делаем с обеими сторонами. В выражениях сначала скобки, затем умножение и деление.",
+            example: "3x = 21, значит x = 21 : 3 = 7.",
+            questions: [
+              mentorQuestion("Реши уравнение: 4x = 28. x = ?", "7", "28 : 4 = 7."),
+              mentorQuestion("Вычисли: 3(5 + 2).", "21", "Сначала скобки: 5 + 2 = 7, затем 3 x 7 = 21."),
+              mentorQuestion("Реши: x - 9 = 14. x = ?", "23", "К обеим частям прибавляем 9: x = 14 + 9 = 23.")
+            ]
+          },
+          functions: {
+            theory: "Функция показывает, как одно число зависит от другого. В заданиях ОГЭ нужно уметь читать формулу, находить значение и видеть, растёт график или убывает.",
+            example: "Если y = 2x + 1, то при x = 3 получаем y = 7.",
+            questions: [
+              mentorQuestion("Для y = 3x - 2 найди y при x = 4.", "10", "3 x 4 - 2 = 10."),
+              mentorQuestion("Если y = -2x + 5, чему равно y при x = 0?", "5", "Подставляем 0: -2 x 0 + 5 = 5."),
+              mentorQuestion("Функция y = 4x растёт или убывает?", "растёт", "Коэффициент при x положительный, поэтому с ростом x растёт и y.", ["растёт", "убывает"])
+            ]
+          },
+          "probability-stats": {
+            theory: "Вероятность равновозможного события - это число подходящих исходов, делённое на число всех исходов. В таблицах сначала читай заголовки строк и столбцов.",
+            example: "В мешке 3 красных и 2 синих шара. Вероятность красного: 3/5.",
+            questions: [
+              mentorQuestion("В коробке 4 белых и 6 чёрных шаров. Какова вероятность достать белый шар? Ответ дробью.", ["2/5", "0,4", "0.4"], "Белых 4 из 10: 4/10 = 2/5."),
+              mentorQuestion("Среднее арифметическое чисел 4, 6 и 8 равно?", "6", "(4 + 6 + 8) : 3 = 18 : 3 = 6."),
+              mentorQuestion("Вероятность достать число 7 на обычном игральном кубике равна?", "0", "На кубике есть числа только от 1 до 6.")
+            ]
+          },
+          sequences: {
+            theory: "В арифметической прогрессии каждый раз прибавляют одно и то же число. В геометрической - умножают на одно и то же число.",
+            example: "2, 5, 8, 11 - каждый раз прибавляем 3.",
+            questions: [
+              mentorQuestion("Продолжи: 4, 7, 10, 13, ...", "16", "Каждый раз прибавляем 3."),
+              mentorQuestion("Найди следующий член: 3, 6, 12, 24, ...", "48", "Каждый раз умножаем на 2."),
+              mentorQuestion("В последовательности 20, 17, 14, ... разность равна?", "-3", "17 - 20 = -3, и дальше также.")
+            ]
+          },
+          "geometry-basic": {
+            theory: "В геометрии всегда рисуй фигуру, подписывай известные данные и вспоминай нужную формулу. Площадь прямоугольника S = ab, теорема Пифагора: c² = a² + b².",
+            example: "Прямоугольник 5 см на 4 см: S = 5 x 4 = 20 см².",
+            questions: [
+              mentorQuestion("Площадь прямоугольника со сторонами 7 см и 3 см равна?", "21", "S = ab = 7 x 3 = 21."),
+              mentorQuestion("В прямоугольном треугольнике катеты 3 и 4. Гипотенуза равна?", "5", "3² + 4² = 9 + 16 = 25, значит гипотенуза 5."),
+              mentorQuestion("Периметр квадрата со стороной 6 см равен?", "24", "У квадрата 4 равные стороны: 4 x 6 = 24.")
+            ]
+          },
+          "part2-algebra": {
+            theory: "Во второй части важен не только ответ, но и понятная цепочка решения: что дано, какие действия, почему получился ответ.",
+            example: "x² = 49. Значит x = 7 или x = -7, потому что и 7², и (-7)² равны 49.",
+            questions: [
+              mentorQuestion("Реши: x² = 36. Напиши меньший корень.", "-6", "Корни: 6 и -6. Меньший - -6."),
+              mentorQuestion("Реши: 2x + 5 = 17. x = ?", "6", "2x = 12, x = 6."),
+              mentorQuestion("Сколько корней у уравнения x² = 0?", "1", "Единственный корень x = 0.")
+            ]
+          },
+          "part2-geometry": {
+            theory: "Во второй части геометрии обязательно делай чертёж и записывай теорему, которую применяешь. Это помогает получить баллы даже при неидеальном ответе.",
+            example: "Если в равнобедренном треугольнике два угла по 50°, третий: 180° - 50° - 50° = 80°.",
+            questions: [
+              mentorQuestion("Два угла треугольника равны 45° и 65°. Найди третий угол.", "70", "Сумма углов треугольника 180°. 180 - 45 - 65 = 70."),
+              mentorQuestion("Радиус окружности 4 см. Диаметр равен?", "8", "Диаметр в два раза больше радиуса: 2 x 4 = 8."),
+              mentorQuestion("В равнобедренном треугольнике угол при вершине 40°. Каждый угол при основании равен?", "70", "Осталось 140°, делим поровну: 70°.")
+            ]
+          },
+          variants: {
+            theory: "Пробник нужен, чтобы увидеть слабые темы. Ошибка - это не провал, а точный адрес следующего урока.",
+            example: "После варианта выписываем: номер, тема, причина ошибки, правильный шаг.",
+            questions: [
+              mentorQuestion("Вариант: 15% от 200 равно?", "30", "10% = 20, 5% = 10, всего 30."),
+              mentorQuestion("Вариант: 9² - 5² равно?", "56", "81 - 25 = 56."),
+              mentorQuestion("Вариант: 1/4 от 36 равно?", "9", "36 делим на 4 = 9.")
+            ]
+          }
+        };
+        return lessons[step.id];
+      }
+
+      function mentorRussianLesson(step) {
+        const lessons = {
+          "ru-exposition": {
+            theory: "Сжатое изложение не пересказывает всё подряд: в каждом абзаце ищем главную мысль, убираем примеры и повторы, но сохраняем смысл.",
+            example: "«Осенью птицы собираются в стаи и улетают на юг» можно сжать до «Осенью птицы улетают на юг».",
+            questions: [
+              mentorQuestion("Что главное в предложении: «Маленький серый воробей быстро подлетел к кормушке за крошками»?", "воробей подлетел", "Основа: кто? воробей; что сделал? подлетел."),
+              mentorQuestion("Что лучше оставить при сжатии: «Дождь шёл весь день, поэтому улицы стали мокрыми»?", "улицы стали мокрыми из-за дождя", "Сохраняем причину и результат, убираем лишнюю деталь «весь день»."),
+              mentorQuestion("Сколько микротем обычно ищем в тексте из трёх абзацев?", "3", "Обычно один абзац - одна микротема.")
+            ]
+          },
+          "ru-syntax": {
+            theory: "Грамматическая основа - это подлежащее и сказуемое. Сначала находи, кто или что действует, затем что именно происходит.",
+            example: "В предложении «Ночью пошёл снег» основа: снег пошёл.",
+            questions: [
+              mentorQuestion("Найди основу: «На поляне выросли яркие цветы».", "цветы выросли", "Кто? цветы. Что сделали? выросли."),
+              mentorQuestion("Сколько грамматических основ: «Солнце вышло, и снег заискрился»?", "2", "Солнце вышло; снег заискрился."),
+              mentorQuestion("Выбери словосочетание: «читать книгу», «книга лежит».", "читать книгу", "В словосочетании нет грамматической основы; «книга лежит» - основа предложения.", ["читать книгу", "книга лежит"])
+            ]
+          },
+          "ru-punctuation": {
+            theory: "Запятая разделяет части сложного предложения и помогает отделить перечисление. Сначала найди основы, затем границу между ними.",
+            example: "«Стало темно, и пошёл дождь»: две основы, поэтому перед «и» запятая.",
+            questions: [
+              mentorQuestion("Нужна ли запятая: «Стемнело и на небе появились звёзды»?", "да", "Две основы: стемнело; звёзды появились.", ["да", "нет"]),
+              mentorQuestion("Сколько запятых: «На столе лежали книги тетради и карандаши»?", "2", "Перечисление из трёх предметов: книги, тетради и карандаши."),
+              mentorQuestion("Нужна ли запятая: «Я открыл окно потому что стало душно»?", "да", "«Потому что» вводит придаточную часть причины.", ["да", "нет"])
+            ]
+          },
+          "ru-spelling": {
+            theory: "Орфография проверяется правилом, а не ощущением. Сначала определяем часть слова и правило: приставка, корень, суффикс, НЕ или Н/НН.",
+            example: "«Безвкусный» пишется с з: перед глухим к в приставке без- пишем с.",
+            questions: [
+              mentorQuestion("Выбери верное написание.", "рассказать", "В приставке рас- перед глухим с пишется с, далее корень начинается с с: рассказать.", ["рассказать", "расказать"]),
+              mentorQuestion("Выбери верное написание.", "неправда", "С существительным «неправда» НЕ пишется слитно: можно заменить словом «ложь».", ["неправда", "не правда"]),
+              mentorQuestion("Сколько Н в слове «длинный»?", "2", "В слове «длинный» пишутся две Н.")
+            ]
+          },
+          "ru-text": {
+            theory: "В заданиях по тексту ответ ищем в самом тексте. Не добавляем то, чего автор не сказал.",
+            example: "Если автор пишет, что герой испугался, нельзя отвечать, что он обрадовался.",
+            questions: [
+              mentorQuestion("Что значит «главная мысль текста»?", "то, что автор хочет сказать читателю", "Тема - о чём текст, главная мысль - зачем он написан.", ["то, что автор хочет сказать читателю", "любое красивое предложение", "только первое предложение"]),
+              mentorQuestion("Какой приём использован в выражении «золотые руки мастера»?", "метафора", "Руки не сделаны из золота: это образное значение.", ["метафора", "сравнение", "вопрос"]),
+              mentorQuestion("Нужно ли доказывать ответ цитатой или примером из текста?", "да", "В заданиях на смысл текста опора на текст делает ответ точным.", ["да", "нет"])
+            ]
+          },
+          "ru-essay": {
+            theory: "Сочинение строим так: тезис, два примера из текста, объяснение каждого примера и вывод. Не нужно писать много, нужно писать понятно и по критериям.",
+            example: "Тезис: «Доброта проявляется в помощи». Затем два эпизода из текста, объяснение и вывод.",
+            questions: [
+              mentorQuestion("Сколько примеров из текста нужно привести в сочинении ОГЭ?", "2", "Нужны два примера-иллюстрации из текста."),
+              mentorQuestion("Что идёт после тезиса в хорошем сочинении?", "примеры из текста", "Тезис нужно доказать двумя примерами.", ["примеры из текста", "новая тема", "список правил"]),
+              mentorQuestion("Нужен ли вывод в конце сочинения?", "да", "Вывод завершает мысль и связывает сочинение.", ["да", "нет"])
+            ]
+          },
+          "ru-variants": {
+            theory: "На пробнике сначала решай знакомые задания, затем возвращайся к сложным. Ошибки записывай по правилу, а не просто по номеру.",
+            example: "Ошибка в запятой: записываем «сложное предложение - две основы», а не «задание 4».",
+            questions: [
+              mentorQuestion("Что полезнее записать после ошибки?", "правило и свой пример", "Так ошибка превращается в материал для следующего повторения.", ["правило и свой пример", "только номер задания", "ничего"]),
+              mentorQuestion("Что лучше делать сначала на пробнике?", "знакомые задания", "Это даёт уверенные баллы и оставляет время на сложное.", ["знакомые задания", "самое сложное", "сочинение без чтения текста"]),
+              mentorQuestion("Нужно ли проверять ответы перед сдачей варианта?", "да", "Пара минут проверки ловит простые ошибки.", ["да", "нет"])
+            ]
+          }
+        };
+        return lessons[step.id];
+      }
+
+      function mentorSocialLesson(step) {
+        const lessons = {
+          "soc-human": {
+            theory: "Обществознание нужно понимать через жизнь. Личность - это человек с социальными качествами: он общается, учится, выбирает и отвечает за поступки.",
+            example: "Ребёнок учится договариваться в команде - это пример социализации.",
+            questions: [
+              mentorQuestion("Как называется процесс усвоения правил и норм общества?", "социализация", "Социализация - это вхождение человека в общество.", ["социализация", "инфляция", "конкуренция"]),
+              mentorQuestion("Что относится к деятельности человека?", "постановка цели", "Деятельность имеет цель, средства, действия и результат.", ["постановка цели", "случайный сон", "цвет глаз"]),
+              mentorQuestion("Человек как участник общественных отношений - это?", "личность", "Личность формируется в обществе.", ["личность", "только организм", "вещь"])
+            ]
+          },
+          "soc-culture": {
+            theory: "К духовной сфере относятся культура, образование, наука, религия и мораль. Мораль опирается на представления о добре и зле.",
+            example: "Школьное обучение - пример деятельности института образования.",
+            questions: [
+              mentorQuestion("Что относится к духовной культуре?", "наука", "Наука создаёт и проверяет знания.", ["наука", "покупка хлеба", "ремонт дороги"]),
+              mentorQuestion("Что регулирует мораль?", "представления о добре и зле", "Моральные нормы оценивают поступки с позиции добра и зла.", ["представления о добре и зле", "курс валют", "правила дорожного движения"]),
+              mentorQuestion("Как называется получение знаний в школе?", "образование", "Это основная функция образования.", ["образование", "производство", "выборы"])
+            ]
+          },
+          "soc-economy": {
+            theory: "Экономика отвечает на вопросы: что производить, как производить и для кого. Семейный бюджет - это доходы и расходы семьи.",
+            example: "Если семья планирует расходы на еду и транспорт, она ведёт бюджет.",
+            questions: [
+              mentorQuestion("Что такое доход семьи?", "деньги, которые семья получает", "Доходы - поступления, расходы - траты.", ["деньги, которые семья получает", "только покупки", "долги"]),
+              mentorQuestion("Что происходит с ценой при дефиците товара при прочих равных?", "растёт", "Когда товара мало, а желающих много, цена обычно растёт.", ["растёт", "исчезает", "всегда равна нулю"]),
+              mentorQuestion("Как называется деньги, взятые у банка с обязанностью вернуть?", "кредит", "Кредит нужно вернуть, обычно с процентами.", ["кредит", "налог", "зарплата"])
+            ]
+          },
+          "soc-social": {
+            theory: "Социальные группы объединяют людей по общему признаку. Социальная роль - ожидаемое поведение человека в определённой ситуации.",
+            example: "В школе один человек может быть ученицей, одноклассницей и участницей команды - это разные роли.",
+            questions: [
+              mentorQuestion("Что является социальной группой?", "класс в школе", "У класса есть общий признак и взаимодействие.", ["класс в школе", "одна книга", "облако"]),
+              mentorQuestion("Что такое социальная роль?", "ожидаемое поведение", "Например, от ученицы ожидают учёбу и соблюдение правил.", ["ожидаемое поведение", "цвет одежды", "случайная вещь"]),
+              mentorQuestion("Семья относится к какой группе?", "малой", "В малой группе люди общаются напрямую.", ["малой", "мировой", "случайной"])
+            ]
+          },
+          "soc-politics": {
+            theory: "Политика связана с властью и управлением обществом. Государство имеет территорию, население, власть и законы.",
+            example: "Выборы - один из способов участия граждан в политике.",
+            questions: [
+              mentorQuestion("Как называется участие граждан в голосовании?", "выборы", "Выборы позволяют гражданам участвовать в формировании власти.", ["выборы", "конкуренция", "инфляция"]),
+              mentorQuestion("Что относится к признакам государства?", "территория", "У государства есть территория, население и публичная власть.", ["территория", "любимый цвет", "одна семья"]),
+              mentorQuestion("Кто является носителем суверенитета в РФ?", "народ", "Конституция РФ закрепляет, что носитель суверенитета и источник власти - многонациональный народ.", ["народ", "один магазин", "школа"])
+            ]
+          },
+          "soc-law": {
+            theory: "Право - это система обязательных правил, установленных государством. Права связаны с обязанностями и ответственностью.",
+            example: "Право на образование сочетается с обязанностью получать основное общее образование.",
+            questions: [
+              mentorQuestion("Главный закон Российской Федерации - это?", "Конституция", "Конституция имеет высшую юридическую силу.", ["Конституция", "договор купли-продажи", "расписание уроков"]),
+              mentorQuestion("С какого возраста в России наступает уголовная ответственность за большинство преступлений?", "16", "По общему правилу - с 16 лет; за некоторые преступления - с 14.", ["16", "10", "25"]),
+              mentorQuestion("Что является примером обязанности гражданина?", "соблюдать законы", "Соблюдение законов - конституционная обязанность.", ["соблюдать законы", "получать подарки", "выбирать погоду"])
+            ]
+          },
+          "soc-long": {
+            theory: "В развёрнутом ответе нужно отвечать на каждый пункт вопроса: назвать, объяснить и привести пример, если это просят.",
+            example: "Термин: «налог». Объяснение: обязательный платёж государству. Пример: НДФЛ.",
+            questions: [
+              mentorQuestion("Сколько частей обычно есть в хорошем развёрнутом ответе: назвать, объяснить, привести пример?", "3", "Проверяй, что ответил на все три действия из задания."),
+              mentorQuestion("Нужен ли жизненный пример, если задание просит привести пример?", "да", "Без примера часть ответа не засчитывается.", ["да", "нет"]),
+              mentorQuestion("Что важнее: длинный текст или ответ на каждый пункт?", "ответ на каждый пункт", "Баллы дают за конкретные элементы ответа.", ["ответ на каждый пункт", "длинный текст"])
+            ]
+          },
+          "soc-variants": {
+            theory: "Пробник по обществознанию проверяет не зубрёжку, а умение применять термины к ситуации. После ошибки возвращайся к конкретному разделу.",
+            example: "Ошибка в задании про рынок - повторяем экономику, а не весь предмет.",
+            questions: [
+              mentorQuestion("Что нужно записать после ошибки в пробнике?", "раздел и правило", "Так наставник поймёт, что повторять дальше.", ["раздел и правило", "только плохое настроение", "ничего"]),
+              mentorQuestion("Можно ли выбирать ответ только потому, что он звучит знакомо?", "нет", "Нужно проверить термин и ситуацию в задании.", ["нет", "да"]),
+              mentorQuestion("Что лучше делать с незнакомым термином?", "найти определение и пример", "Определение плюс жизненный пример помогает запомнить смысл.", ["найти определение и пример", "сразу забыть", "угадать"])
+            ]
+          }
+        };
+        return lessons[step.id];
+      }
+
+      function getMentorTrainingLesson(subjectId, step) {
+        const lesson = subjectId === "math" ? mentorMathLesson(step) : subjectId === "russian" ? mentorRussianLesson(step) : mentorSocialLesson(step);
+        if (lesson) return lesson;
+        return {
+          theory: `Тема: ${step.focus}. Здесь сначала закрепляем определение, затем решаем короткие задания именно по этой теме.`,
+          example: `Ориентир урока: ${step.daily}.`,
+          questions: [mentorQuestion(`Что нужно сделать в этой теме: «${step.title}»?`, "разобрать тему", "Сначала прочитай короткую теорию, затем реши задания и разберём ошибки.", ["разобрать тему", "пропустить тему", "угадать все ответы"])]
+        };
+      }
+
+      let mentorTrainingSession = null;
+
+      function normalizeMentorAnswer(value) {
+        return String(value ?? "").trim().toLowerCase().replaceAll("ё", "е").replaceAll(" ", "").replaceAll(",", ".");
+      }
+
+      function getMentorMastery(subjectId, stepId) {
+        const saved = mentorMemory.mastery?.[subjectId]?.[stepId] || {};
+        const attempts = Number(saved.attempts || 0);
+        const correct = Number(saved.correct || 0);
+        const percent = attempts ? Math.round((correct / attempts) * 100) : 0;
+        return { attempts, correct, percent, mastered: attempts >= 3 && percent >= 80 };
+      }
+
+      function getRecommendedMentorStep(subjectId, detail) {
+        return detail.plan.find((step) => !getMentorMastery(subjectId, step.id).mastered) || detail.plan[detail.plan.length - 1];
+      }
+
+      function setMentorSubjectProgress(subjectId, detail) {
+        const mastered = detail.plan.filter((step) => getMentorMastery(subjectId, step.id).mastered).length;
+        const subject = mentorMemory.subjects.find((item) => item.id === subjectId);
+        if (subject) {
+          subject.progress = Math.round((mastered / detail.plan.length) * 100);
+          subject.nextTopic = getRecommendedMentorStep(subjectId, detail).title;
+        }
+        return mastered;
+      }
+
+      function renderMentorMastery(subjectId, detail) {
+        const list = document.getElementById("mentorMasteryList");
+        const summary = document.getElementById("mentorMasterySummary");
+        const recommended = getRecommendedMentorStep(subjectId, detail);
+        const mastered = setMentorSubjectProgress(subjectId, detail);
+        setText("mentorRecommendedTopic", recommended.title);
+        setText("mentorRecommendedReason", mastered === detail.plan.length ? "Все темы уже освоены. Повторяем самую нужную." : `Следующий шаг: ${recommended.focus}.`);
+        setText("mentorMasterySummary", `${mastered} из ${detail.plan.length} освоено`);
+        if (!list) return;
+        list.innerHTML = detail.plan.map((step) => {
+          const progress = getMentorMastery(subjectId, step.id);
+          const label = progress.mastered ? "освоено" : progress.attempts ? `${progress.percent}% точно` : "не начато";
+          return `<div class="mentor-mastery-row ${progress.mastered ? "status-done" : ""}">
+            <div><h3>${escapeHtml(step.title)}</h3><p class="muted" style="margin-top: 4px">${escapeHtml(step.focus)}</p></div>
+            <div><div class="progress"><span style="--value: ${progress.percent}%"></span></div><p class="muted" style="margin-top: 5px; font-size: 12px">${progress.correct} верно из ${progress.attempts}</p></div>
+            <span class="pill ${progress.mastered ? "status-done" : "blue"}">${label}</span>
+            <button class="btn secondary" type="button" data-mentor-train-step="${escapeHtml(step.id)}">Учить</button>
+          </div>`;
+        }).join("");
+      }
+
+      function startMentorTraining(subjectId, stepId) {
+        const detail = mentorOgeDetails[subjectId] || mentorOgeDetails.math;
+        const step = detail.plan.find((item) => item.id === stepId) || getRecommendedMentorStep(subjectId, detail);
+        const lesson = getMentorTrainingLesson(subjectId, step);
+        mentorTrainingSession = { subjectId, stepId: step.id, step, lesson, index: 0, results: [], startedAt: Date.now(), checked: false, finished: false };
+        renderMentorTraining();
+        document.getElementById("mentor")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+
+      function renderMentorTraining() {
+        const programView = document.getElementById("mentorSubjectProgramView");
+        const trainingView = document.getElementById("mentorTrainingView");
+        if (!mentorTrainingSession) {
+          if (programView) programView.hidden = false;
+          if (trainingView) trainingView.hidden = true;
+          return;
+        }
+        if (programView) programView.hidden = true;
+        if (trainingView) trainingView.hidden = false;
+
+        const session = mentorTrainingSession;
+        const questions = session.lesson.questions;
+        const question = questions[session.index];
+        const subjectTitle = mentorMemory.subjects.find((item) => item.id === session.subjectId)?.title || "ОГЭ";
+        setText("mentorTrainingSubject", `${subjectTitle} · занятие`);
+        setText("mentorTrainingTitle", session.step.title);
+        setText("mentorTrainingTheory", session.lesson.theory);
+        setText("mentorTrainingExample", session.lesson.example);
+        setText("mentorTrainingCounter", `${Math.min(session.index + 1, questions.length)} из ${questions.length}`);
+
+        const dots = document.getElementById("mentorTrainingProgress");
+        if (dots) dots.innerHTML = questions.map((_, index) => `<span class="mentor-training-dot ${index < session.index ? "done" : index === session.index ? "active" : ""}"></span>`).join("");
+        const questionArea = document.getElementById("mentorTrainingQuestionArea");
+        const result = document.getElementById("mentorTrainingResult");
+        if (questionArea) questionArea.hidden = session.finished;
+        if (result) result.hidden = !session.finished;
+        if (session.finished || !question) return;
+
+        setText("mentorQuestionKind", `Задание ${session.index + 1} · ${session.subjectId === "math" ? "ответ числом" : "выбери ответ"}`);
+        setText("mentorQuestionText", question.text);
+        const answerArea = document.getElementById("mentorAnswerArea");
+        if (answerArea) {
+          answerArea.innerHTML = question.options?.length
+            ? `<div class="mentor-answer-options">${question.options.map((option, index) => `<label class="mentor-answer-option"><input type="radio" name="mentorAnswer" value="${escapeHtml(option)}" ${index === 0 ? "" : ""} /><span>${escapeHtml(option)}</span></label>`).join("")}</div>`
+            : `<input class="field" id="mentorAnswerInput" inputmode="decimal" autocomplete="off" placeholder="Впиши ответ" />`;
+        }
+        const feedback = document.getElementById("mentorTrainingFeedback");
+        if (feedback) {
+          feedback.className = "mentor-feedback";
+          feedback.textContent = "";
+        }
+        const check = document.getElementById("mentorCheckAnswer");
+        const next = document.getElementById("mentorNextQuestion");
+        if (check) check.hidden = false;
+        if (next) next.hidden = true;
+        session.checked = false;
+      }
+
+      function checkMentorTrainingAnswer() {
+        const session = mentorTrainingSession;
+        if (!session || session.checked || session.finished) return;
+        const question = session.lesson.questions[session.index];
+        const selected = document.querySelector('input[name="mentorAnswer"]:checked');
+        const typed = document.getElementById("mentorAnswerInput");
+        const answer = selected ? selected.value : typed?.value || "";
+        if (!String(answer).trim()) {
+          const feedback = document.getElementById("mentorTrainingFeedback");
+          if (feedback) {
+            feedback.className = "mentor-feedback show wrong";
+            feedback.textContent = "Сначала дай ответ. Ошибаться можно - именно так наставник поймёт, что объяснить.";
+          }
+          return;
+        }
+        const normalized = normalizeMentorAnswer(answer);
+        const correct = question.answers.some((item) => normalizeMentorAnswer(item) === normalized);
+        session.results.push({ correct, answer: String(answer), question: question.text });
+        session.checked = true;
+        const feedback = document.getElementById("mentorTrainingFeedback");
+        if (feedback) {
+          feedback.className = `mentor-feedback show ${correct ? "correct" : "wrong"}`;
+          feedback.textContent = `${correct ? "Верно." : `Пока нет. Верный ответ: ${question.answers[0]}.`} ${question.explanation}`;
+        }
+        document.getElementById("mentorCheckAnswer").hidden = true;
+        document.getElementById("mentorNextQuestion").hidden = false;
+      }
+
+      function finishMentorTraining() {
+        const session = mentorTrainingSession;
+        if (!session || session.finished) return;
+        const total = session.lesson.questions.length;
+        const correct = session.results.filter((item) => item.correct).length;
+        const percent = Math.round((correct / total) * 100);
+        const stats = mentorMemory.mastery[session.subjectId][session.stepId] || { attempts: 0, correct: 0 };
+        stats.attempts += total;
+        stats.correct += correct;
+        mentorMemory.mastery[session.subjectId][session.stepId] = stats;
+        const topicMastery = getMentorMastery(session.subjectId, session.stepId);
+        if (topicMastery.mastered && !mentorMemory.ogeCompleted[session.subjectId].includes(session.stepId)) mentorMemory.ogeCompleted[session.subjectId].push(session.stepId);
+
+        const today = new Date().toISOString().slice(0, 10);
+        const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+        if (mentorMemory.lastStudyDate !== today) mentorMemory.studyStreak = mentorMemory.lastStudyDate === yesterday ? mentorMemory.studyStreak + 1 : 1;
+        mentorMemory.lastStudyDate = today;
+        const minutes = Math.max(1, Math.round((Date.now() - session.startedAt) / 60000));
+        mentorMemory.studySessions.unshift({ date: today, subject: session.subjectId, topic: session.step.title, correct, total, percent, minutes });
+        mentorMemory.studySessions = mentorMemory.studySessions.slice(0, 60);
+        const detail = mentorOgeDetails[session.subjectId];
+        const next = getRecommendedMentorStep(session.subjectId, detail);
+        mentorMemory.nextStep = next.title;
+        mentorMemory.dailyTopic = next.focus;
+        setMentorSubjectProgress(session.subjectId, detail);
+        session.finished = true;
+        const subjectTitle = mentorMemory.subjects.find((item) => item.id === session.subjectId)?.title || "ОГЭ";
+        const resultText = percent >= 80 ? "Тема засчитана как освоенная. Следующее занятие уже выбрано." : "Тему пока не засчитываем: повтори её ещё раз или вернись к ней завтра.";
+        setText("mentorTrainingScore", `${correct} из ${total} · ${percent}%`);
+        setText("mentorTrainingResultText", `${resultText} Серия занятий: ${mentorMemory.studyStreak} дн.`);
+        setText("mentorTrainingReport", `ОГЭ · ${subjectTitle}\nТема: ${session.step.title}\nРезультат: ${correct} из ${total} (${percent}%)\nВремя: ${minutes} мин\nСерия: ${mentorMemory.studyStreak} дн.\nСледующий шаг: ${next.title}`);
+        renderMentorTraining();
+        saveState();
+      }
+
+      function advanceMentorTraining() {
+        const session = mentorTrainingSession;
+        if (!session || !session.checked) return;
+        if (session.index + 1 >= session.lesson.questions.length) {
+          finishMentorTraining();
+          return;
+        }
+        session.index += 1;
+        renderMentorTraining();
+      }
+
       function mentorAnswer(question) {
         const text = question.toLowerCase();
         mentorMemory.hardTopics = mentorMemory.hardTopics || "";
@@ -4500,8 +5132,9 @@
         if (!subjects) return;
         subjects.innerHTML = mentorMemory.subjects.map((subject) => {
           const active = mentorMemory.activeSubject === subject.id;
-          const total = mentorOgeDetails[subject.id]?.plan.length || 1;
-          const completed = mentorMemory.ogeCompleted?.[subject.id]?.length || 0;
+          const detail = mentorOgeDetails[subject.id];
+          const total = detail?.plan.length || 1;
+          const completed = detail ? setMentorSubjectProgress(subject.id, detail) : 0;
           const progress = Math.min(100, Math.round((completed / total) * 100));
           return `<button class="mentor-subject ${active ? "active" : ""}" type="button" data-mentor-subject="${escapeHtml(subject.id)}" aria-label="Открыть ОГЭ ${escapeHtml(subject.title)}">
             <div class="card-title"><h3>${escapeHtml(subject.title)}</h3><span class="pill ${active ? "blue" : ""}">${progress}%</span></div>
@@ -4523,7 +5156,6 @@
         const taskMap = document.getElementById("mentorSubjectTaskMap");
         const theoryList = document.getElementById("mentorTheoryList");
         const practiceList = document.getElementById("mentorPracticeList");
-        const completed = new Set(mentorMemory.ogeCompleted?.[subjectId] || []);
         const resetToday = document.getElementById("mentorResetToday");
         if (overview) overview.hidden = Boolean(mentorMemory.subjectViewOpen);
         if (detailView) detailView.hidden = !mentorMemory.subjectViewOpen;
@@ -4542,20 +5174,25 @@
         }
         if (program) {
           program.innerHTML = detail.plan.map((step) => {
-            const done = completed.has(step.id);
+            const mastery = getMentorMastery(subjectId, step.id);
+            const done = mastery.mastered;
             return `<div class="mentor-program-card ${done ? "status-done" : ""}">
-              <div class="card-title"><h3>${escapeHtml(step.title)}</h3><span class="pill ${done ? "status-done" : "blue"}">${escapeHtml(step.weeks)}</span></div>
+              <div class="card-title"><h3>${escapeHtml(step.title)}</h3><span class="pill ${done ? "status-done" : "blue"}">${done ? "освоено" : escapeHtml(step.weeks)}</span></div>
               <p class="muted" style="margin-top: 8px">ОГЭ: ${escapeHtml(step.tasks)}</p>
               <p class="muted" style="margin-top: 6px">Тема: ${escapeHtml(step.focus)}</p>
               <p class="compact-help" style="margin-top: 10px">${escapeHtml(step.daily)}</p>
-              <button class="btn secondary" type="button" data-mentor-oge-step="${escapeHtml(step.id)}" style="margin-top: 12px">${done ? "Повторять" : "Этап прошла"}</button>
+              <p class="muted" style="margin-top: 10px; font-size: 12px">${mastery.attempts ? `${mastery.correct} верно из ${mastery.attempts} · ${mastery.percent}%` : "3 верных ответа для освоения"}</p>
+              <button class="btn secondary" type="button" data-mentor-train-step="${escapeHtml(step.id)}" style="margin-top: 12px">${done ? "Повторить" : "Учить тему"}</button>
             </div>`;
           }).join("");
         }
         if (taskMap) {
           taskMap.innerHTML = detail.taskMap.map(([num, title, hint]) => `<div class="mentor-task-chip"><h3>${escapeHtml(num)}</h3><p class="muted">${escapeHtml(title)}</p><p class="muted" style="margin-top: 5px; font-size: 12px">${escapeHtml(hint)}</p></div>`).join("");
         }
-        setText("mentorSubjectProgressBadge", `${completed.size}/${detail.plan.length}`);
+        const mastered = setMentorSubjectProgress(subjectId, detail);
+        setText("mentorSubjectProgressBadge", `${mastered}/${detail.plan.length}`);
+        renderMentorMastery(subjectId, detail);
+        renderMentorTraining();
       }
 
       function renderMentor() {
@@ -4622,7 +5259,7 @@
         const topic = event.target.closest("[data-mentor-topic]");
         const complete = event.target.closest("[data-mentor-complete]");
         const subjectButton = event.target.closest("[data-mentor-subject]");
-        const ogeStep = event.target.closest("[data-mentor-oge-step]");
+        const trainStep = event.target.closest("[data-mentor-train-step]");
         if (topic) {
           mentorMemory.dailyTopic = topic.dataset.mentorTopic;
           mentorMemory.nextStep = topic.dataset.mentorTopic;
@@ -4642,21 +5279,8 @@
           saveState();
           return;
         }
-        if (ogeStep) {
-          const subjectId = mentorMemory.activeSubject || "math";
-          const detail = mentorOgeDetails[subjectId] || mentorOgeDetails.math;
-          const id = ogeStep.dataset.mentorOgeStep;
-          const step = detail.plan.find((item) => item.id === id);
-          mentorMemory.ogeCompleted = mentorMemory.ogeCompleted || { math: [], russian: [], social: [] };
-          mentorMemory.ogeCompleted[subjectId] = mentorMemory.ogeCompleted[subjectId] || [];
-          if (step && !mentorMemory.ogeCompleted[subjectId].includes(id)) {
-            mentorMemory.ogeCompleted[subjectId].push(id);
-            mentorMemory.nextStep = step.title;
-            mentorMemory.dailyTopic = step.focus;
-            mentorMemory.chat.push({ role: "assistant", text: `Отметила этап «${step.title}» по предмету «${detail.title.replace("ОГЭ ", "").replace(": программа", "")}». Следующий фокус: ${step.focus}.` });
-          }
-          renderMentor();
-          saveState();
+        if (trainStep) {
+          startMentorTraining(mentorMemory.activeSubject || "math", trainStep.dataset.mentorTrainStep);
           return;
         }
         if (complete) {
@@ -4669,10 +5293,51 @@
       });
 
       document.getElementById("mentorSubjectsBack")?.addEventListener("click", () => {
+        mentorTrainingSession = null;
         mentorMemory.subjectViewOpen = false;
         renderMentor();
         document.getElementById("mentor")?.scrollIntoView({ behavior: "smooth", block: "start" });
         saveState();
+      });
+
+      document.getElementById("mentorStartRecommended")?.addEventListener("click", () => {
+        const subjectId = mentorMemory.activeSubject || "math";
+        const detail = mentorOgeDetails[subjectId] || mentorOgeDetails.math;
+        startMentorTraining(subjectId, getRecommendedMentorStep(subjectId, detail).id);
+      });
+
+      document.getElementById("mentorTrainingBack")?.addEventListener("click", () => {
+        mentorTrainingSession = null;
+        renderMentorSubjectDetail();
+      });
+
+      document.getElementById("mentorTrainingForm")?.addEventListener("submit", (event) => {
+        event.preventDefault();
+        checkMentorTrainingAnswer();
+      });
+
+      document.getElementById("mentorNextQuestion")?.addEventListener("click", advanceMentorTraining);
+
+      document.getElementById("mentorRepeatTraining")?.addEventListener("click", () => {
+        if (!mentorTrainingSession) return;
+        startMentorTraining(mentorTrainingSession.subjectId, mentorTrainingSession.stepId);
+      });
+
+      document.getElementById("mentorFinishTraining")?.addEventListener("click", () => {
+        mentorTrainingSession = null;
+        renderMentor();
+        document.getElementById("mentor")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+
+      document.getElementById("mentorCopyReport")?.addEventListener("click", async () => {
+        const report = document.getElementById("mentorTrainingReport")?.textContent?.trim();
+        if (!report) return;
+        try {
+          await navigator.clipboard.writeText(report);
+          showNotice("Отчёт скопирован. Его можно отправить в Telegram.");
+        } catch {
+          showNotice("Не получилось скопировать автоматически. Выдели текст отчёта и скопируй его.");
+        }
       });
 
       document.getElementById("mentorResetToday")?.addEventListener("click", () => {
