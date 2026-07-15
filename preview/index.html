@@ -2980,7 +2980,7 @@
                   <button class="btn" type="submit">Добавить в день</button>
                 </form>
               </article>
-              <article class="card"><h2>Закреплено</h2><p class="muted" style="margin-top: 8px">Подъём, умывание, завтрак, чтение, прогулка, готовка, учёба и контент-задачи. Акробатика автоматически во вторник и четверг.</p><div class="activity" style="margin-top: 14px"><span class="pill">режим</span><span class="pill blue">акробатика</span><span class="pill peach">контент</span></div></article>
+              <article class="card"><h2>Закреплено</h2><p class="muted" style="margin-top: 8px">Подъём, завтрак, ИнтернетУрок, чтение, самостоятельная тренировка, прогулка, домашние дела и контент-задачи.</p><div class="activity" style="margin-top: 14px"><span class="pill">режим</span><span class="pill blue">ИнтернетУрок</span><span class="pill peach">контент</span></div></article>
               <article class="card"><h2>Из плана в задачи</h2><p class="muted" style="margin-top: 8px">Каждый пункт плана Евы попадёт в её чек-лист дня.</p></article>
             </div>
           </section>
@@ -6429,7 +6429,7 @@
       const evaPlanStartDate = new Date(2026, 4, 31);
       let selectedDate = savedState.selectedDate ? new Date(savedState.selectedDate) : new Date(evaPlanStartDate);
       let calendarMonth = savedState.calendarMonth ? new Date(savedState.calendarMonth) : new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
-      const PLAN_TEMPLATE_VERSION = "eva-week-plan-v3";
+      const PLAN_TEMPLATE_VERSION = "eva-week-plan-v4";
       const planStore = savedState.planStore || {};
 
       const schoolSubjectOptions = [
@@ -6615,53 +6615,38 @@
         const weekday = [
           "07:30 Ева · подъём #режим",
           "08:30 Ева · завтрак #еда",
-          "09:00 Ева · GPT + вайб-кодинг #вайбкодинг",
-          "11:00 Ева · съёмка и монтаж видео #контент",
-          "12:30 Ева · работа над каналом #контент",
+          "09:00 Ева · ИнтернетУрок: математика — умножение, деление, дроби #учёба",
+          "10:00 Ева · GPT + вайб-кодинг #вайбкодинг",
+          "11:30 Ева · съёмка и монтаж видео #контент",
+          "12:30 Ева · написать текст для видео и работа над каналом #контент",
           "13:30 Ева · чтение книги #библиотека",
           "14:00 Ева · обед #еда",
           "15:00 Ева · выкладка видео #контент",
           "15:10 Ева · запуск робота #робот-пылесос",
           "15:20 Ева · робот-пылесос #робот-пылесос",
           "15:30 Ева · поиграть с кошкой #кошки",
-          "17:30 Ева · тренировка #спорт",
+          "17:30 Ева · самостоятельная тренировка #спорт",
           "18:00 Ева · прогулка #прогулка",
           "19:00 Ева · уборка на кухне #кухня",
           "21:00 Ева · сон #сон"
         ];
-        const trainingDay = [
-          "07:30 Ева · подъём #режим",
-          "08:30 Ева · завтрак #еда",
-          "09:00 Ева · GPT + вайб-кодинг #вайбкодинг",
-          "11:00 Ева · съёмка и монтаж видео #контент",
-          "12:30 Ева · работа над каналом #контент",
-          "13:30 Ева · чтение книги #библиотека",
-          "14:00 Ева · обед #еда",
-          "15:00 Ева · выкладка видео #контент",
-          "15:10 Ева · запуск робота #робот-пылесос",
-          "15:20 Ева · робот-пылесос #робот-пылесос",
-          "15:30 Ева · поиграть с кошкой #кошки",
-          "15:40 Ева · сборы #режим",
-          "16:00 Ева · тренировка #спорт",
-          "19:00 Ева · уборка на кухне #кухня",
-          "21:00 Ева · сон #сон"
-        ];
-        if (day === 2 || day === 4) return trainingDay;
         if (day === 6) {
           return [
             "08:00 Ева · подъём #режим",
             "08:30 Ева · завтрак #еда",
-            "09:00 Ева · GPT + вайб-кодинг #вайбкодинг",
-            "10:00 Ева · съёмка и монтаж видео #контент",
-            "11:30 Ева · тренировка #спорт",
+            "09:00 Ева · ИнтернетУрок: математика — умножение, деление, дроби #учёба",
+            "10:00 Ева · GPT + вайб-кодинг #вайбкодинг",
+            "11:00 Ева · съёмка и монтаж видео #контент",
+            "12:00 Ева · написать текст для видео и работа над каналом #контент",
+            "13:00 Ева · чтение книги #библиотека",
             "14:00 Ева · обед #еда",
             "15:00 Ева · выкладка видео #контент",
             "15:10 Ева · запуск робота #робот-пылесос",
             "15:20 Ева · робот-пылесос #робот-пылесос",
             "15:30 Ева · поиграть с кошкой #кошки",
+            "16:30 Ева · самостоятельная тренировка #спорт",
             "17:30 Ева · прогулка #прогулка",
             "19:00 Ева · уборка на кухне #кухня",
-            "20:00 Ева · чтение книги #библиотека",
             "21:00 Ева · сон #сон"
           ];
         }
@@ -6669,15 +6654,17 @@
           return [
             "09:00 Ева · подъём #режим",
             "09:30 Ева · завтрак #еда",
-            "10:00 Ева · GPT + вайб-кодинг #вайбкодинг",
+            "10:00 Ева · ИнтернетУрок: математика — умножение, деление, дроби #учёба",
+            "11:00 Ева · GPT + вайб-кодинг #вайбкодинг",
             "12:00 Ева · съёмка и монтаж видео #контент",
-            "13:00 Ева · работа над каналом #контент",
+            "13:00 Ева · написать текст для видео и работа над каналом #контент",
             "13:30 Ева · чтение книги #библиотека",
             "14:00 Ева · обед #еда",
             "15:00 Ева · выкладка видео #контент",
             "15:10 Ева · запуск робота #робот-пылесос",
             "15:20 Ева · робот-пылесос #робот-пылесос",
             "15:30 Ева · поиграть с кошкой #кошки",
+            "16:30 Ева · самостоятельная тренировка #спорт",
             "17:30 Ева · прогулка #прогулка",
             "19:00 Ева · уборка на кухне #кухня",
             "21:00 Ева · сон #сон"
@@ -6690,9 +6677,10 @@
         if (savedState.planTemplateVersion === PLAN_TEMPLATE_VERSION) return;
         selectedDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
         calendarMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-        const keys = new Set(Object.keys(planStore));
+        const keys = new Set();
+        const currentWeekStart = mondayOf(today);
         for (let index = 0; index < 7; index += 1) {
-          keys.add(isoDate(addDays(selectedDate, index)));
+          keys.add(isoDate(addDays(currentWeekStart, index)));
         }
         keys.forEach((key) => {
           const [year, month, day] = key.split("-").map(Number);
@@ -6705,6 +6693,7 @@
         const count = (words) => items.filter((item) => words.some((word) => item.toLowerCase().includes(word))).length;
         return {
           content: count(["#контент", "#вайбкодинг", "ролик", "монтаж", "канал"]),
+          study: count(["#учёба", "интернетурок", "умнож", "делени", "дроб"]),
           home: count(["#кухня", "#дом", "#робот-пылесос", "#кошки", "пылесос", "робот", "кош"]),
           food: count(["#еда", "#режим", "#сон", "завтрак", "обед", "подъём"]),
           sport: count(["#спорт", "#прогулка", "тренировка", "прогулка"])
@@ -6825,7 +6814,7 @@
           day.dataset.iso = key;
           day.dataset.child = plan.child;
           const stats = planStats(plan.items || []);
-          day.innerHTML = `<div class="week-day-head"><h3>${weekdayShort[weekdayIndex]} ${date.getDate()}</h3><button class="week-toggle" type="button" aria-label="Открыть день">${sameDay(date, selectedDate) ? "−" : "+"}</button></div><div class="week-items">${plan.items.map((item) => `<div class="week-item">${escapeHtml(item)}</div>`).join("")}</div><div class="week-day-stats"><span class="pill blue">Контент: ${stats.content}</span><span class="pill">Дом: ${stats.home}</span><span class="pill peach">Еда: ${stats.food}</span><span class="pill rose">Спорт: ${stats.sport}</span></div>`;
+          day.innerHTML = `<div class="week-day-head"><h3>${weekdayShort[weekdayIndex]} ${date.getDate()}</h3><button class="week-toggle" type="button" aria-label="Открыть день">${sameDay(date, selectedDate) ? "−" : "+"}</button></div><div class="week-items">${plan.items.map((item) => `<div class="week-item">${escapeHtml(item)}</div>`).join("")}</div><div class="week-day-stats"><span class="pill blue">Учёба: ${stats.study}</span><span class="pill blue">Контент: ${stats.content}</span><span class="pill">Дом: ${stats.home}</span><span class="pill peach">Еда: ${stats.food}</span><span class="pill rose">Спорт: ${stats.sport}</span></div>`;
           day.addEventListener("click", () => {
             selectedDate = date;
             document.querySelectorAll(".week-day").forEach((item) => {
