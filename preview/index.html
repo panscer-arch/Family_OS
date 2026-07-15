@@ -3405,13 +3405,13 @@
                   <h2 id="schoolWeekTitle">13–19 июля 2026</h2>
                   <p class="muted" id="schoolSyncStatus" style="margin-top: 6px"></p>
                 </div>
-                <span class="pill peach" id="schoolWeekStatus">Каникулы</span>
+                <span class="pill blue" id="schoolWeekStatus">Доступ до 15 августа</span>
               </div>
               <div class="school-day-grid" id="schoolWeekDays"></div>
               <div class="helper-actions" style="margin-top: 16px">
                 <button class="btn" id="schoolCopyWeek" type="button">Скопировать план недели</button>
                 <button class="btn secondary" id="schoolAddTasksToPlan" type="button">Добавить задания в план Евы</button>
-                <a class="btn secondary" href="https://interneturok.ru/h/schedule?period=week" target="_blank" rel="noopener noreferrer">Обновить данные</a>
+                <a class="btn secondary" href="https://interneturok.ru/h/materials" target="_blank" rel="noopener noreferrer">Заниматься по материалам</a>
               </div>
             </article>
 
@@ -4000,6 +4000,7 @@
         archivedClasses: [7, 8],
         excludedSubjects: ["Китайский язык", "Немецкий язык"],
         mandatoryOnlySubjects: ["Алгебра", "Вероятность и статистика", "Геометрия", "ОБЗР", "Обществознание", "Физика", "Физическая культура"],
+        accessUntil: "2026-08-15",
         lastUpdatedAt: "2026-07-15T12:00:00+03:00",
         syncMode: "manual",
         week: {
@@ -4023,6 +4024,7 @@
       if (!Array.isArray(schoolWorkspace.excludedSubjects)) schoolWorkspace.excludedSubjects = ["Китайский язык", "Немецкий язык"];
       if (!Array.isArray(schoolWorkspace.mandatoryOnlySubjects)) schoolWorkspace.mandatoryOnlySubjects = ["Алгебра", "Вероятность и статистика", "Геометрия", "ОБЗР", "Обществознание", "Физика", "Физическая культура"];
       if (!Array.isArray(schoolWorkspace.tasks)) schoolWorkspace.tasks = [];
+      if (!schoolWorkspace.accessUntil) schoolWorkspace.accessUntil = "2026-08-15";
       const mentorMemory = savedState.mentorMemory || {
         name: "Ева, 12 лет",
         grade: "перехожу в 9 класс",
@@ -6469,15 +6471,15 @@
 
         const week = schoolWorkspace.week;
         title.textContent = `${schoolDateLabel(week.start)} — ${schoolDateLabel(week.end)} ${new Date(week.end + "T12:00:00").getFullYear()}`;
-        status.textContent = week.vacation ? "Каникулы" : "Учебная неделя";
-        sync.textContent = `Ручная синхронизация · последнее обновление: ${new Date(schoolWorkspace.lastUpdatedAt).toLocaleString("ru-RU", { dateStyle: "medium", timeStyle: "short" })}`;
+        status.textContent = schoolWorkspace.accessUntil ? `Доступ до ${schoolDateLabel(schoolWorkspace.accessUntil)}` : (week.vacation ? "Каникулы" : "Учебная неделя");
+        sync.textContent = `${schoolWorkspace.accessUntil ? `Доступ к материалам открыт до ${schoolDateLabel(schoolWorkspace.accessUntil)} · ` : ""}Ручная синхронизация · последнее обновление: ${new Date(schoolWorkspace.lastUpdatedAt).toLocaleString("ru-RU", { dateStyle: "medium", timeStyle: "short" })}`;
         days.innerHTML = week.days.map((day) => `<div class="school-day ${week.vacation ? "vacation" : ""}"><p class="eyebrow">${escapeHtml(day.title)}</p><h3 style="margin-top: 5px">${schoolDateLabel(day.date)}</h3><p class="muted" style="margin-top: 10px">${escapeHtml(day.status)}</p></div>`).join("");
 
         const visible = visibleSchoolTasks();
         const required = visible.filter((task) => task.required);
         count.textContent = String(required.length);
         tasks.innerHTML = week.vacation && !required.length
-          ? `<div class="school-empty"><h3>Каникулы</h3><p style="margin-top: 6px">На этой неделе обязательных уроков и домашних заданий нет. Ничего в план Евы не добавлено.</p></div>`
+          ? `<div class="school-empty"><h3>В расписании — каникулы</h3><p style="margin-top: 6px">Обязательных уроков и домашних заданий нет. Но доступ к материалам открыт до ${schoolDateLabel(schoolWorkspace.accessUntil)}: можно заниматься и добавлять свои задания ниже.</p></div>`
           : required.length
             ? required.map((task) => `<div class="school-task-item"><label class="check-row"><input type="checkbox" data-school-task-done="${escapeHtml(task.id)}" ${task.done ? "checked" : ""} /><span><strong>${escapeHtml(task.subject)}: ${escapeHtml(task.title)}</strong><small class="muted" style="display:block; margin-top:4px">${task.dueDate ? `Сдать до ${schoolDateLabel(task.dueDate)}` : "Срок не указан"} · обязательное</small></span></label><div class="school-links">${task.url ? `<a class="mini-action" href="${escapeHtml(task.url)}" target="_blank" rel="noopener noreferrer">Открыть задание</a>` : ""}</div></div>`).join("")
             : `<div class="school-empty"><h3>Обязательных заданий нет</h3><p style="margin-top: 6px">Когда они появятся в ИнтернетУроке, их можно добавить вручную ниже.</p></div>`;
@@ -6489,7 +6491,7 @@
       function copySchoolWeek() {
         const week = schoolWorkspace.week;
         const text = week.vacation
-          ? `ИнтернетУрок · Ева · 9 класс\n${schoolDateLabel(week.start)} — ${schoolDateLabel(week.end)}\nКаникулы — обязательных уроков и домашних заданий нет.`
+          ? `ИнтернетУрок · Ева · 9 класс\n${schoolDateLabel(week.start)} — ${schoolDateLabel(week.end)}\nВ расписании каникулы: обязательных уроков и домашних заданий нет. Доступ к материалам открыт до ${schoolDateLabel(schoolWorkspace.accessUntil)}.`
           : `ИнтернетУрок · Ева · 9 класс\n${schoolDateLabel(week.start)} — ${schoolDateLabel(week.end)}\n${visibleSchoolTasks().map((task) => `${task.subject}: ${task.title}${task.dueDate ? ` — до ${schoolDateLabel(task.dueDate)}` : ""}`).join("\n")}`;
         navigator.clipboard.writeText(text).then(() => showNotice("План недели скопирован.")).catch(() => showNotice("Не получилось скопировать автоматически."));
       }
@@ -6497,7 +6499,7 @@
       function addSchoolTasksToPlan() {
         const eligible = visibleSchoolTasks().filter((task) => task.required && !task.done);
         if (!eligible.length) {
-          showNotice("На этой неделе нет обязательных заданий для добавления.");
+          showNotice("Сейчас нет обязательных заданий. Можно добавить своё задание вручную и перенести его в план.");
           return;
         }
         let added = 0;
