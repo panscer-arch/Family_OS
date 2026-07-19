@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pulse — лаборатория контента</title>
+  <link rel="stylesheet" href="styles.css?v=4" />
+  <link rel="stylesheet" href="features.css?v=4" />
+  <link rel="stylesheet" href="planner.css?v=4" />
+  <link rel="stylesheet" href="live.css?v=4" />
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="#"><span class="brand-mark">P</span><span>pulse</span></a>
+    <nav>
+      <button class="nav-item active" data-view="search"><span>⌕</span> Поиск идей</button>
+      <button class="nav-item" data-view="saved"><span>♡</span> Сохранённое <b id="savedCount">0</b></button>
+      <button class="nav-item" data-view="collections"><span>▦</span> Коллекции</button>
+      <button class="nav-item" data-view="planner"><span>◫</span> Контент-план <b id="planCount">0</b></button>
+      <button class="nav-item" data-view="analytics"><span>↗</span> Аналитика</button>
+    </nav>
+    <div class="sidebar-note"><span>Бесплатная версия</span><p>Данные хранятся только в вашем браузере.</p></div>
+    <button class="profile"><span class="avatar">М</span><span><strong>Мой профиль</strong><small>Локальный режим</small></span><span>•••</span></button>
+  </aside>
+
+  <main>
+    <header>
+      <div><p class="eyebrow">CONTENT RESEARCH</p><h1 id="pageTitle">Найдём идею, которая сработает</h1></div>
+      <div class="header-actions"><button class="ghost" id="exportButton">⇩ Экспорт</button><button class="add-button" id="addIdeaButton">＋ Добавить идею</button><button class="ghost" id="themeButton">◐</button></div>
+    </header>
+
+    <section id="searchView">
+      <div class="search-panel">
+        <div class="live-source"><div><i></i><span><strong>Режим реальных данных</strong><small id="connectionStatus">YouTube API не подключён</small></span></div><button type="button" id="apiSettingsButton">⚙ Подключить API</button></div>
+        <div class="platforms" role="group" aria-label="Площадки">
+          <label class="platform-locked" title="Для общего поиска нужен одобренный доступ Meta"><input type="checkbox" value="Instagram" disabled><span class="instagram">◎</span> Instagram <small>API</small></label>
+          <label class="platform-locked" title="Общий поиск доступен только через TikTok Research API"><input type="checkbox" value="TikTok" disabled><span class="tiktok">♪</span> TikTok <small>Research</small></label>
+          <label><input type="checkbox" value="YouTube" checked><span class="youtube">▶</span> YouTube + Shorts</label>
+        </div>
+        <form id="searchForm">
+          <div class="search-box"><span>⌕</span><input id="searchInput" value="мама и подросток, юмор, семейные приколы" placeholder="Тема, ниша или ключевые слова"><button>Найти идеи</button></div>
+        </form>
+        <div class="quick"><span>Попробуйте:</span><button>уютный дом</button><button>материнство</button><button>саморазвитие</button><button>семейный юмор</button></div>
+      </div>
+
+      <div class="result-head">
+        <div><h2>Идеи для контента</h2><p><span id="resultCount">12</span> результатов · обновлено только что</p></div>
+        <div class="controls"><button id="filterButton">⚙ Фильтры</button><select id="sortSelect"><option value="trend">Сначала в тренде</option><option value="views">По просмотрам</option><option value="engagement">По вовлечённости</option></select><button class="layout active">▦</button><button class="layout">☷</button></div>
+      </div>
+      <div class="filter-drawer" id="filterDrawer"><label>Минимум просмотров <input id="minViews" type="range" min="0" max="1000000" step="50000" value="0"><span id="minViewsLabel">0</span></label><label>Длительность <select id="duration"><option value="all">Любая</option><option value="short">до 15 сек.</option><option value="medium">15–30 сек.</option></select></label></div>
+      <div class="cards" id="cards"></div>
+    </section>
+
+    <section class="empty-view" id="emptyView" hidden><div class="empty-icon">✦</div><h2 id="emptyTitle">Здесь пока пусто</h2><p id="emptyText">Сохраняйте удачные идеи — они появятся здесь.</p><button id="backToSearch">Перейти к поиску</button></section>
+    <section id="collectionsView" hidden><div class="section-toolbar"><div><h2>Ваши подборки</h2><p>Разложите сохранённые идеи по будущим рубрикам.</p></div><button class="add-button" id="newCollectionButton">＋ Новая коллекция</button></div><div class="collection-grid" id="collectionGrid"></div></section>
+    <section id="plannerView" hidden><div class="section-toolbar"><div><h2>План публикаций</h2><p>Перетаскивать пока не нужно — меняйте статус одним нажатием.</p></div><button class="add-button" id="planFromSavedButton">＋ Из сохранённых</button></div><div class="week-strip" id="weekStrip"></div><div class="kanban" id="kanban"></div></section>
+    <section id="analyticsView" hidden><div class="stats-grid" id="statsGrid"></div><div class="analytics-grid"><article class="chart-panel"><div class="panel-title"><div><h2>Потенциал идей</h2><p>Сравнение по просмотрам</p></div><span>Последняя подборка</span></div><div class="bar-chart" id="barChart"></div></article><article class="chart-panel"><div class="panel-title"><div><h2>Площадки</h2><p>Распределение всех идей</p></div></div><div class="donut-wrap"><div class="donut" id="donut"><span id="donutTotal">0</span></div><div class="legend" id="platformLegend"></div></div></article></div><article class="chart-panel recommendation"><span class="rec-icon">✦</span><div><h3>Что попробовать дальше</h3><p id="recommendationText"></p></div></article></section>
+  </main>
+  <dialog id="ideaDialog"><form method="dialog" id="ideaForm"><div class="modal-head"><div><p class="eyebrow">СВОЯ БАЗА</p><h2>Добавить идею</h2></div><button value="cancel" class="close-button" aria-label="Закрыть">×</button></div><label>Название идеи<input name="title" required placeholder="Например: утро мамы и подростка"></label><div class="form-row"><label>Площадка<select name="platform"><option>TikTok</option><option>Instagram</option><option>YouTube</option></select></label><label>Автор<input name="author" placeholder="@ваш_аккаунт"></label></div><div class="form-row"><label>Просмотры<input name="views" type="number" min="0" value="0"></label><label>Реакции<input name="likes" type="number" min="0" value="0"></label></div><label>Настроение<select name="emoji"><option>💡</option><option>😂</option><option>👀</option><option>❤️</option><option>🎬</option><option>✨</option></select></label><button class="add-button modal-submit" value="default">Добавить в базу</button></form></dialog>
+  <dialog id="collectionDialog"><form method="dialog" id="collectionForm"><div class="modal-head"><h2>Новая коллекция</h2><button value="cancel" class="close-button" aria-label="Закрыть">×</button></div><label>Название<input name="name" required placeholder="Например: идеи на август"></label><label>Описание<input name="description" placeholder="Необязательно"></label><button class="add-button modal-submit" value="default">Создать</button></form></dialog>
+  <dialog id="detailDialog" class="detail-dialog"><div id="detailContent"></div></dialog>
+  <dialog id="apiDialog"><form method="dialog" id="apiForm"><div class="modal-head"><div><p class="eyebrow">РЕАЛЬНЫЕ ВИДЕО</p><h2>Подключить YouTube</h2></div><button value="cancel" class="close-button" aria-label="Закрыть">×</button></div><p class="form-help">Вставьте ключ YouTube Data API v3. Он сохранится только в этом браузере. В Google Cloud ограничьте ключ вашим адресом сайта.</p><label>API-ключ<input name="youtubeKey" id="youtubeKeyInput" type="password" autocomplete="off" placeholder="AIza…"></label><div class="api-links"><a href="https://console.cloud.google.com/apis/library/youtube.googleapis.com" target="_blank" rel="noreferrer">Включить YouTube Data API ↗</a><a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noreferrer">Создать ключ ↗</a></div><button class="add-button modal-submit" value="default">Сохранить подключение</button><button type="button" class="remove-key" id="removeKeyButton">Удалить сохранённый ключ</button></form></dialog>
+  <div class="toast" id="toast">Сохранено в подборку</div>
+  <script src="app.js?v=4"></script>
+</body>
+</html>
