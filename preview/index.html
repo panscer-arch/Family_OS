@@ -2992,6 +2992,25 @@
             </div>
             <div class="content-board">
             <article class="card">
+              <div class="card-title"><div><h2>Новый выпуск</h2><p class="muted" style="margin-top: 5px">Собери один ролик для всех площадок. Публикацию ты всегда подтверждаешь сама.</p></div><span class="pill blue">контент-студия</span></div>
+              <form class="grid cols-4" id="contentReleaseForm" style="margin-top: 16px">
+                <input class="field" id="contentReleaseTitle" placeholder="О чём ролик?" required />
+                <select id="contentReleaseFormat"><option value="short">Короткий ролик</option><option value="reel">Reel</option><option value="video">Видео</option></select>
+                <input class="field" id="contentReleaseDate" type="datetime-local" aria-label="Когда выпустить" />
+                <button class="btn" type="submit">Создать выпуск</button>
+                <label class="check-row"><input id="contentReleaseYouTube" type="checkbox" checked /> <span>YouTube</span></label>
+                <label class="check-row"><input id="contentReleaseTikTok" type="checkbox" checked /> <span>TikTok</span></label>
+                <label class="check-row"><input id="contentReleaseInstagram" type="checkbox" checked /> <span>Instagram</span></label>
+              </form>
+              <p class="compact-help" style="margin-top: 12px">Сейчас это подготовка выпуска: ролик, текст и площадки хранятся здесь. Подключение аккаунтов и настоящая автопубликация будут добавлены через официальные входы платформ.</p>
+            </article>
+
+            <article class="card">
+              <div class="card-title"><h2>Очередь выпусков</h2><span class="pill peach" id="contentReleasesCount">0</span></div>
+              <div class="activity" id="contentReleasesQueue" style="margin-top: 14px"></div>
+            </article>
+
+            <article class="card">
               <div class="card-title"><h2>Главная идея</h2><span class="pill blue">основа</span></div>
               <h3 style="margin-top: 8px">Мне скоро 13 лет. Я создаю сайты, приложения и проекты с помощью ИИ и показываю весь путь от идеи до результата простыми словами.</h3>
               <ul class="content-static-list">
@@ -3981,6 +4000,7 @@
       if (!Array.isArray(contentWorkspace.projects) || !contentWorkspace.projects.length) contentWorkspace.projects = defaultContentProjects;
       else contentWorkspace.projects = mergeByTitle(contentWorkspace.projects, defaultContentProjects);
       if (!Array.isArray(contentWorkspace.bestVideos)) contentWorkspace.bestVideos = [];
+      if (!Array.isArray(contentWorkspace.releases)) contentWorkspace.releases = [];
       if (!Array.isArray(contentWorkspace.conveyor) || !contentWorkspace.conveyor.length) {
         contentWorkspace.conveyor = defaultContentIdeas.slice(0, 5).map((idea) => ({ id: `card-${idea.id}`, title: idea.title, status: "idea" }));
       }
@@ -4493,7 +4513,8 @@
         const kanban = document.getElementById("contentKanban");
         const bestTable = document.getElementById("bestVideosTable");
         const projectsList = document.getElementById("contentProjectsList");
-        if (!ideaTable || !hooksList || !kanban || !bestTable || !projectsList) return;
+        const releasesQueue = document.getElementById("contentReleasesQueue");
+        if (!ideaTable || !hooksList || !kanban || !bestTable || !projectsList || !releasesQueue) return;
         const search = (document.getElementById("contentSearchInput")?.value || "").trim().toLowerCase();
         const statusFilter = document.getElementById("contentStatusFilter")?.value || "all";
         const matchesSearch = (value) => !search || String(value || "").toLowerCase().includes(search);
@@ -4555,6 +4576,14 @@
             </div>
           </div>
         `).join("");
+
+        const releaseStatuses = ["Черновик", "Сценарий", "Снято", "Смонтировано", "Готово к публикации", "Опубликовано"];
+        setText("contentReleasesCount", contentWorkspace.releases.length);
+        releasesQueue.innerHTML = contentWorkspace.releases.length ? contentWorkspace.releases.map((release) => {
+          const platforms = Array.isArray(release.platforms) ? release.platforms : [];
+          const schedule = release.scheduledAt ? new Date(release.scheduledAt).toLocaleString("ru-RU", { dateStyle: "medium", timeStyle: "short" }) : "Дата не выбрана";
+          return `<div class="activity-item"><span class="mini-icon">▶</span><div><h3>${escapeHtml(release.title)}</h3><p class="muted" style="margin-top: 4px">${escapeHtml(release.format || "Короткий ролик")} · ${escapeHtml(platforms.join(" · ") || "Площадки не выбраны")} · ${escapeHtml(schedule)}</p><div class="activity" style="margin-top: 8px"><span class="pill blue">${escapeHtml(release.status || "Черновик")}</span><span class="pill">Черновик сохранён</span></div></div><div style="display:grid;gap:8px;min-width:170px"><select data-content-release-status="${escapeHtml(release.id)}">${releaseStatuses.map((status) => `<option ${release.status === status ? "selected" : ""}>${escapeHtml(status)}</option>`).join("")}</select><button class="delete-message" type="button" data-delete-content-release="${escapeHtml(release.id)}">Удалить</button></div></div>`;
+        }).join("") : `<div class="onboarding-card"><h3>Первый выпуск ждёт идею</h3><p class="muted">Создай карточку выше: выбери площадки и веди ролик от сценария до публикации.</p></div>`;
       }
 
       function contentStatusToColumn(status) {
@@ -4581,6 +4610,32 @@
         saveState();
         showNotice("Идея добавлена.");
       }
+
+      document.getElementById("contentReleaseForm")?.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const titleInput = document.getElementById("contentReleaseTitle");
+        const title = titleInput.value.trim();
+        if (!title) return;
+        const platforms = [
+          document.getElementById("contentReleaseYouTube")?.checked ? "YouTube" : "",
+          document.getElementById("contentReleaseTikTok")?.checked ? "TikTok" : "",
+          document.getElementById("contentReleaseInstagram")?.checked ? "Instagram" : ""
+        ].filter(Boolean);
+        contentWorkspace.releases.unshift({
+          id: `release-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+          title,
+          format: document.getElementById("contentReleaseFormat").value,
+          scheduledAt: document.getElementById("contentReleaseDate").value,
+          platforms,
+          status: "Черновик",
+          createdAt: new Date().toISOString()
+        });
+        titleInput.value = "";
+        document.getElementById("contentReleaseDate").value = "";
+        renderContentWorkspace();
+        saveState();
+        showNotice("Выпуск создан. Теперь можно подготовить сценарий, ролик и тексты.");
+      });
 
       document.getElementById("quickContentIdeaOpen")?.addEventListener("click", () => {
         const form = document.getElementById("quickContentIdeaForm");
@@ -4699,20 +4754,30 @@
 
       document.getElementById("content")?.addEventListener("change", (event) => {
         const select = event.target.closest("[data-content-idea-status]");
-        if (!select) return;
-        const idea = contentWorkspace.ideas.find((item) => item.id === select.dataset.contentIdeaStatus);
-        if (!idea) return;
-        idea.status = select.value;
-        const card = contentWorkspace.conveyor.find((item) => item.id === `card-${idea.id}`);
-        if (card) card.status = contentStatusToColumn(select.value);
-        renderContentWorkspace();
-        saveState();
+        const releaseSelect = event.target.closest("[data-content-release-status]");
+        if (select) {
+          const idea = contentWorkspace.ideas.find((item) => item.id === select.dataset.contentIdeaStatus);
+          if (!idea) return;
+          idea.status = select.value;
+          const card = contentWorkspace.conveyor.find((item) => item.id === `card-${idea.id}`);
+          if (card) card.status = contentStatusToColumn(select.value);
+          renderContentWorkspace();
+          saveState();
+        }
+        if (releaseSelect) {
+          const release = contentWorkspace.releases.find((item) => item.id === releaseSelect.dataset.contentReleaseStatus);
+          if (!release) return;
+          release.status = releaseSelect.value;
+          renderContentWorkspace();
+          saveState();
+        }
       });
 
       document.getElementById("content")?.addEventListener("click", (event) => {
         const ideaDelete = event.target.closest("[data-delete-content-idea]");
         const hookDelete = event.target.closest("[data-delete-content-hook]");
         const videoDelete = event.target.closest("[data-delete-best-video]");
+        const releaseDelete = event.target.closest("[data-delete-content-release]");
         if (ideaDelete) {
           const id = ideaDelete.dataset.deleteContentIdea;
           contentWorkspace.ideas = contentWorkspace.ideas.filter((item) => item.id !== id);
@@ -4720,7 +4785,8 @@
         }
         if (hookDelete) contentWorkspace.hooks = contentWorkspace.hooks.filter((item) => item.id !== hookDelete.dataset.deleteContentHook);
         if (videoDelete) contentWorkspace.bestVideos = contentWorkspace.bestVideos.filter((item) => item.id !== videoDelete.dataset.deleteBestVideo);
-        if (ideaDelete || hookDelete || videoDelete) {
+        if (releaseDelete) contentWorkspace.releases = contentWorkspace.releases.filter((item) => item.id !== releaseDelete.dataset.deleteContentRelease);
+        if (ideaDelete || hookDelete || videoDelete || releaseDelete) {
           renderContentWorkspace();
           saveState();
         }
