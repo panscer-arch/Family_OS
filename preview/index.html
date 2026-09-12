@@ -2992,6 +2992,12 @@
             </div>
             <div class="content-board">
             <article class="card">
+              <div class="card-title"><div><h2>Площадки</h2><p class="muted" style="margin-top: 5px">Подключи аккаунты один раз, чтобы выпуск можно было отправлять сразу во все выбранные сети.</p></div><span class="pill blue" id="contentConnectionsCount">0/3</span></div>
+              <div class="grid cols-3" id="contentConnections" style="margin-top: 16px"></div>
+              <p class="compact-help" style="margin-top: 12px">Вход будет только через официальное окно YouTube, TikTok или Instagram. Пароли не сохраняются в Family OS.</p>
+            </article>
+
+            <article class="card">
               <div class="card-title"><div><h2>Новый выпуск</h2><p class="muted" style="margin-top: 5px">Собери один ролик для всех площадок. Публикацию ты всегда подтверждаешь сама.</p></div><span class="pill blue">контент-студия</span></div>
               <form class="grid cols-4" id="contentReleaseForm" style="margin-top: 16px">
                 <input class="field" id="contentReleaseTitle" placeholder="О чём ролик?" required />
@@ -4001,6 +4007,13 @@
       else contentWorkspace.projects = mergeByTitle(contentWorkspace.projects, defaultContentProjects);
       if (!Array.isArray(contentWorkspace.bestVideos)) contentWorkspace.bestVideos = [];
       if (!Array.isArray(contentWorkspace.releases)) contentWorkspace.releases = [];
+      if (!contentWorkspace.connections || typeof contentWorkspace.connections !== "object") {
+        contentWorkspace.connections = {
+          youtube: { name: "YouTube", status: "Не подключено" },
+          tiktok: { name: "TikTok", status: "Не подключено" },
+          instagram: { name: "Instagram", status: "Не подключено" }
+        };
+      }
       if (!Array.isArray(contentWorkspace.conveyor) || !contentWorkspace.conveyor.length) {
         contentWorkspace.conveyor = defaultContentIdeas.slice(0, 5).map((idea) => ({ id: `card-${idea.id}`, title: idea.title, status: "idea" }));
       }
@@ -4514,7 +4527,8 @@
         const bestTable = document.getElementById("bestVideosTable");
         const projectsList = document.getElementById("contentProjectsList");
         const releasesQueue = document.getElementById("contentReleasesQueue");
-        if (!ideaTable || !hooksList || !kanban || !bestTable || !projectsList || !releasesQueue) return;
+        const connections = document.getElementById("contentConnections");
+        if (!ideaTable || !hooksList || !kanban || !bestTable || !projectsList || !releasesQueue || !connections) return;
         const search = (document.getElementById("contentSearchInput")?.value || "").trim().toLowerCase();
         const statusFilter = document.getElementById("contentStatusFilter")?.value || "all";
         const matchesSearch = (value) => !search || String(value || "").toLowerCase().includes(search);
@@ -4576,6 +4590,16 @@
             </div>
           </div>
         `).join("");
+
+        const connectedCount = Object.values(contentWorkspace.connections).filter((item) => item.status === "Подключено").length;
+        setText("contentConnectionsCount", `${connectedCount}/3`);
+        connections.innerHTML = Object.entries(contentWorkspace.connections).map(([key, account]) => {
+          const requested = account.status === "Запрошено";
+          const connected = account.status === "Подключено";
+          const statusClass = connected ? "blue" : requested ? "peach" : "";
+          const buttonLabel = connected ? "Отключить" : requested ? "Ожидает настройки" : "Подключить";
+          return `<div class="activity-item"><span class="mini-icon">${key === "youtube" ? "Y" : key === "tiktok" ? "T" : "I"}</span><div><h3>${escapeHtml(account.name)}</h3><p class="muted" style="margin-top: 4px">${connected ? "Аккаунт готов к публикации" : requested ? "Нужно завершить защищённое подключение" : "Аккаунт ещё не подключён"}</p><div class="activity" style="margin-top: 8px"><span class="pill ${statusClass}">${escapeHtml(account.status)}</span></div></div><button class="btn ${connected ? "secondary" : ""}" type="button" data-connect-platform="${escapeHtml(key)}">${buttonLabel}</button></div>`;
+        }).join("");
 
         const releaseStatuses = ["Черновик", "Сценарий", "Снято", "Смонтировано", "Готово к публикации", "Опубликовано"];
         setText("contentReleasesCount", contentWorkspace.releases.length);
@@ -4774,10 +4798,28 @@
       });
 
       document.getElementById("content")?.addEventListener("click", (event) => {
+        const connectPlatform = event.target.closest("[data-connect-platform]");
         const ideaDelete = event.target.closest("[data-delete-content-idea]");
         const hookDelete = event.target.closest("[data-delete-content-hook]");
         const videoDelete = event.target.closest("[data-delete-best-video]");
         const releaseDelete = event.target.closest("[data-delete-content-release]");
+        if (connectPlatform) {
+          const platform = connectPlatform.dataset.connectPlatform;
+          const account = contentWorkspace.connections[platform];
+          if (!account) return;
+          if (account.status === "Подключено") {
+            account.status = "Не подключено";
+            showNotice(`${account.name}: аккаунт отключён.`);
+          } else if (account.status === "Запрошено") {
+            showNotice(`${account.name}: подключение ждёт серверную настройку.`);
+          } else {
+            account.status = "Запрошено";
+            showNotice(`${account.name}: запрос на защищённое подключение сохранён.`);
+          }
+          renderContentWorkspace();
+          saveState();
+          return;
+        }
         if (ideaDelete) {
           const id = ideaDelete.dataset.deleteContentIdea;
           contentWorkspace.ideas = contentWorkspace.ideas.filter((item) => item.id !== id);
