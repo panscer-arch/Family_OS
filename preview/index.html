@@ -1088,6 +1088,27 @@
         background: rgba(143, 199, 255, 0.1);
       }
 
+      .mentor-true-false {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 16px;
+      }
+
+      .mentor-boolean-button {
+        min-height: 72px;
+        font-size: 18px;
+      }
+
+      .mentor-boolean-button.false {
+        background: rgba(255, 122, 122, 0.13);
+        border-color: rgba(255, 122, 122, 0.28);
+      }
+
+      @media (max-width: 560px) {
+        .mentor-true-false { grid-template-columns: 1fr; }
+      }
+
       .mentor-feedback {
         display: none;
         border-radius: 14px;
@@ -5509,12 +5530,15 @@
         if (result) result.hidden = !session.finished;
         if (session.finished || !question) return;
 
-        const answerKind = session.stepId === "soc-presentation-review" ? "выбери: «Верно» или «Неверно»" : session.subjectId === "math" ? "ответ числом" : "выбери ответ";
-        setText("mentorQuestionKind", `ОГЭ: ${session.step.tasks} · тренировка ${session.index + 1} из ${questions.length} · ${answerKind}`);
+        const presentationReview = session.stepId === "soc-presentation-review";
+        const answerKind = presentationReview ? "Вопрос: утверждение верно или неверно?" : session.subjectId === "math" ? "ответ числом" : "выбери ответ";
+        setText("mentorQuestionKind", `${presentationReview ? "Повторение по презентации" : `ОГЭ: ${session.step.tasks}`} · вопрос ${session.index + 1} из ${questions.length} · ${answerKind}`);
         setText("mentorQuestionText", question.text);
         const answerArea = document.getElementById("mentorAnswerArea");
         if (answerArea) {
-          answerArea.innerHTML = question.options?.length
+          answerArea.innerHTML = presentationReview
+            ? `<div class="mentor-true-false"><button class="btn mentor-boolean-button" type="button" data-mentor-boolean-answer="Верно">Верно</button><button class="btn mentor-boolean-button false" type="button" data-mentor-boolean-answer="Неверно">Неверно</button></div>`
+            : question.options?.length
             ? `<div class="mentor-answer-options">${question.options.map((option, index) => `<label class="mentor-answer-option"><input type="radio" name="mentorAnswer" value="${escapeHtml(option)}" ${index === 0 ? "" : ""} /><span>${escapeHtml(option)}</span></label>`).join("")}</div>`
             : `<input class="field" id="mentorAnswerInput" inputmode="decimal" autocomplete="off" placeholder="Впиши ответ" />`;
         }
@@ -5525,18 +5549,24 @@
         }
         const check = document.getElementById("mentorCheckAnswer");
         const next = document.getElementById("mentorNextQuestion");
-        if (check) check.hidden = false;
-        if (next) next.hidden = true;
+        if (check) {
+          check.hidden = presentationReview;
+          check.textContent = "Проверить";
+        }
+        if (next) {
+          next.hidden = true;
+          next.textContent = "Следующий вопрос";
+        }
         session.checked = false;
       }
 
-      function checkMentorTrainingAnswer() {
+      function checkMentorTrainingAnswer(answerFromButton = "") {
         const session = mentorTrainingSession;
         if (!session || session.checked || session.finished) return;
         const question = session.lesson.questions[session.index];
         const selected = document.querySelector('input[name="mentorAnswer"]:checked');
         const typed = document.getElementById("mentorAnswerInput");
-        const answer = selected ? selected.value : typed?.value || "";
+        const answer = answerFromButton || (selected ? selected.value : typed?.value || "");
         if (!String(answer).trim()) {
           const feedback = document.getElementById("mentorTrainingFeedback");
           if (feedback) {
@@ -5547,15 +5577,35 @@
         }
         const normalized = normalizeMentorAnswer(answer);
         const correct = question.answers.some((item) => normalizeMentorAnswer(item) === normalized);
-        session.results.push({ correct, answer: String(answer), question: question.text });
         session.checked = true;
         const feedback = document.getElementById("mentorTrainingFeedback");
+        const presentationReview = session.stepId === "soc-presentation-review";
+        if (presentationReview && !correct) {
+          session.currentQuestionMistakes = Number(session.currentQuestionMistakes || 0) + 1;
+          session.repeatNeeded = true;
+          if (feedback) {
+            feedback.className = "mentor-feedback show wrong";
+            feedback.textContent = `Неправильно. Правильный ответ: ${question.answers[0]}. ${question.explanation} Повтори этот же вопрос.`;
+          }
+          const next = document.getElementById("mentorNextQuestion");
+          if (next) {
+            next.textContent = "Повторить этот вопрос";
+            next.hidden = false;
+          }
+          return;
+        }
+        session.results.push({ correct, answer: String(answer), question: question.text, firstTry: !presentationReview || !session.currentQuestionMistakes });
         if (feedback) {
           feedback.className = `mentor-feedback show ${correct ? "correct" : "wrong"}`;
-          feedback.textContent = `${correct ? "Верно." : `Пока нет. Верный ответ: ${question.answers[0]}.`} ${question.explanation}`;
+          feedback.textContent = `${correct ? "Правильно." : `Пока нет. Верный ответ: ${question.answers[0]}.`} ${question.explanation}`;
         }
-        document.getElementById("mentorCheckAnswer").hidden = true;
-        document.getElementById("mentorNextQuestion").hidden = false;
+        const check = document.getElementById("mentorCheckAnswer");
+        const next = document.getElementById("mentorNextQuestion");
+        if (check) check.hidden = true;
+        if (next) {
+          next.textContent = "Следующий вопрос";
+          next.hidden = false;
+        }
       }
 
       function finishMentorTraining() {
@@ -5563,10 +5613,11 @@
         if (!session || session.finished) return;
         const total = session.lesson.questions.length;
         const correct = session.results.filter((item) => item.correct).length;
-        const percent = Math.round((correct / total) * 100);
+        const firstTryCorrect = session.stepId === "soc-presentation-review" ? session.results.filter((item) => item.firstTry).length : correct;
+        const percent = Math.round((firstTryCorrect / total) * 100);
         const stats = mentorMemory.mastery[session.subjectId][session.stepId] || { attempts: 0, correct: 0 };
         stats.attempts += total;
-        stats.correct += correct;
+        stats.correct += firstTryCorrect;
         mentorMemory.mastery[session.subjectId][session.stepId] = stats;
         const topicMastery = getMentorMastery(session.subjectId, session.stepId);
         if (topicMastery.mastered && !mentorMemory.ogeCompleted[session.subjectId].includes(session.stepId)) mentorMemory.ogeCompleted[session.subjectId].push(session.stepId);
@@ -5589,9 +5640,9 @@
         session.finished = true;
         const subjectTitle = mentorMemory.subjects.find((item) => item.id === session.subjectId)?.title || "ОГЭ";
         const resultText = percent >= 80 ? "Тема засчитана как освоенная. Следующее занятие уже выбрано." : "Тему пока не засчитываем: повтори её ещё раз или вернись к ней завтра.";
-        setText("mentorTrainingScore", `${correct} из ${total} · ${percent}%`);
+        setText("mentorTrainingScore", session.stepId === "soc-presentation-review" ? `${firstTryCorrect} из ${total} с первого раза · ${percent}%` : `${correct} из ${total} · ${percent}%`);
         setText("mentorTrainingResultText", `${resultText} Серия занятий: ${mentorMemory.studyStreak} дн.`);
-        setText("mentorTrainingReport", `ОГЭ · ${subjectTitle}\nТема: ${session.step.title}\nРезультат: ${correct} из ${total} (${percent}%)\nВремя: ${minutes} мин\nСерия: ${mentorMemory.studyStreak} дн.\nСледующий шаг: ${next.title}`);
+        setText("mentorTrainingReport", `ОГЭ · ${subjectTitle}\nТема: ${session.step.title}\nРезультат: ${session.stepId === "soc-presentation-review" ? `${firstTryCorrect} из ${total} с первого раза` : `${correct} из ${total}`} (${percent}%)\nВремя: ${minutes} мин\nСерия: ${mentorMemory.studyStreak} дн.\nСледующий шаг: ${next.title}`);
         renderMentorTraining();
         saveState();
       }
@@ -5599,11 +5650,18 @@
       function advanceMentorTraining() {
         const session = mentorTrainingSession;
         if (!session || !session.checked) return;
+        if (session.repeatNeeded) {
+          session.repeatNeeded = false;
+          session.checked = false;
+          renderMentorTraining();
+          return;
+        }
         if (session.index + 1 >= session.lesson.questions.length) {
           finishMentorTraining();
           return;
         }
         session.index += 1;
+        session.currentQuestionMistakes = 0;
         renderMentorTraining();
       }
 
@@ -5793,11 +5851,16 @@
       });
 
       document.getElementById("mentor")?.addEventListener("click", (event) => {
+        const booleanAnswer = event.target.closest("[data-mentor-boolean-answer]");
         const topic = event.target.closest("[data-mentor-topic]");
         const complete = event.target.closest("[data-mentor-complete]");
         const subjectButton = event.target.closest("[data-mentor-subject]");
         const trainStep = event.target.closest("[data-mentor-train-step]");
         const deleteRequest = event.target.closest("[data-mentor-request-delete]");
+        if (booleanAnswer) {
+          checkMentorTrainingAnswer(booleanAnswer.dataset.mentorBooleanAnswer);
+          return;
+        }
         if (deleteRequest) {
           mentorMemory.questionRequests = mentorMemory.questionRequests.filter((request) => request.id !== deleteRequest.dataset.mentorRequestDelete);
           renderMentorQuestionRequests(mentorMemory.activeSubject || "math");
