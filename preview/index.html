@@ -1040,6 +1040,18 @@
         animation: mentor-subject-in 220ms ease both;
       }
 
+      .mentor-social-review-start[hidden] {
+        display: none !important;
+      }
+
+      .mentor-social-review-start {
+        margin-bottom: 18px;
+      }
+
+      .mentor-training-view.social-presentation-review .grid.cols-2 {
+        display: none;
+      }
+
       .mentor-training-progress {
         display: grid;
         grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -3310,7 +3322,13 @@
                 <button class="btn secondary" id="mentorSubjectsBack" type="button">← К предметам</button>
                 <span class="pill blue" id="mentorSubjectProgressBadge">0/10</span>
               </div>
-              <article class="card">
+              <article class="card mentor-social-review-start" id="mentorSocialReviewStart" hidden>
+                <p class="eyebrow">Обществознание</p>
+                <h2 style="margin-top: 6px">Повторение по презентации</h2>
+                <p class="muted" style="margin-top: 8px">Одно утверждение, две кнопки. Ошиблась - прочитай, что нужно запомнить, и повтори этот же вопрос.</p>
+                <button class="btn" id="mentorStartSocialReview" type="button" style="margin-top: 16px">Начать повторение</button>
+              </article>
+              <article class="card" id="mentorSubjectProgramCard">
               <div class="card-title">
                 <div>
                   <h2 id="mentorDetailTitle">ОГЭ математика: программа</h2>
@@ -5502,14 +5520,18 @@
       }
 
       function renderMentorTraining() {
-        const programView = document.getElementById("mentorSubjectProgramView");
+        const programView = document.getElementById("mentorSubjectProgramCard");
+        const socialReviewStart = document.getElementById("mentorSocialReviewStart");
         const trainingView = document.getElementById("mentorTrainingView");
         if (!mentorTrainingSession) {
-          if (programView) programView.hidden = false;
+          const socialOnly = mentorMemory.activeSubject === "social";
+          if (programView) programView.hidden = socialOnly;
+          if (socialReviewStart) socialReviewStart.hidden = !socialOnly;
           if (trainingView) trainingView.hidden = true;
           return;
         }
         if (programView) programView.hidden = true;
+        if (socialReviewStart) socialReviewStart.hidden = true;
         if (trainingView) trainingView.hidden = false;
 
         const session = mentorTrainingSession;
@@ -5531,6 +5553,7 @@
         if (session.finished || !question) return;
 
         const presentationReview = session.stepId === "soc-presentation-review";
+        if (trainingView) trainingView.classList.toggle("social-presentation-review", presentationReview);
         const answerKind = presentationReview ? "Вопрос: утверждение верно или неверно?" : session.subjectId === "math" ? "ответ числом" : "выбери ответ";
         setText("mentorQuestionKind", `${presentationReview ? "Повторение по презентации" : `ОГЭ: ${session.step.tasks}`} · вопрос ${session.index + 1} из ${questions.length} · ${answerKind}`);
         setText("mentorQuestionText", question.text);
@@ -5585,11 +5608,11 @@
           session.repeatNeeded = true;
           if (feedback) {
             feedback.className = "mentor-feedback show wrong";
-            feedback.textContent = `Неправильно. Правильный ответ: ${question.answers[0]}. ${question.explanation} Повтори этот же вопрос.`;
+            feedback.textContent = `Неправильно. Запомни: ${question.explanation} Потом нажми «Прочитала, повторить вопрос».`;
           }
           const next = document.getElementById("mentorNextQuestion");
           if (next) {
-            next.textContent = "Повторить этот вопрос";
+            next.textContent = "Прочитала, повторить вопрос";
             next.hidden = false;
           }
           return;
@@ -5905,6 +5928,11 @@
         renderMentor();
         document.getElementById("mentor")?.scrollIntoView({ behavior: "smooth", block: "start" });
         saveState();
+      });
+
+      document.getElementById("mentorStartSocialReview")?.addEventListener("click", () => {
+        mentorMemory.activeSubject = "social";
+        startMentorTraining("social", "soc-presentation-review");
       });
 
       document.getElementById("mentorStartRecommended")?.addEventListener("click", () => {
