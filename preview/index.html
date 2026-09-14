@@ -1049,7 +1049,36 @@
       }
 
       .mentor-training-view.social-presentation-review .grid.cols-2 {
+        grid-template-columns: 1fr;
+      }
+
+      .mentor-training-view.social-presentation-review .grid.cols-2 > :nth-child(2) {
         display: none;
+      }
+
+      .mentor-memory-points {
+        display: grid;
+        gap: 9px;
+        margin: 10px 0 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .mentor-memory-points li {
+        padding-left: 18px;
+        position: relative;
+        line-height: 1.5;
+      }
+
+      .mentor-memory-points li::before {
+        content: "";
+        position: absolute;
+        top: 0.65em;
+        left: 0;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--mint);
       }
 
       .mentor-training-progress {
@@ -3324,8 +3353,8 @@
               </div>
               <article class="card mentor-social-review-start" id="mentorSocialReviewStart" hidden>
                 <p class="eyebrow">Обществознание</p>
-                <h2 style="margin-top: 6px">Повторение по презентации</h2>
-                <p class="muted" style="margin-top: 8px">Одно утверждение, две кнопки. Ошиблась - прочитай, что нужно запомнить, и повтори этот же вопрос.</p>
+                <h2 id="mentorSocialReviewTitle" style="margin-top: 6px">Повторение по презентации</h2>
+                <p class="muted" id="mentorSocialReviewDescription" style="margin-top: 8px">Сначала запомни короткую карточку, потом ответь на вопросы только по ней.</p>
                 <button class="btn" id="mentorStartSocialReview" type="button" style="margin-top: 16px">Начать повторение</button>
               </article>
               <article class="card" id="mentorSubjectProgramCard">
@@ -3417,7 +3446,7 @@
                   </div>
                   <div class="mentor-training-progress" id="mentorTrainingProgress"></div>
                   <div class="grid cols-2" style="margin-bottom: 16px">
-                    <div class="mentor-program-card"><p class="eyebrow">Короткая теория</p><p id="mentorTrainingTheory" style="margin-top: 8px; line-height: 1.6"></p></div>
+                    <div class="mentor-program-card"><p class="eyebrow" id="mentorTrainingTheoryLabel">Короткая теория</p><div id="mentorTrainingTheory" style="margin-top: 8px; line-height: 1.6"></div></div>
                     <div class="mentor-program-card"><p class="eyebrow">Пример</p><p id="mentorTrainingExample" style="margin-top: 8px; line-height: 1.6"></p></div>
                   </div>
                   <div id="mentorTrainingQuestionArea">
@@ -4150,6 +4179,7 @@
       mentorMemory.ogeCompleted.russian ||= [];
       mentorMemory.ogeCompleted.social ||= [];
       mentorMemory.socialPresentationCursor = Number(mentorMemory.socialPresentationCursor || 0);
+      mentorMemory.socialPresentationLessonIndex = Number(mentorMemory.socialPresentationLessonIndex || 0);
       if (!Array.isArray(mentorMemory.subjects)) {
         mentorMemory.subjects = [
           { id: "math", title: "Математика", level: "старт с нуля", nextTopic: "таблица умножения и деление", progress: 0, topics: ["таблица умножения", "деление", "дроби", "проценты", "уравнения", "геометрия"] },
@@ -5267,14 +5297,46 @@
           mentorQuestion("Образование помогает социализации человека и может быть каналом социальной мобильности.", "Верно", "Оно передаёт знания и культуру, а также помогает получать новые возможности в обществе.", ["Верно", "Неверно"]),
           mentorQuestion("Основой религии выступает вера в сверхъестественное.", "Верно", "В презентации религия описана как мировоззрение и мироощущение, основанное на такой вере.", ["Верно", "Неверно"])
         ];
-        const batchSize = 8;
-        const start = mentorMemory.socialPresentationCursor % statements.length;
-        const questions = Array.from({ length: batchSize }, (_, index) => statements[(start + index) % statements.length]);
-        return {
-          theory: "Эти утверждения составлены по твоей презентации «Человек и общество». Читай спокойно, вспоминай определение и выбирай только «Верно» или «Неверно».",
-          example: "Пример: «Общество тесно связано с природой» - верно. Люди зависят от ресурсов и климата, а ещё меняют природную среду.",
-          questions
-        };
+        const lessons = [
+          {
+            title: "1. Общество и природа",
+            shortTitle: "Общество и природа",
+            theory: "Запомни: общество - часть материального мира, которая отделилась от природы, но остаётся с ней связанной. Материальный мир = общество + природа. В обществе есть четыре сферы: экономическая, социальная, политическая и духовная. Традиционное общество опирается на землю и сельское хозяйство, индустриальное - на капитал и фабрики, постиндустриальное - на знания, информацию и услуги.",
+            memoryPoints: [
+              "Материальный мир = общество + природа. Они влияют друг на друга.",
+              "Четыре сферы общества: экономическая, социальная, политическая, духовная.",
+              "Земля - традиционное общество, капитал - индустриальное, информация - постиндустриальное."
+            ],
+            example: "Пример: школа относится к социальной и духовной сферам, а производство еды - к экономической. Это разные сферы, но они связаны.",
+            questions: statements.slice(0, 8)
+          },
+          {
+            title: "2. Человек и деятельность",
+            shortTitle: "Человек и деятельность",
+            theory: "Запомни: человек биосоциален. Биологическое - сон, еда, рефлексы и организм. Социальное - речь, сознание, учёба, труд, творчество и жизнь среди людей. Деятельность всегда имеет мотив, цель, средства и результат. Свобода связана с ответственностью. Социализация идёт всю жизнь: мы учимся нормам и ролям в семье, школе, работе и обществе.",
+            memoryPoints: [
+              "Человек биосоциален: сон и рефлексы относятся к биологическому, речь и труд - к социальному.",
+              "У деятельности есть мотив, цель, средства и результат.",
+              "Социализация идёт всю жизнь, а свобода всегда связана с ответственностью."
+            ],
+            example: "Пример: ты решила снять ролик. Мотив - поделиться идеей, цель - готовое видео, средства - телефон и монтаж, результат - опубликованный ролик.",
+            questions: statements.slice(8, 16)
+          },
+          {
+            title: "3. Познание и духовная сфера",
+            shortTitle: "Познание, культура и образование",
+            theory: "Запомни: ощущение даёт отдельное свойство предмета, восприятие - целостный образ. Наука создаёт объективные и обоснованные знания, а практикой проверяют истину. К духовной культуре относятся наука, искусство, образование, религия и мораль. Образование передаёт знания и помогает человеку двигаться в обществе. Религия основана на вере в сверхъестественное.",
+            memoryPoints: [
+              "Ощущение - одно свойство предмета. Восприятие - целостный образ предмета.",
+              "Наука даёт объективные знания, а практика помогает проверить истину.",
+              "Наука, искусство, образование, религия и мораль относятся к духовной культуре."
+            ],
+            example: "Пример: кислый вкус яблока - ощущение. Когда ты видишь круглое зелёное кислое яблоко целиком - это восприятие.",
+            questions: statements.slice(16, 24)
+          }
+        ];
+        const lessonIndex = mentorMemory.socialPresentationLessonIndex % lessons.length;
+        return { ...lessons[lessonIndex], lessonIndex, lessonCount: lessons.length };
       }
 
       function mentorSocialLesson(step) {
@@ -5539,9 +5601,15 @@
         const question = questions[session.index];
         const subjectTitle = mentorMemory.subjects.find((item) => item.id === session.subjectId)?.title || "ОГЭ";
         setText("mentorTrainingSubject", `${subjectTitle} · занятие`);
-        setText("mentorTrainingTitle", session.step.title);
-        setText("mentorTrainingTheory", session.lesson.theory);
+        setText("mentorTrainingTitle", session.lesson.title || session.step.title);
+        const theoryNode = document.getElementById("mentorTrainingTheory");
+        if (theoryNode) {
+          theoryNode.innerHTML = session.stepId === "soc-presentation-review" && Array.isArray(session.lesson.memoryPoints)
+            ? `<ul class="mentor-memory-points">${session.lesson.memoryPoints.map((point) => `<li>${escapeHtml(point)}</li>`).join("")}</ul>`
+            : escapeHtml(session.lesson.theory);
+        }
         setText("mentorTrainingExample", session.lesson.example);
+        setText("mentorTrainingTheoryLabel", session.stepId === "soc-presentation-review" ? "Запомни перед вопросами" : "Короткая теория");
         setText("mentorTrainingCounter", `${Math.min(session.index + 1, questions.length)} из ${questions.length}`);
 
         const dots = document.getElementById("mentorTrainingProgress");
@@ -5653,7 +5721,7 @@
         mentorMemory.studySessions.unshift({ date: today, subject: session.subjectId, topic: session.step.title, correct, total, percent, minutes });
         mentorMemory.studySessions = mentorMemory.studySessions.slice(0, 60);
         if (session.stepId === "soc-presentation-review") {
-          mentorMemory.socialPresentationCursor = (mentorMemory.socialPresentationCursor + total) % 24;
+          mentorMemory.socialPresentationLessonIndex = (Number(session.lesson.lessonIndex || 0) + 1) % Number(session.lesson.lessonCount || 3);
         }
         const detail = mentorOgeDetails[session.subjectId];
         const next = getRecommendedMentorStep(session.subjectId, detail);
@@ -5763,6 +5831,11 @@
         setText("mentorDetailTime", detail.time);
         setText("mentorDetailPoints", detail.points);
         setText("mentorDetailDaily", detail.daily);
+        if (subjectId === "social") {
+          const socialLesson = mentorSocialPresentationLesson();
+          setText("mentorSocialReviewTitle", `Повторение: ${socialLesson.shortTitle}`);
+          setText("mentorSocialReviewDescription", `Часть ${socialLesson.lessonIndex + 1} из ${socialLesson.lessonCount}. Сначала прочитай карточку «Запомни», потом ответь на ${socialLesson.questions.length} вопросов только по этой теме.`);
+        }
         if (theoryList) {
           theoryList.innerHTML = detail.theory.map((item) => `<div class="activity-item"><span class="mini-icon">Т</span><div><h3>${escapeHtml(item)}</h3></div></div>`).join("");
         }
