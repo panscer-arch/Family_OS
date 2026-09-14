@@ -3495,11 +3495,11 @@
             <article class="school-week-card">
               <div class="card-title">
                 <div>
-                  <p class="eyebrow">Текущая неделя</p>
-                  <h2 id="schoolWeekTitle">13–19 июля 2026</h2>
+                  <p class="eyebrow">Первая четверть</p>
+                  <h2 id="schoolWeekTitle">1 сентября — 1 октября 2026</h2>
                   <p class="muted" id="schoolSyncStatus" style="margin-top: 6px"></p>
                 </div>
-                <span class="pill blue" id="schoolWeekStatus">Доступ до 15 августа</span>
+                <span class="pill blue" id="schoolWeekStatus">Доступ до 1 октября</span>
               </div>
               <div class="school-day-grid" id="schoolWeekDays"></div>
               <div class="helper-actions" style="margin-top: 16px">
@@ -4097,28 +4097,42 @@
         { id: "project-content", title: "Контент", createdAt: new Date().toLocaleDateString("ru-RU") },
         { id: "project-life", title: "Быт", createdAt: new Date().toLocaleDateString("ru-RU") }
       ];
+      function schoolWeekForFirstQuarter() {
+        const accessStart = new Date("2026-09-01T12:00:00");
+        const accessEnd = new Date("2026-10-01T12:00:00");
+        const today = new Date();
+        const current = today < accessStart ? accessStart : (today >= accessEnd ? new Date("2026-09-28T12:00:00") : today);
+        const day = current.getDay() || 7;
+        const start = new Date(current);
+        start.setDate(current.getDate() - day + 1);
+        const end = new Date(start);
+        end.setDate(start.getDate() + 6);
+        const weekdayNames = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"];
+        const format = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+        return {
+          start: format(start),
+          end: format(end),
+          vacation: false,
+          days: weekdayNames.map((title, index) => {
+            const date = new Date(start);
+            date.setDate(start.getDate() + index);
+            return { date: format(date), title, status: "Первая четверть" };
+          })
+        };
+      }
+
       const schoolWorkspace = savedState.schoolWorkspace || {
         schoolClass: 9,
         archivedClasses: [7, 8],
         excludedSubjects: ["Китайский язык", "Немецкий язык"],
         mandatoryOnlySubjects: ["Алгебра", "Вероятность и статистика", "Геометрия", "ОБЗР", "Обществознание", "Физика", "Физическая культура"],
-        accessUntil: "2026-08-15",
-        lastUpdatedAt: "2026-07-15T12:00:00+03:00",
+        accessStart: "2026-09-01",
+        accessUntil: "2026-10-01",
+        periodTitle: "Первая четверть",
+        periodGoal: "Закрыть материалы первой четверти до 1 октября",
+        lastUpdatedAt: "2026-09-14T12:00:00+03:00",
         syncMode: "manual",
-        week: {
-          start: "2026-07-13",
-          end: "2026-07-19",
-          vacation: true,
-          days: [
-            { date: "2026-07-13", title: "Понедельник", status: "Каникулы" },
-            { date: "2026-07-14", title: "Вторник", status: "Каникулы" },
-            { date: "2026-07-15", title: "Среда", status: "Каникулы" },
-            { date: "2026-07-16", title: "Четверг", status: "Каникулы" },
-            { date: "2026-07-17", title: "Пятница", status: "Каникулы" },
-            { date: "2026-07-18", title: "Суббота", status: "Каникулы" },
-            { date: "2026-07-19", title: "Воскресенье", status: "Каникулы" }
-          ]
-        },
+        week: schoolWeekForFirstQuarter(),
         tasks: []
       };
       schoolWorkspace.schoolClass = 9;
@@ -4126,7 +4140,12 @@
       if (!Array.isArray(schoolWorkspace.excludedSubjects)) schoolWorkspace.excludedSubjects = ["Китайский язык", "Немецкий язык"];
       if (!Array.isArray(schoolWorkspace.mandatoryOnlySubjects)) schoolWorkspace.mandatoryOnlySubjects = ["Алгебра", "Вероятность и статистика", "Геометрия", "ОБЗР", "Обществознание", "Физика", "Физическая культура"];
       if (!Array.isArray(schoolWorkspace.tasks)) schoolWorkspace.tasks = [];
-      if (!schoolWorkspace.accessUntil) schoolWorkspace.accessUntil = "2026-08-15";
+      const schoolPeriodChanged = schoolWorkspace.accessStart !== "2026-09-01" || schoolWorkspace.accessUntil !== "2026-10-01" || !schoolWorkspace.week || schoolWorkspace.week.vacation || schoolWorkspace.week.end < "2026-09-01";
+      schoolWorkspace.accessStart = "2026-09-01";
+      schoolWorkspace.accessUntil = "2026-10-01";
+      schoolWorkspace.periodTitle = "Первая четверть";
+      schoolWorkspace.periodGoal = "Закрыть материалы первой четверти до 1 октября";
+      if (schoolPeriodChanged) schoolWorkspace.week = schoolWeekForFirstQuarter();
       const mentorMemory = savedState.mentorMemory || {
         name: "Ева, 12 лет",
         grade: "перехожу в 9 класс",
@@ -6787,9 +6806,9 @@
         if (!title || !status || !sync || !days || !tasks || !subjects || !count || !subjectSelect) return;
 
         const week = schoolWorkspace.week;
-        title.textContent = `${schoolDateLabel(week.start)} — ${schoolDateLabel(week.end)} ${new Date(week.end + "T12:00:00").getFullYear()}`;
-        status.textContent = schoolWorkspace.accessUntil ? `Доступ до ${schoolDateLabel(schoolWorkspace.accessUntil)}` : (week.vacation ? "Каникулы" : "Учебная неделя");
-        sync.textContent = `${schoolWorkspace.accessUntil ? `Доступ к материалам открыт до ${schoolDateLabel(schoolWorkspace.accessUntil)} · ` : ""}Ручная синхронизация · последнее обновление: ${new Date(schoolWorkspace.lastUpdatedAt).toLocaleString("ru-RU", { dateStyle: "medium", timeStyle: "short" })}`;
+        title.textContent = `${schoolWorkspace.periodTitle}: ${schoolDateLabel(schoolWorkspace.accessStart)} — ${schoolDateLabel(schoolWorkspace.accessUntil)} 2026`;
+        status.textContent = `Доступ до ${schoolDateLabel(schoolWorkspace.accessUntil)}`;
+        sync.textContent = `${schoolWorkspace.periodGoal} · Эта неделя: ${schoolDateLabel(week.start)} — ${schoolDateLabel(week.end)}.`;
         days.innerHTML = week.days.map((day) => `<div class="school-day ${week.vacation ? "vacation" : ""}"><p class="eyebrow">${escapeHtml(day.title)}</p><h3 style="margin-top: 5px">${schoolDateLabel(day.date)}</h3><p class="muted" style="margin-top: 10px">${escapeHtml(day.status)}</p></div>`).join("");
 
         const visible = visibleSchoolTasks();
@@ -6799,7 +6818,7 @@
           ? `<div class="school-empty"><h3>В расписании — каникулы</h3><p style="margin-top: 6px">Обязательных уроков и домашних заданий нет. Но доступ к материалам открыт до ${schoolDateLabel(schoolWorkspace.accessUntil)}: можно заниматься и добавлять свои задания ниже.</p></div>`
           : required.length
             ? required.map((task) => `<div class="school-task-item"><label class="check-row"><input type="checkbox" data-school-task-done="${escapeHtml(task.id)}" ${task.done ? "checked" : ""} /><span><strong>${escapeHtml(task.subject)}: ${escapeHtml(task.title)}</strong><small class="muted" style="display:block; margin-top:4px">${task.dueDate ? `Сдать до ${schoolDateLabel(task.dueDate)}` : "Срок не указан"} · обязательное</small></span></label><div class="school-links">${task.url ? `<a class="mini-action" href="${escapeHtml(task.url)}" target="_blank" rel="noopener noreferrer">Открыть задание</a>` : ""}</div></div>`).join("")
-            : `<div class="school-empty"><h3>Обязательных заданий нет</h3><p style="margin-top: 6px">Когда они появятся в ИнтернетУроке, их можно добавить вручную ниже.</p></div>`;
+          : `<div class="school-empty"><h3>Пока нет заданий первой четверти</h3><p style="margin-top: 6px">Добавь первое задание из ИнтернетУрока ниже, а потом перенеси его в план Евы.</p></div>`;
 
         subjects.innerHTML = schoolWorkspace.mandatoryOnlySubjects.map((subject) => `<div class="school-subject-item"><div><h3>${escapeHtml(subject)}</h3><p class="muted" style="margin-top: 3px">В план попадают только обязательные задания.</p></div><span class="pill peach">Только обязательные</span></div>`).join("");
         subjectSelect.innerHTML = schoolSubjectOptions.filter((subject) => !isExcludedSchoolSubject(subject)).map((subject) => `<option value="${escapeHtml(subject)}">${escapeHtml(subject)}${isMandatoryOnlySchoolSubject(subject) ? " · только обязательные" : ""}</option>`).join("");
@@ -6807,9 +6826,7 @@
 
       function copySchoolWeek() {
         const week = schoolWorkspace.week;
-        const text = week.vacation
-          ? `ИнтернетУрок · Ева · 9 класс\n${schoolDateLabel(week.start)} — ${schoolDateLabel(week.end)}\nВ расписании каникулы: обязательных уроков и домашних заданий нет. Доступ к материалам открыт до ${schoolDateLabel(schoolWorkspace.accessUntil)}.`
-          : `ИнтернетУрок · Ева · 9 класс\n${schoolDateLabel(week.start)} — ${schoolDateLabel(week.end)}\n${visibleSchoolTasks().map((task) => `${task.subject}: ${task.title}${task.dueDate ? ` — до ${schoolDateLabel(task.dueDate)}` : ""}`).join("\n")}`;
+        const text = `ИнтернетУрок · Ева · 9 класс\nПервая четверть: ${schoolDateLabel(schoolWorkspace.accessStart)} — ${schoolDateLabel(schoolWorkspace.accessUntil)}\n${schoolWorkspace.periodGoal}\n${visibleSchoolTasks().map((task) => `${task.subject}: ${task.title}${task.dueDate ? ` — до ${schoolDateLabel(task.dueDate)}` : ""}`).join("\n") || "Задания ещё не добавлены."}`;
         navigator.clipboard.writeText(text).then(() => showNotice("План недели скопирован.")).catch(() => showNotice("Не получилось скопировать автоматически."));
       }
 
