@@ -2788,10 +2788,6 @@
                 <button class="child-tab active" data-child="Ева"><span class="avatar blue">Е</span><span class="child-tab-copy"><span class="child-tab-status" data-top-status="Ева">Читаю книгу</span><span class="child-tab-name">Ева</span></span></button>
               </div>
             </div>
-            <button class="icon-btn" id="openNotifications" aria-label="Уведомления">
-              <span class="dot"></span>
-              <svg viewBox="0 0 24 24" width="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 8a6 6 0 1 1 12 0c0 7 3 7 3 9H3c0-2 3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg>
-            </button>
             <button class="profile-btn" id="openAuth"><span class="avatar blue" id="profileInitial">С</span><span id="profileName">Ева</span></button>
             <button class="btn secondary" id="logoutBtn" type="button">Выйти</button>
           </div>
@@ -2995,7 +2991,7 @@
           <section class="page active" id="week">
             <div class="page-head">
               <div><p class="eyebrow">Неделя</p><h1>План Евы на неделю</h1><p class="muted" style="margin-top: 8px">Заполняем неделю: понедельник-воскресенье. Из плана автоматически рождаются задачи дня.</p></div>
-              <div style="display: flex; gap: 10px"><button class="btn secondary" id="copyPrevDay">Скопировать вчера</button><button class="btn secondary" id="insertTemplate">Вставить шаблон Евы</button><button class="btn" id="generateDayTasks">Создать задачи из плана</button></div>
+              <div style="display: flex; gap: 10px"><button class="btn" id="generateDayTasks">Создать задачи из плана</button></div>
             </div>
             <div class="card" style="margin-bottom: 18px">
               <div class="calendar-shell">
@@ -3097,7 +3093,6 @@
                 <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap">
                   <span class="pill peach" id="contentIdeasCount">0</span>
                   <button class="btn secondary" id="randomContentIdea" type="button">Случайная идея</button>
-                  <button class="btn secondary" id="quickContentIdeaOpen" type="button">+ Быстро записать идею</button>
                 </div>
               </div>
               <div class="grid cols-3" style="margin-bottom: 14px">
@@ -3106,15 +3101,6 @@
                 <button class="btn secondary" id="toggleIdeasList" type="button">Показать все идеи</button>
               </div>
               <div class="onboarding-card" id="randomIdeaResult" style="display: none; margin-bottom: 14px"></div>
-              <form class="form-row" id="quickContentIdeaForm" style="display: none; margin-bottom: 14px">
-                <input class="field" id="quickContentIdeaInput" placeholder="Быстрая идея ролика" />
-                <button class="btn" type="submit">Сохранить</button>
-              </form>
-              <div class="helper-actions" style="margin-bottom: 14px">
-                <button class="mini-action" type="button" data-content-preset="Что я изменила в Family OS сегодня">Family OS сегодня</button>
-                <button class="mini-action" type="button" data-content-preset="Ошибка, которую я нашла и исправила">Ошибка и фикс</button>
-                <button class="mini-action" type="button" data-content-preset="Показываю путь от идеи до результата">Идея → результат</button>
-              </div>
               <form class="grid cols-4" id="contentIdeaForm" style="margin-bottom: 14px">
                 <input class="field" id="contentIdeaTitle" placeholder="Название идеи" required />
                 <select id="contentIdeaCategory"><option>Vibe Coding</option><option>Проект</option><option>Ошибка</option><option>ChatGPT</option><option>Челлендж</option><option>Закулисье</option></select>
@@ -3190,13 +3176,6 @@
             <div class="grid cols-2">
               <article class="card">
                 <div class="card-title"><div><h2>Добавить идею</h2><p class="muted" style="margin-top: 6px">Блюдо, доставка или быстрый перекус.</p></div><span class="pill blue" id="foodCount">0</span></div>
-                <div class="helper-actions">
-                  <button class="btn secondary" type="button" data-food-preset="Омлет / яичница" data-food-type="приготовить">Омлет</button>
-                  <button class="btn secondary" type="button" data-food-preset="Паста / гречка с чем-то" data-food-type="приготовить">Обед дома</button>
-                  <button class="btn secondary" type="button" data-food-preset="Роллы / пицца / боул" data-food-type="заказать">Заказать</button>
-                  <button class="btn secondary" type="button" data-food-preset="Фрукты / йогурт" data-food-type="быстро">Быстро</button>
-                </div>
-                <p class="compact-help" style="margin-top: 12px">Кнопки выше только заполняют форму. Нажми «Добавить идею», когда вариант подходит.</p>
                 <form class="grid" id="foodForm" style="margin-top: 16px">
                   <input class="field" id="foodTitleInput" placeholder="Идея еды: омлет, паста, роллы" required />
                   <div class="form-row">
@@ -3254,11 +3233,6 @@
                   <button class="btn" type="submit">Добавить</button>
                   <input class="field" id="noteTextInput" placeholder="Заметка или ссылка" />
                 </form>
-                <div class="helper-actions" style="margin-top: 12px">
-                  <button class="mini-action" type="button" data-note-preset="Идея для ролика">Идея ролика</button>
-                  <button class="mini-action" type="button" data-note-preset="Что проверить в проекте">Проверить проект</button>
-                  <button class="mini-action" type="button" data-note-preset="Что купить или заказать">Купить / заказать</button>
-                </div>
               </main>
             </div>
           </section>
@@ -3270,7 +3244,6 @@
                 <h1>Наставник</h1>
                 <p class="muted" style="margin-top: 8px">Личный репетитор без стыда: сначала база, потом подготовка к ОГЭ.</p>
               </div>
-              <button class="btn secondary" id="mentorResetToday" type="button">Сбросить урок дня</button>
             </div>
 
             <div class="mentor-overview" id="mentorOverview">
@@ -3484,12 +3457,7 @@
                 <h1>ИнтернетУрок</h1>
                 <p class="muted" style="margin-top: 8px">Ева · 9 класс</p>
               </div>
-              <div class="school-links">
-                <a class="btn secondary" href="https://interneturok.ru/h/schedule?period=week" target="_blank" rel="noopener noreferrer">Расписание</a>
-                <a class="btn secondary" href="https://interneturok.ru/h/journal" target="_blank" rel="noopener noreferrer">Журнал</a>
-                <a class="btn secondary" href="https://interneturok.ru/h/materials" target="_blank" rel="noopener noreferrer">Материалы</a>
-                <a class="btn secondary" href="https://interneturok.ru/h/stats" target="_blank" rel="noopener noreferrer">Статистика</a>
-              </div>
+              <div class="school-links"><a class="btn secondary" href="https://interneturok.ru/h/materials" target="_blank" rel="noopener noreferrer">Открыть ИнтернетУрок</a></div>
             </div>
 
             <article class="school-week-card">
@@ -3503,9 +3471,7 @@
               </div>
               <div class="school-day-grid" id="schoolWeekDays"></div>
               <div class="helper-actions" style="margin-top: 16px">
-                <button class="btn" id="schoolCopyWeek" type="button">Скопировать план недели</button>
-                <button class="btn secondary" id="schoolAddTasksToPlan" type="button">Добавить задания в план Евы</button>
-                <a class="btn secondary" href="https://interneturok.ru/h/materials" target="_blank" rel="noopener noreferrer">Заниматься по материалам</a>
+                <button class="btn" id="schoolAddTasksToPlan" type="button">Добавить задания в план Евы</button>
               </div>
             </article>
 
@@ -3597,10 +3563,7 @@
               <article class="saved-note">
                 <h2>Instagram knowledge base</h2>
                 <p class="muted" style="margin-top: 8px">Ниже встроена готовая база сохранёнок. Можно фильтровать, открывать карточки и быстро переходить в сами Reels.</p>
-                <div class="saved-actions">
-                  <a class="btn" href="/igkb/index.html" target="_blank" rel="noreferrer">Открыть отдельно</a>
-                  <button class="btn secondary" type="button" id="reloadSavedFrame">Обновить базу</button>
-                </div>
+                <div class="saved-actions"><a class="btn" href="/igkb/index.html" target="_blank" rel="noreferrer">Открыть отдельно</a></div>
                 <p class="muted saved-frame-hint">Если внутри пусто после деплоя, открой базу отдельно: так проще понять, загрузились ли файлы IGKB.</p>
               </article>
               <article class="card saved-frame-card">
@@ -3895,11 +3858,6 @@
         const jump = event.target.closest("[data-route-jump]");
         if (!jump) return;
         go(jump.dataset.routeJump);
-      });
-
-      document.getElementById("reloadSavedFrame")?.addEventListener("click", () => {
-        const frame = document.getElementById("savedFrame");
-        if (frame) frame.src = `/igkb/index.html?ts=${Date.now()}`;
       });
 
       if (PLAN_ONLY_MODE) {
@@ -4748,38 +4706,6 @@
         renderContentWorkspace();
         saveState();
         showNotice("Выпуск создан. Теперь можно подготовить сценарий, ролик и тексты.");
-      });
-
-      document.getElementById("quickContentIdeaOpen")?.addEventListener("click", () => {
-        const form = document.getElementById("quickContentIdeaForm");
-        const input = document.getElementById("quickContentIdeaInput");
-        if (!form) return;
-        const isHidden = form.style.display === "none" || !form.style.display;
-        form.style.display = isHidden ? "flex" : "none";
-        if (isHidden) input?.focus();
-      });
-
-      document.getElementById("quickContentIdeaForm")?.addEventListener("submit", (event) => {
-        event.preventDefault();
-        const input = document.getElementById("quickContentIdeaInput");
-        const title = input.value.trim();
-        if (!title) return;
-        addContentIdea(title, "Быстрая идея", "средний");
-        input.value = "";
-        document.getElementById("quickContentIdeaForm").style.display = "none";
-      });
-
-      document.querySelectorAll("[data-content-preset]").forEach((button) => {
-        button.addEventListener("click", () => {
-          const input = document.getElementById("contentIdeaTitle");
-          const category = document.getElementById("contentIdeaCategory");
-          const priority = document.getElementById("contentIdeaPriority");
-          if (!input) return;
-          input.value = button.dataset.contentPreset;
-          if (category) category.value = button.dataset.contentPreset.includes("Family OS") ? "Проект" : "Vibe Coding";
-          if (priority) priority.value = "средний";
-          input.focus();
-        });
       });
 
       document.getElementById("contentIdeaForm")?.addEventListener("submit", (event) => {
@@ -6092,7 +6018,7 @@
         setText("foodCookSummary", cookCount);
         setText("foodOrderSummary", orderCount);
         if (!foodMeals.length) {
-          list.innerHTML = `<div class="onboarding-card"><h3>Идей еды пока нет</h3><p class="muted">Добавьте блюдо, доставку или быстрый перекус. Самый быстрый путь — выбрать пресет слева и сохранить.</p><button class="btn secondary" type="button" data-focus-food-form>Добавить идею</button></div>`;
+          list.innerHTML = `<div class="onboarding-card"><h3>Идей еды пока нет</h3><p class="muted">Добавь блюдо, доставку или быстрый перекус в форме рядом.</p><button class="btn secondary" type="button" data-focus-food-form>Добавить идею</button></div>`;
           return;
         }
         foodMeals.forEach((meal) => {
@@ -6120,17 +6046,6 @@
         renderFoodMeals();
         saveState();
         showNotice("Идея еды добавлена.");
-      });
-
-      document.querySelectorAll("[data-food-preset]").forEach((button) => {
-        button.addEventListener("click", () => {
-          const titleInput = document.getElementById("foodTitleInput");
-          const typeInput = document.getElementById("foodTypeInput");
-          if (!titleInput) return;
-          titleInput.value = button.dataset.foodPreset;
-          if (typeInput && button.dataset.foodType) typeInput.value = button.dataset.foodType;
-          titleInput.focus();
-        });
       });
 
       document.getElementById("foodList")?.addEventListener("click", (event) => {
@@ -6422,17 +6337,6 @@
         renderNotes();
         saveState();
         showNotice("Корзина очищена.");
-      });
-
-      document.querySelectorAll("[data-note-preset]").forEach((button) => {
-        button.addEventListener("click", () => {
-          const titleInput = document.getElementById("noteTitleInput");
-          const destination = document.getElementById("noteDestinationInput");
-          if (!titleInput) return;
-          titleInput.value = button.dataset.notePreset;
-          if (destination) destination.value = button.dataset.notePreset.includes("ролик") ? "plans" : "inbox";
-          titleInput.focus();
-        });
       });
 
       document.addEventListener("invalid", (event) => {
@@ -6824,12 +6728,6 @@
         subjectSelect.innerHTML = schoolSubjectOptions.filter((subject) => !isExcludedSchoolSubject(subject)).map((subject) => `<option value="${escapeHtml(subject)}">${escapeHtml(subject)}${isMandatoryOnlySchoolSubject(subject) ? " · только обязательные" : ""}</option>`).join("");
       }
 
-      function copySchoolWeek() {
-        const week = schoolWorkspace.week;
-        const text = `ИнтернетУрок · Ева · 9 класс\nПервая четверть: ${schoolDateLabel(schoolWorkspace.accessStart)} — ${schoolDateLabel(schoolWorkspace.accessUntil)}\n${schoolWorkspace.periodGoal}\n${visibleSchoolTasks().map((task) => `${task.subject}: ${task.title}${task.dueDate ? ` — до ${schoolDateLabel(task.dueDate)}` : ""}`).join("\n") || "Задания ещё не добавлены."}`;
-        navigator.clipboard.writeText(text).then(() => showNotice("План недели скопирован.")).catch(() => showNotice("Не получилось скопировать автоматически."));
-      }
-
       function addSchoolTasksToPlan() {
         const eligible = visibleSchoolTasks().filter((task) => task.required && !task.done);
         if (!eligible.length) {
@@ -6874,7 +6772,6 @@
         showNotice(added ? `В план и задачи Евы добавлено: ${added}` : `Новых заданий нет${skipped ? ": все уже добавлены" : ""}.`);
       }
 
-      document.getElementById("schoolCopyWeek")?.addEventListener("click", copySchoolWeek);
       document.getElementById("schoolAddTasksToPlan")?.addEventListener("click", addSchoolTasksToPlan);
       document.getElementById("schoolTaskForm")?.addEventListener("submit", (event) => {
         event.preventDefault();
@@ -7200,24 +7097,6 @@
         renderMonthCalendar();
         updateSelectedDaySummary();
         logActivity(`В план добавлено: ${owner} · ${title}`);
-      });
-
-      document.getElementById("copyPrevDay").addEventListener("click", () => {
-        const source = ensurePlan(addDays(selectedDate, -1));
-        const target = ensurePlan(selectedDate);
-        target.items = [...source.items];
-        renderWeekPlan();
-        renderMonthCalendar();
-        logActivity("План дня скопирован с предыдущего дня");
-      });
-
-      document.getElementById("insertTemplate").addEventListener("click", () => {
-        const target = ensurePlan(selectedDate);
-        target.child = "Ева";
-        target.items = makeFamilyDayTemplate(selectedDate);
-        renderWeekPlan();
-        renderMonthCalendar();
-        logActivity("Вставлен семейный шаблон дня");
       });
 
       document.getElementById("generateDayTasks").addEventListener("click", () => {
@@ -7632,7 +7511,7 @@
         go("dashboard");
       });
 
-      document.getElementById("openNotifications").addEventListener("click", () => {
+      document.getElementById("openNotifications")?.addEventListener("click", () => {
         showNotice("Новых уведомлений нет. Они включатся для задач, отчётов и сообщений.");
       });
 
